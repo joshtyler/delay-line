@@ -8,7 +8,7 @@ parameter DEPTH = 10;
 localparam ADDR_WIDTH = $clog2(DEPTH); //ceiling applied to log2. Technically SystemVerilog...
 localparam CTR_WIDTH = $clog2(DEPTH+1); //The counter must be able to count from 0 to depth, not depth-1
 
-input clk, rst, wr_en, rd_en;
+input clk, wr_en, rd_en;
 input [WIDTH-1:0] data_in;
 
 output reg [WIDTH-1:0] data_out;
