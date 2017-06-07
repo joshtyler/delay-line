@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2017.01.27914 - Bui
 ProjectName=delay_line
 Vendor=SiliconBlue
 Synthesis=synplify
-ProjectVFiles=../../src/fifo.v
+ProjectVFiles=../../src/comparator.v=work,../../src/delay_line.v=work,../../src/edge_detect.v=work,../../src/fifo.v=work,../../src/pulse_gen.v=work
 ProjectCFiles=
 CurImplementation=delay_line_Implmnt
 Implementations=delay_line_Implmnt
@@ -19,9 +19,9 @@ DevicePower=
 NetlistFile=delay_line_Implmnt/delay_line.edf
 AdditionalEDIFFile=
 IPEDIFFile=
-DesignLib=
+DesignLib=delay_line_Implmnt/sbt/netlist/oadb-fifo
 DesignView=
-DesignCell=
+DesignCell=fifo
 SynthesisSDCFile=delay_line_Implmnt/delay_line.scf
 UserPinConstraintFile=
 UserSDCFile=
@@ -84,5 +84,5 @@ BitmapSetSecurity=no
 BitmapSetNoUsedIONoPullup=no
 FloorPlannerShowFanInNets=yes
 FloorPlannerShowFanOutNets=yes
-HookTo3rdPartyTextEditor=
+HookTo3rdPartyTextEditor=no
 
