@@ -28,6 +28,7 @@ begin
 	endcase;
 end
 
-assign out = (state == SM_ASSERT);
+assign req_data = (state == SM_REQUEST);
+assign trigger = (state == SM_ASSERT);
 
 endmodule

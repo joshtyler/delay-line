@@ -2,14 +2,22 @@
 
 module delay_line(clk_in, in, led0, led1, out);
 
-parameter CTR_WIDTH = 16; //Width of main counter
-parameter EDGE_DETECT_TIMEOUT = 20; //Timeout for edge detector, in clock periods
-parameter DELAY_RAW = 200; // Delay of delay line in clock periods.
-parameter FIFO_DEPTH = 1000; //Depth of main FIFO
-parameter PULSE_GEN_CLKS_PER_HALF_PERIOD = 2; //Number of pulses per half period of pulse generator
-parameter PULSE_GEN_PULSES = 3; //Number of pulses for pulse generator to produce
+parameter integer FIFO_DEPTH = 1000; //Depth of main FIFO (How many pulses can be stored)
+parameter integer MODULATION_FREQ = 16_500_000; //16.5MHz
+parameter integer CLK_FREQ = 165_000_000; //165Mhz - must be an even multiple of modulation freq
+parameter time EDGE_DETECT_TIMEOUT = 1.5us; //Timeout for edge detector
+parameter time DELAY_TIME = 1ms; // Delay of delay line
+parameter time PULSE_TIME = 1us; //Time of pulse (will be rounded to full cycles of modulation frequency)
 
-localparam DELAY = DELAY_RAW - 1 - 1 - 1; // We lose two clock cycles due to synchronisation flip flops, one in edge detector, and one in output stage
+localparam time CLK_PERIOD = 1.0s / CLK_FREQ;
+localparam time MODULATION_PERIOD = 1.0s / MODULATION_FREQ;
+localparam integer EDGE_DETECT_TIMEOUT_CYCLES = EDGE_DETECT_TIMEOUT/ CLK_PERIOD; //Timeout for edge detector, in clock periods
+localparam integer DELAY_CYCLES = DELAY_TIME / CLK_PERIOD; // Delay of delay line in clock periods.
+localparam integer PULSE_GEN_CLKS_PER_HALF_PERIOD = (MODULATION_PERIOD/CLK_PERIOD)/2; //Number of pulses per half period of pulse generator
+localparam integer PULSE_GEN_PULSES = PULSE_TIME / MODULATION_PERIOD; //Number of pulses for pulse generator to produce
+localparam integer CTR_WIDTH = $clog2(DELAY_CYCLES); //Counter must not overflow twice between delays, or we will miss the event
+
+localparam integer DELAY = DELAY_CYCLES - 1 - 1 - 1; // We lose two clock cycles due to synchronisation flip flops, one in edge detector, and one in output stage
 
 input clk_in, in;
 output led0, led1, out; //LED0 is heartbeat, // LED1 is FIFO full
@@ -35,7 +43,7 @@ assign fifo_data_in = ctr + DELAY; //Data in to FIFO
 
 //Edge detector
 wire fifo_wren; //FIFO write enable
-edge_detect #(EDGE_DETECT_TIMEOUT) edge0(clk, in, fifo_wren);
+edge_detect #(EDGE_DETECT_TIMEOUT_CYCLES) edge0(clk, in, fifo_wren);
 
 //FIFO
 wire fifo_empty, fifo_full, fifo_rden;
