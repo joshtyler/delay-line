@@ -4,7 +4,7 @@
 
 module test_delay_line;
 
-parameter integer CLK_FREQ = 165_000_000; //165Mhz
+parameter integer CLK_FREQ = 135_000_000; //135Mhz
 localparam time CLK_PERIOD = (1.0s / CLK_FREQ);
 parameter time PULSE_WIDTH = 1us;
 parameter time PULSE_GAP = 10us; // Not the same as the real system
