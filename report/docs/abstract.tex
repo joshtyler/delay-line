@@ -1,0 +1,24 @@
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+\begin{abstract}
+	
+
+	The aim of this project is to produce a real-time, head-mounted, optical eye tracking system. Such a system is a piece of hardware which can monitor eye movement and output the vector along which the wearer is looking, with predictable latency. It is possible to construct such a system thanks to the large amount of research existing within the field of eye tracking.
+	
+	The research consulted covers the topics of: eye behaviour, methodology to capture an eye image suitable for feature extraction, algorithmic methods to extract the pupil position from a suitable image, as well as safety considerations when using \glsentrylong{ir} lighting to illuminate an eye.
+	
+	This research allowed the overall eye-tracking methodology to be chosen, and also highlighted two pupil detection algorithms to develop further. In addition the safety considerations of using \glsentrylong{ir} light are now well understood.
+	
+	From the research outcomes, a specification for the system was able to be derived, and development work could begin. This development work has produced analysis of the expected resolution required to capture eye movement, and led to the selection of an image sensor and processing system. In addition, potential pupil detection algorithms were simulated at this point.
+	
+	Following this, the camera interface has been implemented using \glsentryshort{vhdl} code. Implementing the camera interface in \glsentryshort{vhdl} has allowed full resolution images to be captured using the selected image sensor, therefore enabling the pupil detection algorithms to be optimised and performance evaluated.  
+	
+	Subsequent to algorithm evaluation, the final algorithm has been selected, and its implementation has been fully planned. Development work implementing the algorithm has progressed to the point where real-time candidate point output is possible in hardware simulation, with only the \glsentryshort{ransac} engine remaining to be implemented. Despite this, a \glsentryshort{matlab} model has been created which provides an identical output to what the hardware would produce, allowing system testing and evaluation to take place.
+	
+	In addition to algorithmic and \glsentryshort{vhdl} implementation developments, a head mounted hardware platform has been produced by integration of both \glsentrylong{cots} and fully-custom, mechanical and electronic, components. The custom elements include \glsentryshortpl{pcb} created for interface between the camera module and \glsentryshort{fpga} development board.
+	
+	The results of system testing are that all the implemented features meet specification, and the project has therefore produced six of its seven deliverables. The seventh deliverable, the final system implementation, is partially complete. The development work performed by the project, including the implementation of a custom pupil-detection algorithm, will be of interest to future eye-tracking projects, and could allow cost effective real-time eye tracking systems to be built.
+	
+
+\end{abstract}

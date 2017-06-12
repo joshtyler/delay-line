@@ -1,0 +1,54 @@
+\input{docs/preamble}
+
+\newcommand{\thesisUniversity}{University of Southampton}
+\newcommand{\thesisFaculty}{Faculty of Physical Sciences and Engineering}
+\newcommand{\thesisSchool}{School of Electronics and Computer Science}
+\newcommand{\thesisTitle}{Mercury Delay Line Emulation:\\Reconstructing Memory for EDSAC}
+\newcommand{\thesisAuthor}{Joshua Tyler}
+\newcommand{\thesisYear}{2016}
+\newcommand{\thesisDate}{\today}
+\newcommand{\MScPathway}{Embedded Systems}
+\newcommand{\thesisSupervisor}{Dr Andrew Brown}
+
+\begin{document}
+
+% we use lowercase roman for non content pages
+\pagenumbering{roman}
+\hypersetup{pageanchor=false} %See http://tex.stackexchange.com/questions/18924/pdftex-warning-ext4-destination-with-the-same-identifier-nam-epage-1-has
+
+\input{docs/title_page}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Table Of Contents}
+\tableofcontents
+
+
+%List of acronyms
+\chapter*{Acronyms}
+\printnoidxglossary[type=acronym,title={List of Acronyms}]
+\clearpage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+\begingroup
+\let\clearpage\relax
+\vspace{50pt}
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+\endgroup
+\clearpage %Make sure that acronyms are grouped with the preamble, and fall under that page numbering scheme
+
+% now start counting pages normally
+\pagenumbering{arabic}
+\hypersetup{pageanchor=true}
+
+\input{docs/main}
+
+% Bibliography
+\clearpage
+\bibliographystyle{IEEEtranN}
+\bibliography{refs/references}
+
+% Appendices
+\input{docs/appendices}
+
+\end{document}

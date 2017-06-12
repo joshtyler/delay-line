@@ -1,0 +1,147 @@
+
+\documentclass[12pt, a4paper, notitlepage]{report}
+
+\usepackage{geometry}
+\geometry{a4paper, portrait, margin=1in}
+
+%Sort out generous chapter spacing
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{10pt}{\Huge} % Was:{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[runin]
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titleformat{\subparagraph}[runin]
+{\normalfont\normalsize\bfseries}{\thesubparagraph}{1em}{}
+
+\titlespacing*{\chapter} {0pt}{-20pt}{10pt} %Was: {0pt}{50pt}{40pt}
+\titlespacing*{\section} {0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+\titlespacing*{\subsection} {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\paragraph} {0pt}{3.25ex plus 1ex minus .2ex}{1em}
+\titlespacing*{\subparagraph} {\parindent}{3.25ex plus 1ex minus .2ex}{1em}
+%\titlespacing{command}{left spacing}{before spacing}{after spacing}[right]
+% spacing: how to read {12pt plus 4pt minus 2pt}
+%           12pt is what we would like the spacing to be
+%           plus 4pt means that TeX can stretch it by at most 4pt
+%           minus 2pt means that TeX can shrink it by at most 2pt
+%       This is one example of the concept of, 'glue', in TeX
+
+%Remove chapter space in list of figures and tables
+\usepackage{etoolbox}% http://ctan.org/pkg/etoolbox
+\makeatletter
+% \patchcmd{<cmd>}{<search>}{<replace>}{<succes>}{<failure>}
+\patchcmd{\@chapter}{\addtocontents{lof}{\protect\addvspace{10\p@}}}{}{}{}% LoF
+\patchcmd{\@chapter}{\addtocontents{lot}{\protect\addvspace{10\p@}}}{}{}{}% LoT
+\makeatother
+
+
+\def\singleQuotes#1{\lq{#1}\rq} %Macro to wrap something in single quotes
+
+\usepackage{etoolbox} %Let's let bibliography be ragged right to avoid typesetting problems
+\apptocmd{\thebibliography}{\raggedright}{}{}
+
+
+%Drawing
+\usepackage{tikz}
+
+% http://tex.stackexchange.com/questions/177164/tikz-externalization-and-directory-questions
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz/] 
+% Only externalise on-demand.
+\tikzexternaldisable
+
+\usepackage{tikz-3dplot}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+\usetikzlibrary{positioning}
+\usetikzlibrary{patterns}
+\usetikzlibrary{automata}
+
+
+%Acronyms!
+\usepackage[nonumberlist, acronyms, toc,]{glossaries}
+\makenoidxglossaries
+\setacronymstyle{long-short}
+\renewcommand{\glsgroupskip}{} %Don't put a small space between groups
+\input{docs/acronyms} %Import list of acronyms
+
+%Degree symbol
+\usepackage{textcomp} %Remove \gensymb warning
+\usepackage{gensymb}
+
+%Appendix Handling
+\usepackage[titletoc,title]{appendix}
+
+%Posh enumeration
+\usepackage{enumitem}
+\setlist[enumerate]{nosep} %No special separation for enumerated lists
+\setlist[itemize]{nosep}
+
+%Times for main font and math
+\usepackage{mathptmx}
+
+% AMS math packages:
+% Required for proper math display.
+\usepackage{amsmath,amsfonts,amsthm}
+
+% Graphicx
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+
+% Booktabs - better looking tables
+\usepackage{booktabs}
+
+% SI Units
+\usepackage{siunitx}
+\DeclareSIUnit \pixel{px}
+\DeclareSIUnit \bit{b}
+
+
+% Caption - better looking captions
+\usepackage{caption}
+
+% Hyperref:
+% This package makes all references within your document clickable. By default, these references will become boxed and colored. This is turned back to normal with the \hypersetup command below.
+\usepackage[pdfpagelabels]{hyperref} %pdfpagelabels allows page numbers such as i and ii in pdf reader
+	\hypersetup{colorlinks=false,pdfborder=0 0 0}
+
+	
+%Count pages
+\usepackage{lastpage}
+
+% headers
+\usepackage{fancyhdr}
+
+% we want fancy headers
+\pagestyle{fancy}
+% we want fancy headers even when LaTeX explicitely uses "plain" pagestyle
+\fancypagestyle{plain}{%
+	% reset headers and footers
+	\fancyhead{}
+	\fancyfoot{}
+	% top right corner of each page
+	\fancyhead[R]{\scriptsize \thesisAuthor, \thesisDate, MSc dissertation}
+	\fancyfoot[C]{\scriptsize - \thepage\ -}
+}
+
+%Stuff for reviewing, placeholders, etc.
+%Commmand to review
+\newcommand{\review}[1]
+{
+	{\color{red} \bfseries [#1]}
+}
+%Dummy figures
+\usepackage{tcolorbox}
+\newcommand{\dummyfigure}
+{
+	\begin{tcolorbox}[width=2.5in,height=1.5in,arc=0mm,auto outer arc, halign=center, valign=center]
+		Figure placeholder
+	\end{tcolorbox}
+}
+%Fake text
+\usepackage{lipsum}
