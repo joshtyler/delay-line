@@ -8,6 +8,8 @@
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{10pt}{\Huge} % Was:{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+% Make {\scshape\Huge} for ALL chapters to have small caps headings
+% Note this does not apply to ToC, but DOES apply to list of tables etc.
 \titleformat{\section}
 {\normalfont\Large\bfseries}{\thesection}{1em}{}
 \titleformat{\subsection}
@@ -31,6 +33,10 @@
 %           plus 4pt means that TeX can stretch it by at most 4pt
 %           minus 2pt means that TeX can shrink it by at most 2pt
 %       This is one example of the concept of, 'glue', in TeX
+
+%Command to apply to normal chapters to give them fancy small caps
+%There will be a clever automatic way to do this, but I don't have all day...
+\newcommand{\chapterStyle}[1]{\textsc{#1}}
 
 %Remove chapter space in list of figures and tables
 \usepackage{etoolbox}% http://ctan.org/pkg/etoolbox
