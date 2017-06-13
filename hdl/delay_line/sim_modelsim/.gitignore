@@ -8,3 +8,4 @@ msim_transcript
 log.txt
 wlft*
 *.vstf
+*.gtk

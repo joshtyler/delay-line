@@ -7,7 +7,7 @@ parameter integer MODULATION_FREQ = 13_500_000; //13.5MHz
 parameter integer CLK_FREQ = 135_000_000; //135Mhz - must be an even multiple of modulation freq
 parameter real EDGE_DETECT_TIMEOUT = 1.5e-6; //Timeout for edge detector
 parameter real DELAY_TIME = 1e-3; // Delay of delay line
-parameter real PULSE_TIME = 1e-6; //Time of pulse (will be rounded to full cycles of modulation frequency)
+parameter real PULSE_TIME = 0.9e-6; //Time of pulse (will be rounded to full cycles of modulation frequency)
 
 localparam real CLK_PERIOD = 1.0 / CLK_FREQ;
 localparam real MODULATION_PERIOD = 1.0 / MODULATION_FREQ;
