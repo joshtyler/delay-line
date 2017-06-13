@@ -15,7 +15,7 @@
 #
 #TOOL INPUT
 SRC = ../src/edge_detect.v
-TESTBENCH = test_edge_detect.v
+TESTBENCH = ../sim/test_edge_detect.v
 TBOUTPUT = test.lxt	#THIS NEEDS TO MATCH THE OUTPUT FILE
 			#FROM YOUR TESTBENCH
 ###############################################################################

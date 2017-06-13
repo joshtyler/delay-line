@@ -15,7 +15,7 @@
 #
 #TOOL INPUT
 SRC = ../src/edge_detect.v ../src/fifo.v ../src/comparator.v ../src/pulse_gen.v ../src/delay_line.v
-TESTBENCH = test_delay_line.v
+TESTBENCH = ../sim/test_delay_line.sv
 TBOUTPUT = test.lxt	#THIS NEEDS TO MATCH THE OUTPUT FILE
 			#FROM YOUR TESTBENCH
 ###############################################################################

@@ -15,7 +15,7 @@
 #
 #TOOL INPUT
 SRC = ../src/pulse_gen.v
-TESTBENCH = test_pulse_gen.v
+TESTBENCH = ../sim/test_pulse_gen.v
 TBOUTPUT = test.lxt	#THIS NEEDS TO MATCH THE OUTPUT FILE
 			#FROM YOUR TESTBENCH
 ###############################################################################

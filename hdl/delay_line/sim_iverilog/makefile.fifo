@@ -15,7 +15,7 @@
 #
 #TOOL INPUT
 SRC = ../src/fifo.v
-TESTBENCH = test_fifo.v
+TESTBENCH = ../sim/test_fifo.v
 TBOUTPUT = test.lxt	#THIS NEEDS TO MATCH THE OUTPUT FILE
 			#FROM YOUR TESTBENCH
 ###############################################################################
