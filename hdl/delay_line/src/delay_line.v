@@ -20,13 +20,11 @@ localparam integer CTR_WIDTH = $clog2(DELAY_CYCLES); //Counter must not overflow
 localparam integer DELAY = DELAY_CYCLES - 1 - 1 - 1; // We lose two clock cycles due to synchronisation flip flops, one in edge detector, and one in output stage
 
 input clk_in, in;
-output led0, led1, out; //LED0 is data in, // LED1 is FIFO full
+output led0, led1, out; //LED0 is PLL lock, // LED1 is FIFO full
 
-assign led0 = in;
-
-//Temporary, names are different to allow for addition of PLL
+//PLL
 wire clk;
-assign clk = clk_in;
+pll pll0(clk_in, clk, led0);
 
 //Synchronisation flip flops
 reg in_sync_intermediate, in_sync;

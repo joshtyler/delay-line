@@ -1,18 +1,19 @@
 #--  Synopsys, Inc.
 #--  Version L-2016.09L+ice40
-#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/delay_line/hdl/iCEcube/delay_line/delay_line_syn.prj
-#--  Written on Wed Jun  7 16:04:52 2017
+#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/delay_line/iCEcube/delay_line/delay_line_syn.prj
+#--  Written on Tue Jun 13 17:12:40 2017
 
 
 #project files
+add_file -verilog "../../src/comparator.v"
+add_file -verilog "../../src/delay_line.v"
+add_file -verilog "../../src/edge_detect.v"
+add_file -verilog "../../src/fifo.v"
+add_file -verilog "../../src/pulse_gen.v"
+add_file -verilog "../../src/pll.v"
 
 
 
-add_file -verilog -lib work "../../src/comparator.v" 
-add_file -verilog -lib work "../../src/delay_line.v" 
-add_file -verilog -lib work "../../src/edge_detect.v" 
-add_file -verilog -lib work "../../src/fifo.v" 
-add_file -verilog -lib work "../../src/pulse_gen.v" 
 #implementation: "delay_line_Implmnt"
 impl -add delay_line_Implmnt -type fpga
 
@@ -26,7 +27,7 @@ set_option -project_relative_includes 1
 set_option -technology SBTiCE40
 set_option -part iCE40HX1K
 set_option -package TQ144
-set_option -speed_grade 
+set_option -speed_grade ""
 set_option -part_companion ""
 
 #compilation/mapping options
@@ -39,7 +40,7 @@ set_option -frequency auto
 set_option -srs_instrumentation 1
 
 # mapper_options
-set_option -write_verilog 0
+set_option -write_verilog 1
 set_option -write_vhdl 0
 
 # Lattice iCE40
@@ -70,5 +71,4 @@ set_option -write_apr_constraint 1
 
 #set result format/file last
 project -result_file "delay_line_Implmnt/delay_line.edf"
-impl -active delay_line_Implmnt
-project -run synthesis -clean
+impl -active "delay_line_Implmnt"
