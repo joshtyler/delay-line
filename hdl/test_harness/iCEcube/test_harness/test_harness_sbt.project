@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2017.01.27914 - Bui
 ProjectName=test_harness
 Vendor=SiliconBlue
 Synthesis=synplify
-ProjectVFiles=../../src/test_harness.v=work,../../src/uart_tx.v=work,../../../common/src/power_on_reset.v
+ProjectVFiles=../../src/test_harness.v=work,../../src/uart_tx.v=work,../../../common/src/power_on_reset.v,../../src/uart_rx.v=work
 ProjectCFiles=
 CurImplementation=test_harness_Implmnt
 Implementations=test_harness_Implmnt

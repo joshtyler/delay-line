@@ -11,6 +11,7 @@
 add_file -verilog -lib work "../../src/test_harness.v" 
 add_file -verilog -lib work "../../src/uart_tx.v" 
 add_file -verilog -lib work "../../../common/src/power_on_reset.v" 
+add_file -verilog -lib work "../../src/uart_rx.v" 
 #implementation: "test_harness_Implmnt"
 impl -add test_harness_Implmnt -type fpga
 

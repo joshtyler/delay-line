@@ -84,6 +84,7 @@ localparam realtime SPACE_DELAY = 100us;
 integer i;
 initial
 begin
+	uart_tb_tx_fpga_rx = 1;
 	#SPACE_DELAY;
 	uart_transmit(0);
 	#SPACE_DELAY;

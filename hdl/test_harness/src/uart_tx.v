@@ -19,7 +19,7 @@ reg [DATA_BITS-1:0] data_reg;
 output ready;
 output reg out;
 
-enum {READY, SYNC, START, DATA, STOP} state;
+enum reg[2:0] {READY, SYNC, START, DATA, STOP} state;
 
 reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr;
 

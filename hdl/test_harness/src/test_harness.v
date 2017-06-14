@@ -2,7 +2,7 @@
 //Variable stop bits, no parity
 //Sample once in the middle of each bit
 
-`define TX_ONLY_TEST
+//`define TX_ONLY_TEST
 
 module test_harness(clk, uart_rx_pin, uart_tx_pin, led0, led1);
 
