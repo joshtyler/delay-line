@@ -1,0 +1,12 @@
+# iCEstick constraints
+
+# Red LEDs
+set_io led0 99
+set_io led1 98
+
+# UART
+set_io uart_tx_pin 8
+set_io uart_rx_pin 9
+
+# 12 MHz clock
+set_io clk_in 21

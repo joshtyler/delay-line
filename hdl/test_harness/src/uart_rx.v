@@ -18,7 +18,7 @@ output reg [DATA_BITS-1:0] data_out;
 
 enum {START, DATA, STOP} state = START;
 
-reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr = (DATA_BITS-1);
+reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr = (DATA_BITS-1); //Unfortunately next_bit_ctr needs initialisation because always @(*) does not run for initial conditions (unlike always_comb in SV)
 
 reg [SAMPLE_CTR_WIDTH-1:0] sample_ctr = 0;
 

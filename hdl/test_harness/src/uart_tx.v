@@ -16,9 +16,9 @@ input [DATA_BITS-1:0] data_in;
 reg [DATA_BITS-1:0] data_reg;
 
 output ready;
-output reg out;
+output reg out = 1; //Init to idle
 
-enum {READY, START, DATA, STOP} state = READY;
+enum {READY, SYNC, START, DATA, STOP} state = READY;
 
 reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr;
 
@@ -37,9 +37,10 @@ always @(posedge clk)
 begin
 	case(state)
 		READY : if(start) begin //Wait for data
-			state <= START;
+			state <= SYNC;
 			data_reg <= data_in;
 			end
+		SYNC : if(next_bit) state <= START; //Synchronise with baud rate pulses, to avoid a mis-shaped start pulse
 		START : if(next_bit) state <= DATA; //Output start bit
 		DATA : if((0 == bit_ctr) && next_bit) state <= STOP; //Output data bits
 		STOP : if((0 == bit_ctr) && next_bit) state <= READY; //Output stop bit(s)
@@ -65,9 +66,10 @@ end
 always @(*)
 begin
 	//Output
-	out = 0;
+	out = 1;
 	case(state)
 		READY: out = 1;
+		SYNC: out = 1;
 		START: out = 0;
 		DATA: out = data_reg[bit_ctr];
 		STOP: out = 1;
