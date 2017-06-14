@@ -30,9 +30,12 @@ always @(posedge clk)
 	else
 		sample_ctr <= sample_ctr + 1;
 
-wire next_bit;
-assign next_bit = (0 == sample_ctr);
 
+//State machine
+wire next_bit, data_bits_done, stop_bits_done;
+assign next_bit = (0 == sample_ctr);
+assign data_bits_done = ((DATA_BITS-1) == bit_ctr);
+assign stop_bits_done = ((STOP_BITS-1) == bit_ctr);
 always @(posedge clk)
 begin
 	case(state)
@@ -42,8 +45,8 @@ begin
 			end
 		SYNC : if(next_bit) state <= START; //Synchronise with baud rate pulses, to avoid a mis-shaped start pulse
 		START : if(next_bit) state <= DATA; //Output start bit
-		DATA : if((0 == bit_ctr) && next_bit) state <= STOP; //Output data bits
-		STOP : if((0 == bit_ctr) && next_bit) state <= READY; //Output stop bit(s)
+		DATA : if(data_bits_done && next_bit) state <= STOP; //Output data bits
+		STOP : if(stop_bits_done && next_bit) state <= READY; //Output stop bit(s)
 	endcase
 
 	if(next_bit) bit_ctr <= next_bit_ctr;
@@ -56,9 +59,9 @@ begin
 	//Counter
 	next_bit_ctr = 0;
 	case(state)
-		START : next_bit_ctr = (DATA_BITS-1);
-		DATA : if(0 == bit_ctr) next_bit_ctr = (STOP_BITS-1); else next_bit_ctr = bit_ctr-1;
-		STOP: next_bit_ctr = bit_ctr - 1;
+		START : next_bit_ctr = 0;
+		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr+1;
+		STOP: next_bit_ctr = bit_ctr + 1;
 	endcase
 
 end

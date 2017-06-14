@@ -2,6 +2,8 @@
 //Variable stop bits, no parity
 //Sample once in the middle of each bit
 
+`define TX_ONLY_TEST
+
 module test_harness(clk, uart_rx_pin, uart_tx_pin, led0, led1);
 
 input clk, uart_rx_pin;
@@ -15,7 +17,11 @@ parameter integer CLK_RATE = 12_000_000; //12MHz
 localparam integer CLKS_PER_BAUD = (CLK_RATE / BAUD);
 
 //Loopback test
+`ifdef TX_ONLY_TEST
+reg en;
+`else
 wire en;
+`endif
 wire [DATA_WIDTH-1:0] data;
 
 //Status LEDs. Assign inverse because line is normally high
@@ -36,6 +42,17 @@ uart_tx #(
 		.out(uart_tx_pin)
 	);
 
+`ifdef TX_ONLY_TEST
+assign data = 84; //'T'
+always @(posedge clk)
+begin
+	en <= 0;
+	if(ready)
+	begin
+		en<= 1;
+	end
+end
+`else
 uart_rx #(
 		.DATA_BITS(DATA_WIDTH),
 		.STOP_BITS(STOP_BITS),
@@ -46,5 +63,7 @@ uart_rx #(
 		.valid(en),
 		.data_out(data)
 	);
+`endif
+
 
 endmodule

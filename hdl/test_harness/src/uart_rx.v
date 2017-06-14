@@ -18,7 +18,7 @@ output reg [DATA_BITS-1:0] data_out;
 
 enum {START, DATA, STOP} state = START;
 
-reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr = (DATA_BITS-1); //Unfortunately next_bit_ctr needs initialisation because always @(*) does not run for initial conditions (unlike always_comb in SV)
+reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr = 0; //Unfortunately next_bit_ctr needs initialisation because always @(*) does not run for initial conditions (unlike always_comb in SV)
 
 reg [SAMPLE_CTR_WIDTH-1:0] sample_ctr = 0;
 
@@ -40,6 +40,10 @@ wire sample;
 assign sample = (sample_ctr == SAMPLE_COUNT); //True when we should sample each bit
 
 //State machine
+wire data_bits_done, stop_bits_done;
+assign data_bits_done = ((DATA_BITS-1) == bit_ctr);
+assign stop_bits_done = ((STOP_BITS-1) == bit_ctr);
+
 always @(posedge clk)
 begin
 	valid <= 0; //Will we overwritten in STOP state if required
@@ -49,7 +53,7 @@ begin
 		DATA : begin
 			if(sample)
 			begin
-				if((0 == bit_ctr))
+				if(data_bits_done)
 					state <= STOP;
 				data_out[bit_ctr] <= data_in;
 			end
@@ -57,10 +61,10 @@ begin
 		STOP : begin
 			if(sample)
 			begin
-				if((0 == data_in) || (0 == bit_ctr)) //Invalid stop bit, or we are done
+				if((0 == data_in) || stop_bits_done) //Invalid stop bit, or we are done
 					state <= START;
 
-				if((1 == data_in) && (0 == bit_ctr)) //Valid stop bit and we are done
+				if((1 == data_in) && stop_bits_done) //Valid stop bit and we are done
 					valid <= 1;
 			end
 		end
@@ -72,9 +76,9 @@ always @(*)
 begin
 	next_bit_ctr = 0;
 	case(state)
-		START : next_bit_ctr = (DATA_BITS-1);
-		DATA : if(0 == bit_ctr) next_bit_ctr = (STOP_BITS-1); else next_bit_ctr = bit_ctr -1;
-		STOP: next_bit_ctr = bit_ctr - 1;
+		START : next_bit_ctr = 0;
+		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr +1;
+		STOP: next_bit_ctr = bit_ctr + 1;
 	endcase
 end
 

@@ -9,7 +9,6 @@
 
 
 add_file -verilog -lib work "../../src/test_harness.v" 
-add_file -verilog -lib work "../../src/uart_rx.v" 
 add_file -verilog -lib work "../../src/uart_tx.v" 
 #implementation: "test_harness_Implmnt"
 impl -add test_harness_Implmnt -type fpga
