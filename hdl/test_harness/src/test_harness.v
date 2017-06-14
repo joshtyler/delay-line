@@ -16,6 +16,10 @@ parameter integer CLK_RATE = 12_000_000; //12MHz
 
 localparam integer CLKS_PER_BAUD = (CLK_RATE / BAUD);
 
+//Reset
+reg n_reset;
+power_on_reset por_gen (.*);
+
 //Loopback test
 `ifdef TX_ONLY_TEST
 reg en;
@@ -36,6 +40,7 @@ uart_tx #(
 		.CLKS_PER_BIT(CLKS_PER_BAUD)
 	) uart_tx_0 (
 		.clk(clk),
+		.n_reset(n_reset),
 		.ready(ready),
 		.start(en),
 		.data_in(data),
@@ -59,6 +64,7 @@ uart_rx #(
 		.CLKS_PER_BIT(CLKS_PER_BAUD)
 	) uart_rx_0 (
 		.clk(clk),
+		.n_reset(n_reset),
 		.data_in(uart_rx_pin),
 		.valid(en),
 		.data_out(data)

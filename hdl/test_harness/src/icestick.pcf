@@ -9,4 +9,4 @@ set_io uart_tx_pin 8
 set_io uart_rx_pin 9
 
 # 12 MHz clock
-set_io clk_in 21
+set_io clk 21
