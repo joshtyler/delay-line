@@ -1,40 +1,47 @@
 //Controller
+`include "uart_msg_consts.h"
+`include "test_harness_consts.h"
 
-module controller;
+module controller(clk, n_reset, run,
+                  uart_in_avail, uart_in_msg, uart_in_full, uart_in_req,
+                  uart_out_ready, uart_out_msg, uart_out_req,
+                  mem_received_num, mem_valid, mem_overrun, mem_ack, mem_replace_num, mem_replace_valid, mem_params,
+                  mod_params);
 
 //Clocking/reset inputs
 input clk, n_reset;
 
 //System status
-output run; //True when the system is running
+output reg run; //True when the system is running
 
 //UART message input
 input uart_in_avail; //Messge is waiting in the FIFO
 input `UART_MSG_SIZE uart_in_msg; //Message from input FIFO
 input uart_in_full; //Input FIFO is full
-output uart_in_req; //Request input message from FIFO
+output reg uart_in_req; //Request input message from FIFO
 
 //UART message output
 input uart_out_ready; //System is ready to process output message
 output `UART_MSG_SIZE uart_out_msg; //Message to client
-output uart_out_req; //Send message to client
+output reg uart_out_req; //Send message to client
 
 //Memory manager IO
-input `MEM_NUM_SIZE mem_received_num; //Received number message from memory manager
+input `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
 input mem_valid; //The current message is valid - reset when acked 
 input mem_overrun; //High if a second number is received before the first is acked
-output mem_ack; //The current message has been read
-output `MEM_NUM_SIZE mem_replace_num; //Number to replace a number in memory
-output mem_replace_valid; //True when memory replacement number is true
-output `MEM_PARAM_SIZE mem_params; //Memory manager parameters
+output reg mem_ack; //The current message has been read
+output `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; //Number to replace a number in memory
+output reg mem_replace_valid; //True when memory replacement number is true
+output reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; //Memory manager parameters
 
 //Modulator IO
-output `MOD_PARAM_SIZE mod_params
+output reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE mod_params;
 
 enum logic[1:0] {SM_POLL_MEM_MANAGER, SM_POLL_UART_IN, SM_POLL_UART_OUT, SM_HALT} state;
 
-uartMessageType uart_msg_out next_uart_msg_out;
-
+reg `UART_MSG_SIZE uart_msg_out, next_uart_msg_out;
+reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE next_mem_params;
+reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE next_mod_params;
 reg next_run;
 
 //Next state logic
@@ -45,9 +52,9 @@ begin
 		state <= SM_POLL_MEM_MANAGER;
 		run <= 0;
 		mod_params <= `DEFAULT_MOD_PARAMS;
-		mem_params <= `DEFUALT_MEM_PARAMS;
-	else begin
-		uart_msg_out <= next_uart_msg_out
+		mem_params <= `DEFAULT_MEM_PARAMS;
+	end else begin
+		uart_msg_out <= next_uart_msg_out;
 		run <= next_run;
 		mod_params <= next_mod_params;
 		mem_params <= next_mem_params;
@@ -74,6 +81,7 @@ begin
 				end
 		endcase
 	end
+end
 
 //State machine output logic
 always @(*)
@@ -91,42 +99,42 @@ begin
 		SM_POLL_MEM_MANAGER:
 		begin
 			if(mem_overrun)
-				next_uart_msg_out = `UART_ERROR_MEM_OVERRUN; //Throw error
+				next_uart_msg_out = `UART_HEADER_ERR_MEM_OVERRUN; //Throw error
 			else begin
 				if(mem_valid)
 				begin
 					mem_ack = 1;
-					next_uart_msg_out = { `UART_HEADER_REC_NUM , mem_received_num };
+					next_uart_msg_out = { `UART_HEADER_RECEIVED_NUM , mem_received_num };
 				end
 			end
 		end
 
 		SM_POLL_UART_IN:
 			if(uart_in_full)
-				next_uart_msg_out = `UART_ERROR_IN_FIFO_FULL; //Throw error
+				next_uart_msg_out = `UART_HEADER_ERR_FIFO_FULL; //Throw error
 			else begin
 				if(uart_in_avail)
 				begin
 					uart_in_req = 1;
 					next_uart_msg_out = {`UART_HEADER_ACK, uart_in_msg};
-					case(uart_in_msg[`UART_HEADER_BITS]) //Handle various input messages here
-						`UART_HEADER_REPLACE_NO :
+					case(uart_in_msg`UART_HEADER_BITS) //Handle various input messages here
+						`UART_HEADER_REPLACE_NUM :
 							mem_replace_valid = 1;
 						`UART_HEADER_MOD_PARAMS :
 							if(run)
-								next_uart_msg_out = `UART_ERROR_UPDATE_PARAMS_WHILST_RUNNING;
+								next_uart_msg_out = `UART_HEADER_ERR_UPDATE_WHILST_RUN;
 							else
-								next_mod_params = uart_in_msg[`UART_MOD_PARAMS_BITS];
+								next_mod_params = uart_in_msg`UART_MOD_PARAMS_TOTAL_PAYLOAD_BITS;
 						`UART_HEADER_MEM_PARAMS :
 							if(run)
-								next_uart_msg_out = `UART_ERROR_UPDATE_PARAMS_WHILST_RUNNING;
+								next_uart_msg_out = `UART_HEADER_ERR_UPDATE_WHILST_RUN;
 							else
-								next_mem_params = uart_in_msg[`UART_MEM_PARAMS_BITS];
+								next_mem_params = uart_in_msg`UART_MEM_PARAMS_TOTAL_PAYLOAD_BITS;
 
 						`UART_HEADER_SYS_STATUS :
-							next_run = uart_in_msg[`UART_MSG_RUN_BIT];
+							next_run = uart_in_msg`UART_SYS_STATUS_RUN_BITS;
 
-						default: next_uart_msg_out = `UART_ERROR_INVALID_MESSAGE;
+						default: next_uart_msg_out = `UART_HEADER_ERR_INVALID_MSG;
 					endcase
 				end
 			end

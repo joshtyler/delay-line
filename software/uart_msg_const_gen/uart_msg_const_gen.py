@@ -34,7 +34,8 @@ msg_types = [('received num', ('addr',edsac_addr_len), ('data',edsac_data_len)),
              ('sys status', ('run', 1)),  # Request to update system status
              ('mem params', ('no nums', edsac_addr_len), ('test mode',1)),  # Requst to update memory manager params
              ('err fifo full', ('payload', payload_len*word_len)),  # Error - input FIFO is full
-             ('err update run', ('payload', payload_len*word_len)),  # Error - attempted to update parameters whilst running
+             ('err mem overrun', ('payload', payload_len*word_len)),  # Error - missed a word that came in because dealing with UART request took too long
+             ('err update whilst run', ('payload', payload_len*word_len)),  # Error - attempted to update parameters whilst running
              ('err invalid msg', ('payload', payload_len*word_len)),  # Error - invalid message received
              ('ack', ('payload', payload_len*word_len)),  # Acknowledge receipt of message
 ]
@@ -69,6 +70,10 @@ def verilog_construct_bits(start, end):
 def verilog_define_string(const, val):
     return verilog_define_prefix + to_verilog_style(verilog_prefix+const) + ' ' + val + '\n'
 
+# Create a verilog style constant e.g. 8'd5
+def verilog_construct_constant(num, width):
+    return str(width) + '\'d' + str(num)
+
 # Create a statement for the bits size and width of a statement
 # Width = How many bits wide is the item
 # Size = Verilog size declaration of how bit the item is
@@ -85,18 +90,27 @@ def verilog_construct_width_size_bits(ident, width, start_bit, end_bit):
 # Write out all that is required for a particular message type
 def verilog_write_msg_type(file, msg_type, ident):
     #Comment
-    file.write('// '+ msg_type[0].capitalize() + '\n')
+    msg_type_str = msg_type[0]
+    file.write('// '+ msg_type_str.capitalize() + '\n')
 
     # Write definition of header
-    file.write(verilog_define_string(verilog_header_prefix + msg_type[0], str(ident)))
+    file.write(verilog_define_string(verilog_header_prefix + msg_type_str, verilog_construct_constant(ident,ident_len*word_len)))
 
     # Write out bit definitions for each item in bit field
     start_bit = payload_start_bit # The ident is the first field
+
+    total_payload_bits = 0
     for i in range(1, len(msg_type)):
         param = msg_type[i]
-        end_bit = start_bit + param[1] -1
-        file.write(verilog_construct_width_size_bits(param[0], param[1], start_bit, end_bit))
+        param_str = param[0]
+        param_width = param[1]
+        total_payload_bits = total_payload_bits + param[1]
+        end_bit = start_bit + param_width -1
+        file.write(verilog_construct_width_size_bits(msg_type_str + ' ' + param_str, param_width, start_bit, end_bit))
         start_bit = end_bit +1
+
+    # Print an item for the total payload
+    file.write(verilog_construct_width_size_bits(msg_type_str + ' total payload', total_payload_bits, payload_start_bit, payload_start_bit + total_payload_bits-1))
 
     file.write('\n')
 
