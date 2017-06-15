@@ -16,6 +16,10 @@ localparam realtime CLK_PERIOD = (1.0s / CLK_RATE);
 reg clk = 0;
 always #(CLK_PERIOD/2) clk = !clk;
 
+//Reset
+reg n_reset;
+power_on_reset reset0(.*);
+
 //DUTs
 reg transmit=0, bus;
 wire transmit_ready, output_valid;
@@ -25,8 +29,9 @@ uart_tx #(
 		.DATA_BITS(DATA_WIDTH),
 		.STOP_BITS(STOP_BITS),
 		.CLKS_PER_BIT(CLKS_PER_BAUD)
-	) uart_tx_0 ( //N.B. Ready isn't connected for this test.
+	) uart_tx_0 (
 		.clk(clk),
+		.n_reset(n_reset),
 		.start(transmit),
 		.data_in(data_in),
 		.ready(transmit_ready),
@@ -37,8 +42,9 @@ uart_rx #(
 		.DATA_BITS(DATA_WIDTH),
 		.STOP_BITS(STOP_BITS),
 		.CLKS_PER_BIT(CLKS_PER_BAUD)
-	) uart_rx_0 ( //N.B. Ready isn't connected for this test.
+	) uart_rx_0 (
 		.clk(clk),
+		.n_reset(n_reset),
 		.data_in(bus),
 		.valid(output_valid),
 		.data_out(data_out)
@@ -69,8 +75,7 @@ endtask
 integer i;
 initial
 begin
-	@(posedge clk);
-	#1;
+	#1us; //Reset etc.
 	singleTest('1);
 	singleTest('0);
 
