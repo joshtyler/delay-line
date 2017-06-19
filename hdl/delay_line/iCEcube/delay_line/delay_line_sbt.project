@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2017.01.27914 - Bui
 ProjectName=delay_line
 Vendor=SiliconBlue
 Synthesis=synplify
-ProjectVFiles=../../src/comparator.v=work,../../src/delay_line.v=work,../../src/edge_detect.v=work,../../src/fifo.v=work,../../src/pulse_gen.v=work,../../src/pll.v=work
+ProjectVFiles=../../src/comparator.v=work,../../src/delay_line.v=work,../../src/edge_detect.v=work,../../src/pulse_gen.v=work,../../src/pll.v=work,../../../common/src/fifo.v=work,../../../common/src/power_on_reset.v=work
 ProjectCFiles=
 CurImplementation=delay_line_Implmnt
 Implementations=delay_line_Implmnt
@@ -20,7 +20,7 @@ NetlistFile=delay_line_Implmnt/delay_line.edf
 AdditionalEDIFFile=
 IPEDIFFile=
 DesignLib=delay_line_Implmnt/sbt/netlist/oadb-delay_line
-DesignView=_rt
+DesignView=
 DesignCell=delay_line
 SynthesisSDCFile=delay_line_Implmnt/delay_line.scf
 UserPinConstraintFile=

@@ -4,26 +4,20 @@ module test_edge_detect;
 
 parameter CLK_PERIOD = 10;
 
-reg clk = 0, in;
+reg clk, n_reset, in;
 wire out;
 
-edge_detect dut(clk, in, out);
+clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
+power_on_reset por0(.*);
+edge_detect dut(.*);
 
-//Dump to waveform
-initial
-begin
-    $dumpfile("test.lxt");
-    $dumpvars(0,dut);
-end
-
-//Clock
-always #(CLK_PERIOD/2) clk = !clk;
 
 //Stimulus
 integer i;
 initial
 begin
 	in = 0;
+	#100ns; //Wait for reset
 	@(posedge clk);
 	for(i = 0; i < 50; i ++)
 	begin

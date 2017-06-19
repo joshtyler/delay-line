@@ -6,28 +6,16 @@ parameter WIDTH = 8;
 parameter DEPTH = 10;
 parameter CLK_PERIOD = 10;
 
-reg clk = 0, wr_en, rd_en;
-wire empty, full;
-reg [WIDTH-1:0] data_in;
-wire [WIDTH-1:0] data_out;
+logic clk, n_reset, wr_en, rd_en;
+logic empty, full;
+logic [WIDTH-1:0] data_in;
+logic [WIDTH-1:0] data_out;
 
-fifo #(WIDTH, DEPTH) dut(clk, data_in, wr_en, data_out, rd_en, empty, full);
+clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
 
-//fifo dut #(.WIDTH(WIDTH), .DEPTH(DEPTH)) (*.);
+fifo  #(.WIDTH(WIDTH), .DEPTH(DEPTH)) dut(.*);
 
-//Dump to waveform
-integer i;
-initial
- begin
-    $dumpfile("test.lxt");
-    $dumpvars(0,dut);
-	for(i=0; i< DEPTH; i++)
-		$dumpvars(1, dut.mem[i]);
- end
-
-//Clock
-always #(CLK_PERIOD/2) clk = !clk;
-
+power_on_reset reset0 (.*);
 
 //Stimulus
 initial
@@ -35,6 +23,7 @@ begin
 	wr_en = 0;
 	rd_en = 0;
 	data_in = 0;
+	#100ns; //Reset
 	@(posedge clk);
 
 	while(!full)

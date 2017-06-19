@@ -4,26 +4,19 @@ module test_pulse_gen;
 
 parameter CLK_PERIOD = 10;
 
-reg clk = 0, en;
-wire out;
+logic clk, n_reset, en;
+logic out;
 
-pulse_gen dut(clk, en, out);
-
-//Dump to waveform
-initial
-begin
-    $dumpfile("test.lxt");
-    $dumpvars(0,dut);
-end
-
-//Clock
-always #(CLK_PERIOD/2) clk = !clk;
+clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
+power_on_reset por0(.*);
+pulse_gen dut(.*);
 
 //Stimulus
 integer i,j;
 initial
 begin
 	en = 0;
+	#100ns;
 	@(posedge clk);
 	for(i = 0; i < 2; i ++)
 	begin

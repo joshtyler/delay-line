@@ -5,15 +5,16 @@
 
 
 #project files
-add_file -verilog "../../src/comparator.v"
-add_file -verilog "../../src/delay_line.v"
-add_file -verilog "../../src/edge_detect.v"
-add_file -verilog "../../src/fifo.v"
-add_file -verilog "../../src/pulse_gen.v"
-add_file -verilog "../../src/pll.v"
 
 
 
+add_file -verilog -lib work "../../src/comparator.v" 
+add_file -verilog -lib work "../../src/delay_line.v" 
+add_file -verilog -lib work "../../src/edge_detect.v" 
+add_file -verilog -lib work "../../src/pulse_gen.v" 
+add_file -verilog -lib work "../../src/pll.v" 
+add_file -verilog -lib work "../../../common/src/fifo.v" 
+add_file -verilog -lib work "../../../common/src/power_on_reset.v" 
 #implementation: "delay_line_Implmnt"
 impl -add delay_line_Implmnt -type fpga
 
@@ -27,7 +28,7 @@ set_option -project_relative_includes 1
 set_option -technology SBTiCE40
 set_option -part iCE40HX1K
 set_option -package TQ144
-set_option -speed_grade ""
+set_option -speed_grade 
 set_option -part_companion ""
 
 #compilation/mapping options
@@ -71,4 +72,5 @@ set_option -write_apr_constraint 1
 
 #set result format/file last
 project -result_file "delay_line_Implmnt/delay_line.edf"
-impl -active "delay_line_Implmnt"
+impl -active delay_line_Implmnt
+project -run synthesis -clean

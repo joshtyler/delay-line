@@ -17,27 +17,15 @@ localparam realtime CLK_PERIOD = (1.0s / CLK_FREQ);
 localparam realtime MOD_PERIOD = (1.0s / MOD_FREQ);
 localparam integer PULSES = $floor(PULSE_WIDTH / MOD_PERIOD);
 
-localparam realtime DELAY_TOLERANCE = 0.5*CLK_PERIOD; //Allow +/- this
+localparam realtime DELAY_TOLERANCE = CLK_PERIOD;
  
 
-wire clk_in;
-reg in = 0;
-wire led0, led1, out;
+logic clk, clk_in, in, led0, led1, out;
 
-delay_line dut(clk_in, in, led0, led1, out);
+clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
+delay_line dut(.*);
 
-reg clk =0;
 assign clk_in = clk;
-
-//Dump to waveform
-initial
-begin
-    $dumpfile("test.gtk");
-    $dumpvars(0,dut);
-end
-
-//Clock
-always #(CLK_PERIOD/2) clk = !clk;
 
 
 //Queue for verification of pulses
@@ -48,6 +36,7 @@ task simulate_pulse;
 input logic value;
 integer i;
 begin
+	#100ns;
 	in = 0;
 	for(i=0; i< PULSES; i++)
 	begin
@@ -98,6 +87,8 @@ end
 integer i;
 initial
 begin
+	in = 0;
+	#100ns;
 	simulate_number('1);
 	simulate_number(0);
 

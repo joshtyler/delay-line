@@ -1,21 +1,22 @@
-// Synchronous FIFO for ice40
-// No reset - we are committed to the data in the FIFO
+// Synchronous FIFO for iCE40
+// Would work for other FPGAs, as memory is inferred
+// Synchronous reset
 
-module fifo(clk, data_in, wr_en, data_out, rd_en, empty, full);
+module fifo(clk, n_reset, data_in, wr_en, data_out, rd_en, empty, full);
 
 parameter WIDTH = 8;
 parameter DEPTH = 10;
 localparam ADDR_WIDTH = $clog2(DEPTH); //ceiling applied to log2. Technically SystemVerilog...
 localparam CTR_WIDTH = $clog2(DEPTH+1); //The counter must be able to count from 0 to depth, not depth-1
 
-input clk, wr_en, rd_en;
+input clk, n_reset, wr_en, rd_en;
 input [WIDTH-1:0] data_in;
 
 output reg [WIDTH-1:0] data_out;
 output empty, full;
 
-reg [ADDR_WIDTH-1:0] rd_addr = 0, wr_addr = 0;
-reg [CTR_WIDTH-1:0] counter = 0; //Counter holds num. of elements in fifo
+reg [ADDR_WIDTH-1:0] rd_addr, wr_addr;
+reg [CTR_WIDTH-1:0] counter; //Counter holds num. of elements in fifo
 
 reg [WIDTH-1:0] mem [DEPTH-1:0];
 
@@ -40,7 +41,9 @@ end
 //Dont change if both at once
 always @(posedge clk)
 begin
-	if(rd_en_checked ^ wr_en_checked) // Don't change if we are both reading and writing
+	if(!n_reset)
+		counter <= 0;
+	else if(rd_en_checked ^ wr_en_checked) // Don't change if we are both reading and writing
 	begin
 		if(rd_en_checked) //If reading decrement
 			counter <= counter -1;
@@ -57,7 +60,9 @@ end
 //Read address
 always @(posedge clk)
 begin
-	if(rd_en_checked)
+	if(!n_reset)
+		rd_addr <= 0;
+	else if(rd_en_checked)
 	begin
 		if(rd_addr == DEPTH -1) // If we are at the highest address
 			rd_addr <= 0;
@@ -69,7 +74,9 @@ end
 //Write address
 always @(posedge clk)
 begin
-	if(wr_en_checked)
+	if(!n_reset)
+		wr_addr <= 0;
+	else if(wr_en_checked)
 	begin
 		if(wr_addr == DEPTH -1) // If we are at the highest address
 			wr_addr <= 0;
