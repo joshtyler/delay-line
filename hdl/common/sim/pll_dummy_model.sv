@@ -1,5 +1,4 @@
 //Dummy model of PLL. Always output 135MHz
-`timescale 1fs/1fs
 
 module SB_PLL40_CORE(
 	input RESETB,

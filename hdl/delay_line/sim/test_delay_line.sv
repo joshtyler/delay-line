@@ -1,6 +1,5 @@
 //Testbench for delay line (top level)
-
-`timescale 1fs/1fs
+//Run with 1fs time precision to avoid assert failures
 
 //`define DEBUG
 
