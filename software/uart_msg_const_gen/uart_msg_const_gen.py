@@ -30,9 +30,9 @@ payload_end_bit = msg_len*word_len -1
 # Each tuple contains the message type, then the remaining fields are message contents, and no. bits required
 msg_types = [('received num', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Number has been received by controller
              ('replace num', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Request to replace a number in memory
-             ('mod params',('cycles per pulse',5), ('pulse gap',8)),  # Request to update modulator parameters
+             ('mod params',('cycles per half period',6)),  # Request to update modulator parameters
              ('sys status', ('run', 1)),  # Request to update system status
-             ('mem params', ('no nums', edsac_addr_len), ('test mode',1)),  # Requst to update memory manager params
+             ('mem params', ('no nums', edsac_addr_len), ('test mode',1),('pulse width',10), ('pulse gap',10)),  # Requst to update memory manager params
              ('err fifo full', ('payload', payload_len*word_len)),  # Error - input FIFO is full
              ('err mem overrun', ('payload', payload_len*word_len)),  # Error - missed a word that came in because dealing with UART request took too long
              ('err update whilst run', ('payload', payload_len*word_len)),  # Error - attempted to update parameters whilst running
@@ -107,6 +107,7 @@ def verilog_write_msg_type(file, msg_type, ident):
         total_payload_bits = total_payload_bits + param[1]
         end_bit = start_bit + param_width -1
         file.write(verilog_construct_width_size_bits(msg_type_str + ' ' + param_str, param_width, start_bit, end_bit))
+        file.write(verilog_define_string(msg_type_str + ' ' + param_str + ' payload bits', verilog_construct_bits(start_bit-payload_start_bit, end_bit-payload_start_bit)))  # Bit define for inside payload
         start_bit = end_bit +1
 
     # Print an item for the total payload
