@@ -10,8 +10,8 @@ module msg_disasm(clk, n_reset,
                ready //Signal that module is ready to accept data
                );
 
-parameter integer WORD_SIZE;
-parameter integer WORDS_PER_PACKET;
+parameter integer WORD_SIZE = 8;
+parameter integer WORDS_PER_PACKET = 4;
 
 localparam integer CTR_WIDTH = $clog2(WORDS_PER_PACKET);
 localparam integer INPUT_WIDTH = WORD_SIZE * WORDS_PER_PACKET;

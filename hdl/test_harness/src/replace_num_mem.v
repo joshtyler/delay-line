@@ -2,7 +2,7 @@
 //Note that this block is not reset, so numbers will continue to be replaced after shutdown
 `include "uart_msg_consts.h"
 
-module replace_num_mem(clk, n_reset,
+module replace_num_mem(clk,
                        wr_packet,
                        rd_addr,
                        rd_en, wr_en,
@@ -11,7 +11,7 @@ module replace_num_mem(clk, n_reset,
                        );
 
 //Clocking/reset inputs
-input clk, n_reset; //n_reset is synchronous
+input clk;
 
 //Data input
 input `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE wr_packet; //Address and data to write
@@ -65,7 +65,7 @@ begin
 	end
 end
 
-reg [`UART_REPLACE_NUM_DATA_WIDTH:0] data_mem `UART_REPLACE_NUM_ADDR_SIZE; //Data memory - block RAM
+reg [`UART_REPLACE_NUM_DATA_WIDTH:0] data_mem [2**`UART_REPLACE_NUM_ADDR_WIDTH-1:0]; //Data memory - block RAM
 always @(posedge clk)
 begin
 	if(wr_en_mem)

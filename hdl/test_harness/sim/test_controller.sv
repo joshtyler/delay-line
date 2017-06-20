@@ -53,20 +53,21 @@ endtask
 task send_uart_msg;
 input `UART_HEADER_SIZE header;
 input `UART_PAYLOAD_SIZE payload;
+logic `UART_MSG_SIZE msg;
 begin
 	assert(uart_in_avail == 0);
 	assert(uart_in_req == 0);
 	uart_in_avail = 1;
-	uart_in_msg = {payload, header};
+	msg = {payload, header};
 	case(header)
 		`UART_HEADER_REPLACE_NUM:
 		begin
-			ackMsg(uart_in_msg);
+			ackMsg(msg);
 			mem_replace_queue.push_back(payload);
 		end
 		`UART_HEADER_SYS_STATUS:
 		begin
-			ackMsg(uart_in_msg);
+			ackMsg(msg);
 			assert(run_queue.size() ==0); //The following logic is invalid if we are outrunning the size of the queue
 			if(payload != run)
 			begin
@@ -77,31 +78,32 @@ begin
 		`UART_HEADER_MOD_PARAMS:
 		begin
 			if(run)
-				uart_out_queue.push_back( genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN) );
+				uart_out_queue.push_back( genAckErrMsg(msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN) );
 			else begin
 				assert(mod_params_queue.size() ==0); //The following logic is invalid if we are outrunning the size of the queue
 				if(payload != mod_params)
 					mod_params_queue.push_back(payload);
-				ackMsg(uart_in_msg);
+				ackMsg(msg);
 			end
 		end
 		`UART_HEADER_MEM_PARAMS:
 		begin
 			if(run)
-				uart_out_queue.push_back( genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN) );
+				uart_out_queue.push_back( genAckErrMsg(msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN) );
 			else begin
 				assert(mem_params_queue.size()==0); //The following logic is invalid if we are outrunning the size of the queue
 				if(payload != mem_params)
 					mem_params_queue.push_back(payload);
-				ackMsg(uart_in_msg);
+				ackMsg(msg);
 			end
 		end
 		default:
-			uart_out_queue.push_back( genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_INVALID_MSG) );
+			uart_out_queue.push_back( genAckErrMsg(msg, `UART_HEADER_ERR_INVALID_MSG) );
 	endcase
 	while(uart_in_req == 0) //Wait for the controler to request the message
 		@(posedge clk);
 	uart_in_avail = 0; //Withdraw message availibility
+	uart_in_msg = msg; //Put message on bus
 	@(posedge clk);
 	assert(uart_in_req == 0); //Ensure that the controller is no longer requesting a message
 end
@@ -197,7 +199,7 @@ logic  run_queue[$] = {};
 always @(run)
 begin
 	assert(run_queue.size() != 0); //Make sure we are expecting a change
-//	$display("Checking run = %d at %tps", run_queue[0], $realtime);
+	$display("Checking run = %d at %tps", run_queue[0], $realtime);
 	assert(run_queue[0] == run) //Make sure that the data is what we expect it to be
 		else begin $display("run error. Expected %d, Got %d", run_queue[0], run); $error; end
 	void'(run_queue.pop_front());
@@ -218,7 +220,7 @@ begin
 	if( run != 0)
 	begin
 		run_queue.push_back(0);
-//		$display("(Reset) Logging run = 0 at %tps", $realtime);
+		$display("(Reset) Logging run = 0 at %tps", $realtime);
 	end
 end
 endtask

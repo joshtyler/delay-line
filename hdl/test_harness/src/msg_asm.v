@@ -7,8 +7,8 @@ module msg_asm(clk, n_reset,
                data_out, data_out_valid //FIFO IO
                );
 
-parameter integer WORD_SIZE;
-parameter integer WORDS_PER_PACKET;
+parameter integer WORD_SIZE = 8;
+parameter integer WORDS_PER_PACKET = 4;
 
 localparam integer CTR_WIDTH = $clog2(WORDS_PER_PACKET);
 localparam integer OUTPUT_WIDTH = WORD_SIZE * WORDS_PER_PACKET;

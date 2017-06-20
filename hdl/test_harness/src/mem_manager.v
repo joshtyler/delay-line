@@ -89,12 +89,11 @@ always @(posedge clk)
 //Word counter
 wire word_transition; //High on the rising edge which transitions between words
 assign word_transition = output_clk_rising_edge && bit_ctr_reset;
-reg `UART_RECEIVED_NUM_ADDR_SIZE word_ctr, next_word_ctr; //next_word_ctr holds the value of the next word;
+reg `UART_RECEIVED_NUM_ADDR_SIZE word_ctr; //next_word_ctr holds the value of the next word;
 always @(posedge clk)
 	if(!run)
 	begin
 		word_ctr <= 0;
-		next_word_ctr <= 1;
 	end else begin
 		if(word_transition)
 		begin
@@ -102,11 +101,6 @@ always @(posedge clk)
 				word_ctr <= 0;
 			else
 				word_ctr <= word_ctr +1;
-
-			if(word_ctr == (no_nums-2))
-				next_word_ctr <= 0;
-			else
-				next_word_ctr <= next_word_ctr +1;
 		end
 	end
 
@@ -114,7 +108,7 @@ always @(posedge clk)
 reg `UART_REPLACE_NUM_DATA_SIZE  replace_num_data;
 reg replace_num_valid;
 wire read_replacement_num = (output_clk_falling_edge && bit_ctr_reset); //Load during last bit of output word
-replace_num_mem mem0 (.clk(clk), .n_reset(run),
+replace_num_mem mem0 (.clk(clk),
                       .wr_packet(mem_replace_num),
                       .rd_addr(word_ctr),
                       .rd_en(read_replacement_num), .wr_en(mem_replace_valid),
