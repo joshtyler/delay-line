@@ -16,6 +16,8 @@ FtdiWrapper::FtdiWrapper(int vidIn, int pidIn)
 		throw FtdiLibException("Failed to allocate/init FTDI context");
 	}
 
+	checkRet(ftdi_set_interface(context, INTERFACE_B)); //Always use interface B
+
 	//Try and find devices
 	refresh();
 }
