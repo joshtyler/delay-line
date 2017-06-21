@@ -3,9 +3,9 @@
 #	Josh Tyler June 2017
 #
 CC=g++
-CFLAGS=-c -Wall -I ftdi/
-LDFLAGS=
-SOURCES=ftdi/ftdi.cpp mem_gui.cpp
+CFLAGS=-c -Wall -I ftdi_wrapper/ -I /usr/include/libftdi1/
+LDFLAGS= -lftdi1
+SOURCES=ftdi_wrapper/ftdi_wrapper.cpp mem_gui.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=mem_gui
 
@@ -15,4 +15,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@ -lftdi
+	$(CC) $(CFLAGS) $< -o $@
+
+clean:
+	/bin/rm $(OBJECTS) $(EXECUTABLE)
