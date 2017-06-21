@@ -51,7 +51,7 @@ end
 
 always @(posedge receive_done)
 begin
-	$display("Received %d", received_num);
+	$display("Received %X at time %t", received_num, $realtime);
 end
 
 task uart_transmit;
@@ -110,6 +110,7 @@ begin
 	payload `UART_MEM_PARAMS_PULSE_GAP_PAYLOAD_BITS = 12; // 1us at 12MHz
 	uart_transmit_packet(`UART_HEADER_MEM_PARAMS,payload); //Setup memory manager
 	uart_transmit_packet(`UART_HEADER_SYS_STATUS,1); //Run
+	uart_transmit_packet(`UART_HEADER_REPLACE_NUM,0); //Replace the number at address 0 with 0
 	#END_DELAY;
 	$finish;
 end

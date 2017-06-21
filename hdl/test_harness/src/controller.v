@@ -4,8 +4,9 @@
 
 module controller(clk, n_reset, run,
                   uart_in_avail, uart_in_msg, uart_in_full, uart_in_req,
-                  uart_out_ready, uart_out_msg, uart_out_req,
-                  mem_received_num, mem_valid, mem_overrun, mem_ack, mem_replace_num, mem_replace_valid, mem_params,
+                  uart_out_full, uart_out_msg, uart_out_req,
+                  mem_received_num, mem_received_replaced, mem_received_valid, mem_received_overrun, mem_received_ack,
+                  mem_replace_num, mem_replace_valid, mem_params,
                   mod_params);
 
 //Clocking/reset inputs
@@ -21,15 +22,16 @@ input uart_in_full; //Input FIFO is full
 output reg uart_in_req; //Request input message from FIFO
 
 //UART message output
-input uart_out_ready; //System is ready to process output message
+input uart_out_full; //Output FIFO is full
 output reg `UART_MSG_SIZE uart_out_msg; //Message to client
 output reg uart_out_req; //Send message to client
 
 //Memory manager IO
-input `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
-input mem_valid; //The current message is valid - reset when acked 
-input mem_overrun; //High if a second number is received before the first is acked
-output reg mem_ack; //The current message has been read
+input `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
+input mem_received_replaced; //True if the number is a replacement rather than an errror
+input mem_received_valid; //The current message is valid - reset when acked 
+input mem_received_overrun; //High if a second number is received before the first is acked
+output reg mem_received_ack; //The current message has been read
 output `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; //Number to replace a number in memory
 output reg mem_replace_valid; //True when memory replacement number is true
 output reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; //Memory manager parameters
@@ -43,7 +45,7 @@ reg `UART_MSG_SIZE next_uart_out_msg;
 reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE next_mem_params;
 reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE next_mod_params;
 reg next_run;
-reg next_mem_ack; //This needs to be registered to avoid a logic loop
+reg next_mem_received_ack; //This needs to be registered to avoid a logic loop
 
 //Next state logic
 always @(posedge clk)
@@ -54,17 +56,17 @@ begin
 		run <= 0;
 		mod_params <= `DEFAULT_MOD_PARAMS;
 		mem_params <= `DEFAULT_MEM_PARAMS;
-		mem_ack <= 0;
+		mem_received_ack <= 0;
 		
 	end else begin
 		uart_out_msg <= next_uart_out_msg;
 		run <= next_run;
 		mod_params <= next_mod_params;
 		mem_params <= next_mem_params;
-		mem_ack <= next_mem_ack;
+		mem_received_ack <= next_mem_received_ack;
 		case(state)
 			SM_POLL_MEM_MANAGER:
-				if(mem_valid || mem_overrun)
+				if(mem_received_valid || mem_received_overrun)
 					state <= SM_POLL_UART_OUT; //Send message (or error) via UART
 				else
 					state <= SM_POLL_UART_IN; //No new number, check UART
@@ -81,7 +83,7 @@ begin
 				state <= SM_POLL_UART_OUT; //Send via UART
 
 			SM_POLL_UART_OUT:
-				if(uart_out_ready)
+				if(!uart_out_full)
 				begin
 					if(isFatalErrorMessage(uart_out_msg `UART_HEADER_BITS))
 						state <= SM_HALT; //Halt if error message
@@ -99,7 +101,7 @@ begin
 	uart_in_req = 0;
 	next_run = run;
 	next_uart_out_msg = uart_out_msg;
-	next_mem_ack = 0;
+	next_mem_received_ack = 0;
 	uart_out_req = 0;
 	mem_replace_valid = 0;
 	next_mod_params = mod_params;
@@ -108,13 +110,16 @@ begin
 	case(state)
 		SM_POLL_MEM_MANAGER:
 		begin
-			if(mem_overrun)
+			if(mem_received_overrun)
 				next_uart_out_msg = `UART_HEADER_ERR_MEM_OVERRUN; //Throw error
 			else begin
-				if(mem_valid)
+				if(mem_received_valid)
 				begin
-					next_mem_ack = 1;
-					next_uart_out_msg = { mem_received_num, `UART_HEADER_RECEIVED_NUM };
+					next_mem_received_ack = 1;
+					if(mem_received_replaced)
+						next_uart_out_msg = { mem_received_num, `UART_HEADER_REPLACE_NUM_DONE };
+					else
+						next_uart_out_msg = { mem_received_num, `UART_HEADER_RECEIVED_WRONG_NUM };
 				end
 			end
 		end
@@ -152,7 +157,7 @@ begin
 		end
 
 		SM_POLL_UART_OUT:
-		if(uart_out_ready)
+		if(!uart_out_full)
 				uart_out_req = 1;
 
 		SM_HALT:

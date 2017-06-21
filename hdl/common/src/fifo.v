@@ -18,13 +18,12 @@ output empty, full;
 reg [ADDR_WIDTH-1:0] rd_addr, wr_addr;
 reg [CTR_WIDTH-1:0] counter; //Counter holds num. of elements in fifo
 
-reg [WIDTH-1:0] mem [DEPTH-1:0];
-
 //Signals for when reading and writing is requested and allowed
 wire rd_en_checked, wr_en_checked;
 assign rd_en_checked = (rd_en && !empty); //Ignore read request if empty
 assign wr_en_checked = (wr_en && !full); //Ignore write request if empty
 
+reg [WIDTH-1:0] mem [DEPTH-1:0];
 //Should infer Block RAM
 always @(posedge clk)
 begin

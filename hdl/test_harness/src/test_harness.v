@@ -14,6 +14,7 @@ parameter integer UART_STOP_BITS = 1;
 parameter integer UART_BAUD = 9600;
 parameter integer CLK_RATE = 12_000_000; //12MHz
 parameter integer MSG_ASM_FIFO_DEPTH = 8; //8 Packets
+parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
 
 localparam integer UART_CLKS_PER_BAUD = (CLK_RATE / UART_BAUD);
 
@@ -96,9 +97,10 @@ fifo #(
 		.full(uart_in_full)
 	);
 
-//Message disassembler (takes input from controller and outputs to UART TX)
-reg `UART_MSG_SIZE disasm_data_in;
-reg disasm_ready, disasm_req;
+//Message disassembler (and FIFO)(takes input from controller and outputs to UART TX)
+reg `UART_MSG_SIZE uart_out_data, disasm_data_in;
+reg disasm_req;
+reg uart_out_full, disasm_fifo_empty, uart_out_req;
 msg_disasm #(
 		.WORD_SIZE(UART_DATA_WIDTH),
 		.WORDS_PER_PACKET(ASM_DISASM_WORDS_PER_PACKET)
@@ -106,18 +108,32 @@ msg_disasm #(
 		.clk(clk),
 		.n_reset(n_reset),
 		.data_in(disasm_data_in),
-		.data_in_valid(disasm_req),
+		.data_in_ready(!disasm_fifo_empty),
+		.data_in_req(disasm_req),
 		.uart_ready(uart_tx_ready),
 		.data_out(uart_tx_data),
-		.data_out_req(uart_tx_en),
-		.ready(disasm_ready)
+		.data_out_req(uart_tx_en)
+	);
+
+fifo #(
+		.WIDTH(`UART_MSG_WIDTH),
+		.DEPTH(MSG_DISASM_FIFO_DEPTH)
+	) msg_disasm_fifo (
+		.clk(clk),
+		.n_reset(n_reset),
+		.data_in(uart_out_data),
+		.wr_en(uart_out_req),
+		.data_out(disasm_data_in),
+		.rd_en(disasm_req),
+		.empty(disasm_fifo_empty),
+		.full(uart_out_full)
 	);
 
 //Controller
 reg run;
 
-reg `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
-reg mem_received_valid, mem_received_overrun, mem_received_ack, mem_replace_valid;
+reg `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
+reg mem_received_valid, mem_received_overrun, mem_received_ack, mem_replace_valid, mem_received_replaced;
 reg `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; 
 reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; 
 
@@ -134,14 +150,15 @@ controller controller_0
 	.uart_in_full(uart_in_full),
 	.uart_in_req(uart_in_req),
 
-	.uart_out_ready(disasm_ready),
-	.uart_out_msg(disasm_data_in),
-	.uart_out_req(disasm_req),
+	.uart_out_full(uart_out_full),
+	.uart_out_msg(uart_out_data),
+	.uart_out_req(uart_out_req),
 
 	.mem_received_num(mem_received_num),
-	.mem_valid(mem_received_valid),
-	.mem_overrun(mem_received_overrun),
-	.mem_ack(mem_received_ack),
+	.mem_received_replaced(mem_received_replaced),
+	.mem_received_valid(mem_received_valid),
+	.mem_received_overrun(mem_received_overrun),
+	.mem_received_ack(mem_received_ack),
 	.mem_replace_num(mem_replace_num),
 	.mem_replace_valid(mem_replace_valid),
 	.mem_params(mem_params),
@@ -158,9 +175,10 @@ mem_manager mem_manager_0
 	.run(run),
 
 	.mem_received_num(mem_received_num),
-	.mem_valid(mem_received_valid),
-	.mem_overrun(mem_received_overrun),
-	.mem_ack(mem_received_ack),
+	.mem_received_replaced(mem_received_replaced),
+	.mem_received_valid(mem_received_valid),
+	.mem_received_overrun(mem_received_overrun),
+	.mem_received_ack(mem_received_ack),
 
 	.mem_replace_num(mem_replace_num),
 	.mem_replace_valid(mem_replace_valid),

@@ -16,7 +16,7 @@ payload_len = 7  # Length of payload
 msg_len = ident_len + payload_len # Total message length
 
 # Bitfield sizes (bits)
-edsac_addr_len = 9  # 512 nums per coffin - 9 bits
+edsac_addr_len = 8  # 256 nums per coffin - 8 bits
 edsac_data_len = 36  # 35 for num plus blanking bit
 
 # Generic bit constants
@@ -28,8 +28,9 @@ payload_end_bit = msg_len*word_len -1
 # Message types
 # This is a list of tuples
 # Each tuple contains the message type, then the remaining fields are message contents, and no. bits required
-msg_types = [('received num', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Number has been received by controller
+msg_types = [('received wrong num', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Received a number different to what was expected
              ('replace num', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Request to replace a number in memory
+             ('replace num done', ('addr',edsac_addr_len), ('data',edsac_data_len)),  # Replacement of a number is complete. Data is old data.
              ('mod params',('cycles per half period',6)),  # Request to update modulator parameters
              ('sys status', ('run', 1)),  # Request to update system status
              ('mem params', ('no nums', edsac_addr_len), ('test mode',1),('pulse width',10), ('pulse gap',10)),  # Requst to update memory manager params

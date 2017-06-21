@@ -5,7 +5,7 @@
 module mem_manager(clk,
                   in,
                   run,
-                  mem_received_num, mem_valid, mem_overrun, mem_ack,
+                  mem_received_num, mem_received_replaced, mem_received_valid, mem_received_overrun, mem_received_ack,
                   mem_replace_num, mem_replace_valid,
                   mem_params,
                   out
@@ -17,10 +17,11 @@ input clk, run; //Run is effectively a reset for this module, it resets when run
 //Data input
 input in;
 
-output reg `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
-output reg mem_valid; //The current message is valid - reset when acked 
-output reg mem_overrun; //High if a second number is received before the first is acked
-input mem_ack; //The current message has been read
+output reg `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received incrorrect number message from memory manager
+output reg mem_received_replaced; //True if the received number was a replacement, false if it was an incorrect number
+output reg mem_received_valid; //The current message is valid - reset when acked 
+output reg mem_received_overrun; //High if a second number is received before the first is acked
+input mem_received_ack; //The current message has been read
 input `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; //Number to replace a number in memory
 input mem_replace_valid; //True when memory replacement number is true
 input `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; //Memory manager parameters
@@ -68,10 +69,10 @@ always @(posedge clk)
 
 
 //Bit counter
-localparam integer BIT_CTR_WIDTH = $clog2(`UART_RECEIVED_NUM_DATA_WIDTH); //Must be able to count up to the word width
+localparam integer BIT_CTR_WIDTH = $clog2(`UART_REPLACE_NUM_DATA_WIDTH); //Must be able to count up to the word width
 reg [BIT_CTR_WIDTH-1:0] bit_ctr;
 wire bit_ctr_reset;
-assign bit_ctr_reset = (bit_ctr == `UART_RECEIVED_NUM_DATA_WIDTH -1);
+assign bit_ctr_reset = (bit_ctr == `UART_REPLACE_NUM_DATA_WIDTH -1);
 always @(posedge clk)
 	if(!run)
 		bit_ctr <=0;
@@ -89,11 +90,12 @@ always @(posedge clk)
 //Word counter
 wire word_transition; //High on the rising edge which transitions between words
 assign word_transition = output_clk_rising_edge && bit_ctr_reset;
-reg `UART_RECEIVED_NUM_ADDR_SIZE word_ctr; //next_word_ctr holds the value of the next word;
+reg `UART_REPLACE_NUM_ADDR_SIZE word_ctr, next_word_ctr; //next_word_ctr holds the value of the next word;
 always @(posedge clk)
 	if(!run)
 	begin
 		word_ctr <= 0;
+		next_word_ctr <= 1;
 	end else begin
 		if(word_transition)
 		begin
@@ -101,6 +103,11 @@ always @(posedge clk)
 				word_ctr <= 0;
 			else
 				word_ctr <= word_ctr +1;
+
+			if(next_word_ctr >= (no_nums-1))
+				next_word_ctr <= 0;
+			else
+				next_word_ctr <= next_word_ctr + 1;
 		end
 	end
 
@@ -110,7 +117,7 @@ reg replace_num_valid;
 wire read_replacement_num = (output_clk_falling_edge && bit_ctr_reset); //Load during last bit of output word
 replace_num_mem mem0 (.clk(clk),
                       .wr_packet(mem_replace_num),
-                      .rd_addr(word_ctr),
+                      .rd_addr(next_word_ctr),
                       .rd_en(read_replacement_num), .wr_en(mem_replace_valid),
                       .data_out(replace_num_data),
                       .valid_out(replace_num_valid)
@@ -118,9 +125,9 @@ replace_num_mem mem0 (.clk(clk),
 
 //Shift registers
 wire replace_shift_out;
-wire `UART_RECEIVED_NUM_DATA_SIZE normal_shift_data_out;
+wire `UART_REPLACE_NUM_DATA_SIZE normal_shift_data_out;
 wire load_replacement_num = (output_clk_rising_edge && bit_ctr_reset); //Load on transition to next number
-shift_register #(.WIDTH(`UART_RECEIVED_NUM_DATA_WIDTH)) replace_shift
+shift_register #(.WIDTH(`UART_REPLACE_NUM_DATA_WIDTH)) replace_shift
 (
 	.clk(clk),
 	.n_reset(run),
@@ -132,7 +139,7 @@ shift_register #(.WIDTH(`UART_RECEIVED_NUM_DATA_WIDTH)) replace_shift
 	.out(replace_shift_out)
 );
 
-shift_register #(.WIDTH(`UART_RECEIVED_NUM_DATA_WIDTH)) normal_shift
+shift_register #(.WIDTH(`UART_REPLACE_NUM_DATA_WIDTH)) normal_shift
 (
 	.clk(clk),
 	.n_reset(run),
@@ -159,26 +166,28 @@ assign out = (mux_en? replace_shift_out : in) && output_clk; //AND with output c
 
 //Received number handler
 reg data_out_ready;
-assign mem_valid = data_out_ready && !mem_ack; //make sure we remove valid flag once the client has acked
+assign mem_received_valid = data_out_ready && !mem_received_ack; //make sure we remove valid flag once the client has acked
 always @(posedge clk)
 begin
 	if(!run)
 	begin
 		data_out_ready <= 0;
-		mem_overrun <= 0;
+		mem_received_overrun <= 0;
 	end else begin
 
-		if(mem_ack)
+		if(mem_received_ack)
 			data_out_ready <= 0;
 
-		if(load_replacement_num) // Transition to next number
+		// On last falling edge before transition to next number, and either number is wrong, or we replaced it
+		if(read_replacement_num && ( (normal_shift_data_out != replace_num_data)||replace_num_valid)) 
 		begin
-			mem_received_num `UART_RECEIVED_NUM_ADDR_PAYLOAD_BITS <= word_ctr;
-			mem_received_num `UART_RECEIVED_NUM_DATA_PAYLOAD_BITS <= normal_shift_data_out;
+			mem_received_num `UART_RECEIVED_WRONG_NUM_ADDR_PAYLOAD_BITS <= word_ctr;
+			mem_received_num `UART_RECEIVED_WRONG_NUM_DATA_PAYLOAD_BITS <= normal_shift_data_out;
+			mem_received_replaced <= replace_num_valid; //True if this was a number we just replaced
 			data_out_ready <= 1;
 
 			if(data_out_ready)
-				mem_overrun <= 1;
+				mem_received_overrun <= 1;
 		end
 	end
 end

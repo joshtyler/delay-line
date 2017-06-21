@@ -30,11 +30,11 @@ logic run;
 logic uart_in_avail = 0, uart_in_full = 0, uart_in_req;
 logic `UART_MSG_SIZE uart_in_msg;
 
-logic uart_out_ready = 0, uart_out_req;
+logic uart_out_full = 0, uart_out_req;
 logic `UART_MSG_SIZE uart_out_msg;
 
-logic mem_valid=0, mem_overrun = 0, mem_ack, mem_replace_valid;
-logic `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
+logic mem_received_valid=0, mem_received_overrun = 0, mem_received_replaced, mem_received_ack, mem_replace_valid;
+logic `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
 logic `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num;
 logic `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params;
 
@@ -109,25 +109,33 @@ begin
 end
 endtask;
 
-//Send a 'number received' message
+//Send a 'number wrong/replaced received' message
 task send_num_received;
-input `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE num;
+input logic `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE msg;
+input logic replaced;
 begin
-	assert(mem_valid == 0);
-	assert(mem_overrun == 0);
-	assert(mem_ack == 0);
-	mem_received_num = num;
-	mem_valid = 1;
+	assert(mem_received_valid == 0);
+	assert(mem_received_overrun == 0);
+	assert(mem_received_ack == 0);
+	mem_received_num = msg;
+	mem_received_replaced = replaced;
 
-	while(mem_ack ==0) //Wait for ack
+	@(posedge clk)
+		mem_received_valid = 1;
+
+	if(replaced)
+		uart_out_queue.push_back( genAckErrMsg(msg, `UART_HEADER_REPLACE_NUM_DONE));
+	else
+		uart_out_queue.push_back( genAckErrMsg(msg, `UART_HEADER_RECEIVED_WRONG_NUM));
+
+	while(mem_received_ack ==0) //Wait for ack
 		@(posedge clk);
 
-	mem_valid = 0;
+	mem_received_valid = 0;
 	
-	uart_out_queue.push_back( genAckErrMsg(num, `UART_HEADER_RECEIVED_NUM));
-	
+
 	@(posedge clk)
-		assert(mem_ack == 0); //Make sure controller withdraws ack
+		assert(mem_received_ack == 0); //Make sure controller withdraws ack
 end
 endtask;
 
@@ -143,7 +151,7 @@ end
 
 
 //Verify message overrun
-always @(posedge mem_overrun)
+always @(posedge mem_received_overrun)
 begin
 	uart_out_queue.push_back( genAckErrMsg('0, `UART_HEADER_ERR_MEM_OVERRUN) );
 	assert(run_queue.size() ==0); //The following logic is invalid if we are outrunning the size of the queue
@@ -175,7 +183,7 @@ begin
 	if(uart_out_req)
 	begin
 		assert(uart_out_queue.size() != 0); //Make sure we are expecting a change
-//		$display("UART received message: %d (queue length)", uart_out_queue[0], uart_out_queue.size());
+//		$display("UART received message: %X (queue length)", uart_out_msg, uart_out_queue.size());
 		assert(uart_out_queue[0] == uart_out_msg) //Make sure that the data is what we expect it to be
 			else begin $display("uart_out data error. Expected %X, Got %X", uart_out_queue[0], uart_out_msg); $error; end
 		void'(uart_out_queue.pop_front());
@@ -247,35 +255,48 @@ begin
 	mem_params_queue.push_back(`DEFAULT_MEM_PARAMS);
 	run_queue.push_back(0);
 
-	uart_out_ready = 1; //Always be ready (good advice for life)
+	uart_out_full = 0; //Always be ready (good advice for life)
 	#delay;
 	
 	for(i=0; i<2; i++)
 	begin
 		$display("Test 1 at time %tps", $realtime);
 		send_uart_msg(`UART_HEADER_REPLACE_NUM, {$urandom, $urandom});
+		#delay;
 		$display("Test 2 at time %tps", $realtime);
 		send_uart_msg(`UART_HEADER_REPLACE_NUM, {$urandom, $urandom});
+		#delay;
 		$display("Test 3 at time %tps", $realtime);
 		send_uart_msg(`UART_HEADER_MOD_PARAMS, {$urandom, $urandom});
+		#delay;
 		$display("Test 4 at time %tps", $realtime);
 		send_uart_msg(`UART_HEADER_MEM_PARAMS, {$urandom, $urandom});
+		#delay;
 		$display("Test 5 at time %tps", $realtime);
 		send_uart_msg(255, {$urandom, $urandom}); //Invalid message
+		#delay;
 		$display("Test 6 at time %tps", $realtime);
 		send_uart_msg(`UART_HEADER_SYS_STATUS, i); //Stop / start system
+		#delay;
 	end
 
-	$display("Test new number received at time %tps", $realtime);
-	send_num_received( {$urandom, $urandom} ); //New number request;
+	#delay;
+
+	$display("Test wrong number received at time %tps", $realtime);
+	send_num_received( {$urandom, $urandom}, 0);
+	#delay;
+
+	$display("Test replaced number received at time %tps", $realtime);
+	send_num_received( {$urandom, $urandom}, 1);
+	#delay;
 
 	$display("Test mem overrun at time %tps", $realtime);
 	//Test mem overrun
 	@(posedge clk)
-		mem_overrun = 1;
+		mem_received_overrun = 1;
 	#delay;
 	@(posedge clk)
-		mem_overrun = 0;
+		mem_received_overrun = 0;
 
 
 	$display("Reset system at time %tps", $realtime);

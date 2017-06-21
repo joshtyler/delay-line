@@ -18,8 +18,8 @@ input `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE wr_packet; //Address and data to writ
 input `UART_REPLACE_NUM_ADDR_SIZE rd_addr;
 input rd_en, wr_en; //Read and write enables
 
-output reg `UART_REPLACE_NUM_DATA_SIZE data_out;
-output reg valid_out; //Valid if the replacement data is valid
+output `UART_REPLACE_NUM_DATA_SIZE data_out;
+output valid_out; //Valid if the replacement data is valid
 
 
 //Decode wr_packet
@@ -39,7 +39,7 @@ reg clear; //Request to clear location
 reg `UART_REPLACE_NUM_ADDR_SIZE clear_addr;
 
 //This block handles clearing of a write request after reading
-//It asumes that there will be at least one clock cycle where we are not writing before the next number comes around
+//It asumes that there will be at least one clock cycle where we are not writing before the next read
 //This is a reasonable assumption!
 always @(posedge clk)
 begin
@@ -53,7 +53,7 @@ begin
 		clear <= 0;
 		wr_en_mem <= 1;
 		wr_addr_mem <= clear_addr;
-		wr_data_mem <= 0;
+		wr_data_mem <= {1'b0, data_out};
 	end
 
 	//Check if we have a new location to clear
@@ -65,16 +65,23 @@ begin
 	end
 end
 
-reg [`UART_REPLACE_NUM_DATA_WIDTH:0] data_mem [2**`UART_REPLACE_NUM_ADDR_WIDTH-1:0]; //Data memory - block RAM
-always @(posedge clk)
-begin
-	if(wr_en_mem)
-		data_mem[wr_addr_mem] <= wr_data_mem;
+reg [`UART_REPLACE_NUM_DATA_WIDTH:0] rd_data_mem;
+assign valid_out = rd_data_mem[`UART_REPLACE_NUM_DATA_WIDTH];
+assign data_out = rd_data_mem[`UART_REPLACE_NUM_DATA_WIDTH-1:0];
 
-	if(rd_en)
-		{valid_out, data_out} <= data_mem[rd_addr];
-		
-end
+dual_port_ram #(
+		.WIDTH(`UART_REPLACE_NUM_DATA_WIDTH +1),
+		.DEPTH(2**`UART_REPLACE_NUM_ADDR_WIDTH)
+	) ram0 (
+		.clk(clk),
+		.wr_addr(wr_addr_mem),
+		.wr_en(wr_en_mem),
+		.wr_data(wr_data_mem),
+		.rd_addr(rd_addr),
+		.rd_en(rd_en),
+		.rd_data(rd_data_mem)
+	);
+
 
 
 endmodule

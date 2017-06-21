@@ -14,10 +14,11 @@ always #(CLK_PERIOD/2) clk = !clk;
 
 logic run;
 
-logic `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
-logic mem_valid; //The current message is valid - reset when acked 
-logic mem_overrun; //High if a second number is received before the first is acked
-logic mem_ack; //The current message has been read
+logic `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num; //Received number message from memory manager
+logic mem_received_valid; //The current message is valid - reset when acked
+logic mem_received_replaced; //True if the received number is a replacement, rather than an error
+logic mem_received_overrun; //High if a second number is received before the first is acked
+logic mem_received_ack; //The current message has been read
 logic `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; //Number to replace a number in memory
 logic mem_replace_valid; //True when memory replacement number is true
 logic `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; //Memory manager parameters
@@ -81,9 +82,10 @@ begin
 end
 
 task decodeMessage;
-input `UART_RECEIVED_NUM_TOTAL_PAYLOAD_SIZE msg;
+input logic `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE msg;
+input logic replaced;
 begin
-	$display("Received %d at address %d, time %t", msg `UART_RECEIVED_NUM_DATA_PAYLOAD_BITS, msg `UART_RECEIVED_NUM_ADDR_PAYLOAD_BITS, $realtime);
+	$display("Received %d at address %d. Replacement: %d. Time %t", msg `UART_RECEIVED_WRONG_NUM_DATA_PAYLOAD_BITS, msg `UART_RECEIVED_WRONG_NUM_ADDR_PAYLOAD_BITS, replaced, $realtime);
 end
 endtask
 
@@ -91,19 +93,19 @@ endtask
 logic ack_messages = 1; //Decides whether to ack messages or not
 always @(posedge clk)
 begin
-	if(mem_valid)
+	if(mem_received_valid)
 	begin
-		mem_ack <= ack_messages;
-		decodeMessage(mem_received_num);
+		mem_received_ack <= ack_messages;
+		decodeMessage(mem_received_num, mem_received_replaced);
 	end else begin
-		mem_ack <= 0;
+		mem_received_ack <= 0;
 	end
 end
 
 //Check for overrun
 always @(posedge clk)
 begin
-	if(mem_overrun)
+	if(mem_received_overrun)
 		$display("Warning memory overrun");
 end
 
@@ -112,7 +114,7 @@ end
 //Delay is number of numbers * bits per number * bit period
 always @(out)
 begin
-	automatic realtime delay = (no_nums * `UART_RECEIVED_NUM_DATA_WIDTH *(pulse_width + pulse_gap) * CLK_PERIOD);
+	automatic realtime delay = (no_nums * `UART_RECEIVED_WRONG_NUM_DATA_WIDTH *(pulse_width + pulse_gap) * CLK_PERIOD);
 	in <= #delay out;
 end
 
@@ -138,7 +140,7 @@ begin
 		mem_replace_valid = 1;
 	@(posedge clk)
 		mem_replace_valid = 0;
-	$display("Sent update request for data %d, at address %d at time %t", addr, data, $realtime);
+	$display("Sent update request for data %d, at address %d at time %t", data, addr, $realtime);
 end
 endtask 
 
@@ -147,7 +149,7 @@ endtask
 initial
 begin
 	run =0;
-	mem_ack = 0;
+	mem_received_ack = 0;
 	mem_replace_valid = 0;
 	no_nums = 5;
 	test_mode = 0;
@@ -163,7 +165,13 @@ begin
 	sendUpdateRequest(2,3);
 	sendUpdateRequest(1,4);
 	#100us;
-
+	sendUpdateRequest(1,500);
+	#100us;
+	sendUpdateRequest(2,6000);
+	#100us;
+	sendUpdateRequest(3,01134);
+	sendUpdateRequest(4,`UART_REPLACE_NUM_DATA_WIDTH'd07432142771);
+	#100us;
 	$finish;
 end
 
