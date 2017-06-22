@@ -3,6 +3,7 @@
 #include <iostream>
 #include <typeinfo>
 #include "ftdi_wrapper.h"
+#include "uart_msg.hpp"
 
 using namespace std;
 
@@ -26,8 +27,9 @@ int main(int argc, char **argv)
 		cout << "Connected at baud " << serial.getBaud() << endl;
 		
 		//Data transfer
-		uint8_t start[10] = {4,1,0,0,0,0,0,0,0,0}; //Start request
-		serial.write_blocking(start, 10);
+		SysStatus start;
+		start.setRun(1);
+		serial.write_blocking(start.getData().data(), 8);
 
 		uint8_t received[10] = {0};
 		serial.read_blocking(received,10);
