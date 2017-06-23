@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <typeinfo>
-#include "ftdi_wrapper.h"
+#include "ftdi_wrapper.hpp"
 #include "uart_msg.hpp"
 
 using namespace std;

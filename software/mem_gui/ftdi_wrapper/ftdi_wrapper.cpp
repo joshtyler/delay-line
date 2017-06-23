@@ -7,7 +7,7 @@
 #include "ftdi_wrapper.h"
 
 FtdiWrapper::FtdiWrapper(int vidIn, int pidIn)
-:vid(vidIn), pid(pidIn), noDevs(0), state(false)
+:vid(vidIn), pid(pidIn), noDevs(0), state(false), readDoneFlag(true), writeDoneFlag(true)
 {
 	//Allocate and init FTDI context
 	context = ftdi_new();
@@ -110,5 +110,38 @@ void FtdiWrapper::checkRet(int ret)
 	}
 }
 
+void write_request(unsigned char *data, int size)
+{
+	if(!writeDoneFlag)
+	{
+		throw FtdiWrapperException("Attempt to write whilst active write request");
+	}
+	write_tc = ftdi_write_data_submit(context,data, size);
+}
+void read_request(unsigned char *data, int size)
+{
+	if(!readDoneFlag)
+	{
+		throw FtdiWrapperException("Attempt to read whilst active read request");
+	}
+	read_tc = ftdi_read_data_submit(context,data, size);
+}
 
+bool write_done(void)
+{
+	if(!writeDoneFlag)
+	{
+		writeDoneFlag = ftdi_transfer_data_done(write_tc);
+	}
+	return writeDoneFlag;
+}
+
+bool read_done(void)
+{
+	if(!readDoneFlag)
+	{
+		readDoneFlag = ftdi_transfer_data_done(read_tc);
+	}
+	return readDoneFlag;
+}
 

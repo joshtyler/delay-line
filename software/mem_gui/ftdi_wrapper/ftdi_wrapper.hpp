@@ -7,24 +7,20 @@
 #include "ftdi.h"
 
 //Exception classes
-class FtdiLibException
+class FtdiLibException : public std::runtime_error
 {
 	public:
-		FtdiLibException(std::string str) {throw std::runtime_error(explanation+str);};
+		FtdiLibException(std::string str) :std::runtime_error(explanation+str) {};
+		FtdiLibException(struct ftdi_context *context) :std::runtime_error(explanation+ftdi_get_error_string(context)) {};
 
-		FtdiLibException(struct ftdi_context *context)
-		{
-			std::string err = ftdi_get_error_string(context);
-			throw std::runtime_error(explanation+err);
-		};
 	private:
 		const std::string explanation = "FTDI library exception: ";
 };
 
-class FtdiWrapperException
+class FtdiWrapperException : public std::runtime_error
 {
 	public:
-		FtdiWrapperException(std::string str) {throw std::runtime_error(explanation+str);};
+		FtdiWrapperException(std::string str) :std::runtime_error(explanation+str) {};
 
 	private:
 		const std::string explanation = "FTDI wrapper exception: ";
@@ -40,12 +36,12 @@ class FtdiWrapper
 		void listDevs(void); //List available devices
 		void open(unsigned int idx, int baud); //Open the device of index chosen from listDevs()
 		int getBaud(void) {return context->baudrate;}; //Get the actual baud rate of the device
-		void write_blocking(const unsigned char *data, int size) {checkRet(ftdi_write_data(context, data, size));}; //Write data (blocking)
-		void read_blocking(unsigned char *data, int size) {checkRet(ftdi_read_data(context, data, size));}; //Read data (blocking)
-		void write_request(unsigned char *data, int size) { write_tc = ftdi_write_data_submit(context,data, size); };
-		void read_request(unsigned char *data, int size) { read_tc = ftdi_read_data_submit(context,data, size); };
-		bool write_done(void) { return ftdi_transfer_data_done(write_tc);};
-		bool read_done(void) { return ftdi_transfer_data_done(read_tc);};
+		void write_blocking(const unsigned char *data, int size) {checkRet(ftdi_write_data(context, data, size));}; //Perform blocking r/w
+		void read_blocking(unsigned char *data, int size) {checkRet(ftdi_read_data(context, data, size));};
+		void write_request(unsigned char *data, int size); //Request for non blocking r/w
+		void read_request(unsigned char *data, int size);
+		bool write_done(void); //Status of previously requested r/w
+		bool read_done(void);
 		void close(void);
 
 	private:
@@ -57,7 +53,9 @@ class FtdiWrapper
 		void refresh(void); //Refresh list of available devices
 
 		struct ftdi_transfer_control *read_tc, *write_tc; //Transfer control structures to monitor status of tx/rx requests
-		void checkState(bool stateIn); //Checks the device state is what is reqired, throws an exception if it is not
+		bool readDoneFlag, writeDoneFlag;
+
+		void checkState(bool stateIn); //Checks the device state is what is required, throws an exception if it is not
 		void checkRet(int ret); //Checks the return value of the FTDI library functions
 
 };
