@@ -1,5 +1,5 @@
 // UART Message Decoder and Encoder Classes 
-// Automatically generated  by uart_msg_const_gen.py at 09:06PM on June 23, 2017
+// Automatically generated  by uart_msg_const_gen.py at 06:22PM on June 26, 2017
 // DO NOT MODIFY MANUALLY
 
 #ifndef UART_MSG_HPP
@@ -35,10 +35,11 @@ class UartMessage
 		UartMessage(MessageType dataIn) :data(dataIn) {};
 		UartMessage() { data.fill(0);};
 		MessageType getData() const { return data;};
+		uint8_t * getDataRef() {return data.data();};
 		void setData(MessageType dataIn) {data = dataIn;};
 		messageHeaders getHeader(void) const {return (messageHeaders) data[0];};
 		void setHeader(messageHeaders header) {data[0] = (uint8_t) header;};
-		std::string getHeaderStr(void) {return headerStrings[getHeader()]; };
+		std::string getHeaderStr(void) const {return headerStrings[getHeader()]; };
 		UartMessage& operator=(const UartMessage& in) {data = in.data; return *this;};
 	protected:
 		MessageType data;
@@ -103,7 +104,7 @@ class ReceivedWrongNum : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm)
 {
-	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
+	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
 	return os;
 }
 
@@ -151,7 +152,7 @@ class ReplaceNum : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm)
 {
-	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
+	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
 	return os;
 }
 
@@ -199,7 +200,7 @@ class ReplaceNumDone : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm)
 {
-	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
+	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
 	return os;
 }
 
@@ -223,7 +224,7 @@ class ModParams : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ModParams& itm)
 {
-	os  << "cycles per half period: " << itm.getCyclesPerHalfPeriod();
+	os << itm.getHeaderStr() << ": " << std::hex  << "cycles per half period: " << itm.getCyclesPerHalfPeriod()<< std::endl;
 	return os;
 }
 
@@ -247,7 +248,7 @@ class SysStatus : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const SysStatus& itm)
 {
-	os  << "run: " << itm.getRun();
+	os << itm.getHeaderStr() << ": " << std::hex  << "run: " << itm.getRun()<< std::endl;
 	return os;
 }
 
@@ -312,7 +313,7 @@ class MemParams : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const MemParams& itm)
 {
-	os  << "no nums: " << itm.getNoNums() << "test mode: " << itm.getTestMode() << "pulse width: " << itm.getPulseWidth() << "pulse gap: " << itm.getPulseGap();
+	os << itm.getHeaderStr() << ": " << std::hex  << "no nums: " << itm.getNoNums() << "test mode: " << itm.getTestMode() << "pulse width: " << itm.getPulseWidth() << "pulse gap: " << itm.getPulseGap()<< std::endl;
 	return os;
 }
 
@@ -355,7 +356,7 @@ class ErrFifoFull : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm)
 {
-	os  << "payload: " << itm.getPayload();
+	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
 	return os;
 }
 
@@ -398,7 +399,7 @@ class ErrMemOverrun : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm)
 {
-	os  << "payload: " << itm.getPayload();
+	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
 	return os;
 }
 
@@ -441,7 +442,7 @@ class ErrUpdateWhilstRun : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm)
 {
-	os  << "payload: " << itm.getPayload();
+	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
 	return os;
 }
 
@@ -484,7 +485,7 @@ class ErrInvalidMsg : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm)
 {
-	os  << "payload: " << itm.getPayload();
+	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
 	return os;
 }
 
@@ -535,7 +536,7 @@ class Ack : public UartMessage
 };
 inline std::ostream& operator<<(std::ostream& os, const Ack& itm)
 {
-	os  << "payload: " << itm.getPayload();
+	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
 	return os;
 }
 

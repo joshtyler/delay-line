@@ -7,7 +7,7 @@
 #include "ftdi_wrapper.hpp"
 
 FtdiWrapper::FtdiWrapper(int vidIn, int pidIn)
-:vid(vidIn), pid(pidIn), noDevs(0), state(false), readDoneFlag(true), writeDoneFlag(true)
+:vid(vidIn), pid(pidIn), noDevs(0), state(false), readProgress(rwProgress::READ), writeProgress(rwProgress::WRITE)
 {
 	//Allocate and init FTDI context
 	context = ftdi_new();
@@ -30,7 +30,9 @@ FtdiWrapper::~FtdiWrapper()
 
 void FtdiWrapper::refresh(void)
 {
-	checkRet(ftdi_usb_find_all(context, &devList, vid, pid));
+	int ret = ftdi_usb_find_all(context, &devList, vid, pid);
+	checkRet(ret);
+	noDevs = ret;
 }
 
 void FtdiWrapper::listDevs(void)
@@ -110,40 +112,72 @@ void FtdiWrapper::checkRet(int ret)
 	}
 }
 
-void FtdiWrapper::writeRequest(unsigned char *data, int size)
+void FtdiWrapper::setupTransferReq(unsigned char *data, int size, FtdiWrapper::rwProgress &structure)
 {
-	if(writeDoneFlag == false) //If we are already writing
+	//If we are already reading/writing
+	if(!progressTransfer(structure))
 	{
-		throw FtdiWrapperException("Attempt to write whilst active write request");
+		throw FtdiWrapperException("Attempt to read/write whilst active write request");
 	}
-	write_tc = ftdi_write_data_submit(context,data, size);
-	writeDoneFlag = false;
-}
-void FtdiWrapper::readRequest(unsigned char *data, int size)
-{
-	if(readDoneFlag == false) //If we are already reading
-	{
-		throw FtdiWrapperException("Attempt to read whilst active read request");
-	}
-	read_tc = ftdi_read_data_submit(context,data, size);
-	readDoneFlag = false; //signal that we have logged a read
+
+	structure.data = data;
+	structure.size = size;
+	progressTransfer(structure);
 }
 
-bool FtdiWrapper::writeDone(void)
+bool FtdiWrapper::progressTransfer(FtdiWrapper::rwProgress &structure)
 {
-	if(!writeDoneFlag)
+	if(structure.size <0) //Invalid transfer size
 	{
-		writeDoneFlag = ftdi_transfer_data_done(write_tc);
+		FtdiWrapperException("Requested transfer of length <0");
 	}
-	return writeDoneFlag;
+
+	if(structure.size != 0) //There is work left to do
+	{
+		int noBytes;
+		if(structure.mode == rwProgress::READ)
+		{
+			noBytes = ftdi_read_data(context, structure.data, structure.size);
+		} else {
+			noBytes = ftdi_write_data(context, structure.data, structure.size);
+		}
+		checkRet(noBytes); //Check for error
+		if(noBytes <= structure.size)
+		{
+			structure.size -= noBytes; //Decrement the number of bytes left
+			structure.data += noBytes; //Move the transfer pointer
+
+		} else {
+			throw FtdiWrapperException("Driver transferred more bytes than requested!");
+		}
+	}
+	return (structure.size == 0); //We are done if there is nothing left to transfer
 }
 
-bool FtdiWrapper::readDone(void)
+void FtdiWrapper::writeBlocking(unsigned char *data, int size)
 {
-	if(!readDoneFlag)
+	struct ftdi_transfer_control *tc;
+	tc = ftdi_write_data_submit(context,data, size);
+	int ret;
+	ret = ftdi_transfer_data_done(tc); // This will block until complete
+	checkRet(ret); //Check that we didn't error
+	if(ret != size)
 	{
-		readDoneFlag = ftdi_transfer_data_done(read_tc);
+		throw FtdiWrapperException("Incorrect number of bytes written.");
 	}
-	return readDoneFlag;
 }
+
+void FtdiWrapper::readBlocking(unsigned char *data, int size)
+{
+	struct ftdi_transfer_control *tc;
+	tc = ftdi_read_data_submit(context, data, size);
+	int ret;
+	ret = ftdi_transfer_data_done(tc); // This will block until complete
+	checkRet(ret); //Check that we didn't error
+	if(ret != size)
+	{
+		throw FtdiWrapperException("Incorrect number of bytes read.");
+	}
+}
+
 

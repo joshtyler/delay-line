@@ -17,13 +17,11 @@ class UartManagerException : public GenericException
 		UartManagerException(std::string str) :GenericException("UART Manager exception: ",str) {};
 };
 
-class FpgaMessageError : public std::runtime_error
+class FpgaMessageError : public GenericException
 {
-public:
-    FpgaMessageError(std::string str) :std::runtime_error(explanation+str) {};
+	public:
+		FpgaMessageError(std::string str) :GenericException("FPGA reported error : ",str) {};
 
-private:
-    const std::string explanation = "FPGA reported error : ";
 };
 
 //Main class

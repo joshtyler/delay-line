@@ -53,6 +53,11 @@ int main(int argc, char **argv)
 		//Setup status manager
 		StatusManager statusManager;
 
+		//Send some initial parameters
+		StatusManager::sysStatus initialSysStatus;
+		initialSysStatus.run = 0;
+		statusManager.setSysStatus(initialSysStatus);
+
 		StatusManager::memParams initialMemParams;
 		initialMemParams.testMode = 0;
 		initialMemParams.noNums = memSize;
@@ -64,7 +69,6 @@ int main(int argc, char **argv)
 		initialModParams.cyclesPerHalfPeriod = 5;
 		statusManager.setModParams(initialModParams);
 
-		StatusManager::sysStatus initialSysStatus;
 		initialSysStatus.run = 1;
 		statusManager.setSysStatus(initialSysStatus);
 

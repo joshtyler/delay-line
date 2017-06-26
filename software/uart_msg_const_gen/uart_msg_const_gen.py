@@ -281,10 +281,11 @@ cpp_file.write('\n//Base Class\n')
 public = [name +'(' + cpp_msg_var_fmtd + ' dataIn) :data(dataIn) {};',
           name +'() { data.fill(0);};',
           cpp_msg_var_fmtd + ' getData() const { return data;};',
+          'uint8_t * getDataRef() {return data.data();};',
           'void setData(' + cpp_msg_var_fmtd + ' dataIn) {data = dataIn;};',
           cpp_enum_name_fmtd+' getHeader(void) const {return ('+cpp_enum_name_fmtd+') data[0];};',
           'void setHeader('+cpp_enum_name_fmtd+' header) {data[0] = (uint8_t) header;};',
-          'std::string getHeaderStr(void) {return '+to_cpp_style(cpp_string_lookup_name)+'[getHeader()]; };',
+          'std::string getHeaderStr(void) const {return '+to_cpp_style(cpp_string_lookup_name)+'[getHeader()]; };',
           cpp_base_class_fmtd + '& operator=(const '+cpp_base_class_fmtd+'& in) {data = in.data; return *this;};',
           ]
 
@@ -348,11 +349,11 @@ for msg_type in msg_types:
 
     printer_extra = ('inline std::ostream& operator<<(std::ostream& os, const '+name+'& itm)\n' #Operator itself, inline is a dirty trick to allow multiple definition
                      '{\n'
-                     '\tos '
+                     '\tos << itm.getHeaderStr() << ": " << std::hex '
                      )
     for param in msg_type[1:]:
         printer_extra += ' << "'+param[0]+': " << itm.get'+to_cpp_class_style(param[0])+'()'
-    printer_extra += ';\n\treturn os;\n}'
+    printer_extra += '<< std::endl;\n\treturn os;\n}'
 
     cpp_file.write(cpp_create_class(name + ' : public '+cpp_base_class_fmtd, public,(),[printer_extra,]))
     msg_ident = msg_ident + 1

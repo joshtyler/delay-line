@@ -48,7 +48,7 @@ void UartManager::update(void)
 	//Setup a new read if the resource is available
 	if(!readLogged)
 	{
-		uart.readRequest(currentRead.getData().data(),UartMsgLen);
+		uart.readRequest(currentRead.getDataRef(),UartMsgLen);
         readLogged = true;
 	}
 
@@ -57,7 +57,6 @@ void UartManager::update(void)
 	{
 		if(uart.writeDone())
 		{
-			ackQueue.push({currentWrite, (clock() + timeout)}); //We expect the packet to be ACKed. Log this in the ACK queue
 			writeLogged = false;
 		}
 	}
@@ -67,7 +66,9 @@ void UartManager::update(void)
     {
         currentWrite = sendQueue.front();
         sendQueue.pop();
-        uart.writeRequest(currentWrite.getData().data(),UartMsgLen);
+        uart.writeRequest(currentWrite.getDataRef(),UartMsgLen);
+        ackQueue.push({currentWrite, (clock() + timeout)}); //We expect the packet to be ACKed. Log this in the ACK queue
+        writeLogged = true;
     }
 }
 
@@ -108,7 +109,7 @@ void UartManager::processReceivedMessage(UartMessage msg)
                     ackQueue.pop();
 
                     //Handle case of expired packet
-                    if(ackPacket.latestTime > clock())
+                    if(clock() > ackPacket.latestTime)
                     {
                         throw UartManagerException("FGPA took too long to ACK");
                     }
