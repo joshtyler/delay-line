@@ -77,7 +77,8 @@ cpp_header = ('// UART Message Decoder and Encoder Classes \n'
               '// DO NOT MODIFY MANUALLY\n\n'
               '#ifndef ' + cpp_guard_name + '\n'
               '#define ' + cpp_guard_name + '\n\n'
-              '#include <array>\n\n'
+              '#include <array>\n'
+              '#include <iostream>\n\n'
 )
 cpp_footer = '\n#endif\n'
 cpp_ret_type = 'param type' # A typedef'd type used to store any of the paramters
@@ -281,9 +282,10 @@ public = [name +'(' + cpp_msg_var_fmtd + ' dataIn) :data(dataIn) {};',
           name +'() { data.fill(0);};',
           cpp_msg_var_fmtd + ' getData() const { return data;};',
           'void setData(' + cpp_msg_var_fmtd + ' dataIn) {data = dataIn;};',
-          cpp_enum_name_fmtd+' getHeader(void) {return ('+cpp_enum_name_fmtd+') data[0];};',
+          cpp_enum_name_fmtd+' getHeader(void) const {return ('+cpp_enum_name_fmtd+') data[0];};',
           'void setHeader('+cpp_enum_name_fmtd+' header) {data[0] = (uint8_t) header;};',
-          'std::string getHeaderStr(void) {return '+to_cpp_style(cpp_string_lookup_name)+'[getHeader()]; };'
+          'std::string getHeaderStr(void) {return '+to_cpp_style(cpp_string_lookup_name)+'[getHeader()]; };',
+          cpp_base_class_fmtd + '& operator=(const '+cpp_base_class_fmtd+'& in) {data = in.data; return *this;};',
           ]
 
 type_enum = 'enum '+cpp_enum_name_fmtd+'\n{\n'
@@ -294,6 +296,17 @@ for param in msg_types:
 type_enum = type_enum[0:-2]  #Get rid of comma
 type_enum += '\n};'
 public.insert(0,type_enum)
+
+#Upgrade type function
+#upgrade = 'auto upgradeType(void) const\n'
+#upgrade += '{\n\tauto recd;\n\tswitch(in.getHeader())\n\t{'
+#for param in msg_types:
+#    upgrade += '\t case '+to_guard(param[0])+':\n'
+#    upgrade += '\t\trecd = '+to_cpp_class_style(param[0])+'(*this);\n'
+#    upgrade += '\t\tbreak;\n'
+#upgrade += '\t}\n\treturn recd;\n}\n'
+#public.append(upgrade)
+
 
 protected = [cpp_msg_var_fmtd + ' data;',]
 type_strings = 'const std::string '+ to_cpp_style(cpp_string_lookup_name)+'['+str(len(msg_types))+']=\n{\n'
@@ -310,17 +323,30 @@ for msg_type in msg_types:
     # Create class
     start_bit = payload_start_bit
     name = to_cpp_class_style(msg_type[0])
-    public = [name+'() :'+cpp_base_class_fmtd+'() {data[0] = (uint8_t) '+to_guard(msg_type[0])+';};']
+    public = [name+'() :'+cpp_base_class_fmtd+'() {data[0] = (uint8_t) '+to_guard(msg_type[0])+';};',
+              name + '(const '+cpp_base_class_fmtd+'& in) {data = in.getData();};',
+              ]
     for param in msg_type[1:]:
         end_bit = start_bit + param[1] -1
         public.extend(cpp_gen_getter_setter_printer(param[0], start_bit, end_bit))
         start_bit = end_bit +1;
 
+    #Special function for ACK
+    if msg_type[0] == 'ack':
+        public.append(cpp_base_class_fmtd+' getUnderlyingMsg(void) const\n'
+                                          '{\n'
+                                           '\t'+cpp_msg_var_fmtd+' data = getData();\n'
+                                          '\tfor(unsigned int i=0; i<(data.size()-1);i++)\n'
+                                          '\t\tdata[i] = data[i+1];\n'
+                                          '\tdata[data.size()-1]=0;\n'
+                                          '\treturn '+cpp_base_class_fmtd+'(data);\n'
+                                          '};')
+
     #Pretty printer
     printer_class = 'friend std::ostream& operator<<(std::ostream& os, const '+name+'& itm);' #Friend entry to go inside class
     public.append(printer_class)
 
-    printer_extra = ('std::ostream& operator<<(std::ostream& os, const '+name+'& itm)\n' #Operator itself
+    printer_extra = ('inline std::ostream& operator<<(std::ostream& os, const '+name+'& itm)\n' #Operator itself, inline is a dirty trick to allow multiple definition
                      '{\n'
                      '\tos '
                      )

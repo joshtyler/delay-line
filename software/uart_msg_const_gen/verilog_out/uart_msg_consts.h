@@ -1,5 +1,5 @@
 // UART Message Constants 
-// Automatically generated  by uart_msg_const_gen.py at 08:04PM on June 22, 2017
+// Automatically generated  by uart_msg_const_gen.py at 09:06PM on June 23, 2017
 // DO NOT MODIFY MANUALLY
 
 `ifndef UART_MSG_CONSTS_H

@@ -8,5 +8,9 @@ set_io led1 98
 set_io uart_tx_pin 8
 set_io uart_rx_pin 9
 
+# PMOD
+set_io uart_tx_pmod 78 #Pin1
+set_io uart_rx_pmod 79 #Pin2
+
 # 12 MHz clock
 set_io clk 21

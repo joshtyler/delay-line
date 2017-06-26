@@ -1,11 +1,12 @@
 // UART Message Decoder and Encoder Classes 
-// Automatically generated  by uart_msg_const_gen.py at 08:04PM on June 22, 2017
+// Automatically generated  by uart_msg_const_gen.py at 09:06PM on June 23, 2017
 // DO NOT MODIFY MANUALLY
 
 #ifndef UART_MSG_HPP
 #define UART_MSG_HPP
 
 #include <array>
+#include <iostream>
 
 // Generic constants
 const int UartMsgLen = 8; //Length of UART message in bytes
@@ -35,9 +36,10 @@ class UartMessage
 		UartMessage() { data.fill(0);};
 		MessageType getData() const { return data;};
 		void setData(MessageType dataIn) {data = dataIn;};
-		messageHeaders getHeader(void) {return (messageHeaders) data[0];};
+		messageHeaders getHeader(void) const {return (messageHeaders) data[0];};
 		void setHeader(messageHeaders header) {data[0] = (uint8_t) header;};
 		std::string getHeaderStr(void) {return headerStrings[getHeader()]; };
+		UartMessage& operator=(const UartMessage& in) {data = in.data; return *this;};
 	protected:
 		MessageType data;
 		const std::string headerStrings[11]=
@@ -61,6 +63,7 @@ class ReceivedWrongNum : public UartMessage
 {
 	public:
 		ReceivedWrongNum() :UartMessage() {data[0] = (uint8_t) RECEIVED_WRONG_NUM;};
+		ReceivedWrongNum(const UartMessage& in) {data = in.getData();};
 		ParamType getAddr(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -98,7 +101,7 @@ class ReceivedWrongNum : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm)
+inline std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm)
 {
 	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
 	return os;
@@ -108,6 +111,7 @@ class ReplaceNum : public UartMessage
 {
 	public:
 		ReplaceNum() :UartMessage() {data[0] = (uint8_t) REPLACE_NUM;};
+		ReplaceNum(const UartMessage& in) {data = in.getData();};
 		ParamType getAddr(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -145,7 +149,7 @@ class ReplaceNum : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm)
+inline std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm)
 {
 	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
 	return os;
@@ -155,6 +159,7 @@ class ReplaceNumDone : public UartMessage
 {
 	public:
 		ReplaceNumDone() :UartMessage() {data[0] = (uint8_t) REPLACE_NUM_DONE;};
+		ReplaceNumDone(const UartMessage& in) {data = in.getData();};
 		ParamType getAddr(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -192,7 +197,7 @@ class ReplaceNumDone : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm)
+inline std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm)
 {
 	os  << "addr: " << itm.getAddr() << "data: " << itm.getData();
 	return os;
@@ -202,6 +207,7 @@ class ModParams : public UartMessage
 {
 	public:
 		ModParams() :UartMessage() {data[0] = (uint8_t) MOD_PARAMS;};
+		ModParams(const UartMessage& in) {data = in.getData();};
 		ParamType getCyclesPerHalfPeriod(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -215,7 +221,7 @@ class ModParams : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ModParams& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ModParams& itm)
+inline std::ostream& operator<<(std::ostream& os, const ModParams& itm)
 {
 	os  << "cycles per half period: " << itm.getCyclesPerHalfPeriod();
 	return os;
@@ -225,6 +231,7 @@ class SysStatus : public UartMessage
 {
 	public:
 		SysStatus() :UartMessage() {data[0] = (uint8_t) SYS_STATUS;};
+		SysStatus(const UartMessage& in) {data = in.getData();};
 		ParamType getRun(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -238,7 +245,7 @@ class SysStatus : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const SysStatus& itm);
 };
-std::ostream& operator<<(std::ostream& os, const SysStatus& itm)
+inline std::ostream& operator<<(std::ostream& os, const SysStatus& itm)
 {
 	os  << "run: " << itm.getRun();
 	return os;
@@ -248,6 +255,7 @@ class MemParams : public UartMessage
 {
 	public:
 		MemParams() :UartMessage() {data[0] = (uint8_t) MEM_PARAMS;};
+		MemParams(const UartMessage& in) {data = in.getData();};
 		ParamType getNoNums(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) ;
@@ -302,7 +310,7 @@ class MemParams : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const MemParams& itm);
 };
-std::ostream& operator<<(std::ostream& os, const MemParams& itm)
+inline std::ostream& operator<<(std::ostream& os, const MemParams& itm)
 {
 	os  << "no nums: " << itm.getNoNums() << "test mode: " << itm.getTestMode() << "pulse width: " << itm.getPulseWidth() << "pulse gap: " << itm.getPulseGap();
 	return os;
@@ -312,6 +320,7 @@ class ErrFifoFull : public UartMessage
 {
 	public:
 		ErrFifoFull() :UartMessage() {data[0] = (uint8_t) ERR_FIFO_FULL;};
+		ErrFifoFull(const UartMessage& in) {data = in.getData();};
 		ParamType getPayload(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) 
@@ -344,7 +353,7 @@ class ErrFifoFull : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm)
+inline std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm)
 {
 	os  << "payload: " << itm.getPayload();
 	return os;
@@ -354,6 +363,7 @@ class ErrMemOverrun : public UartMessage
 {
 	public:
 		ErrMemOverrun() :UartMessage() {data[0] = (uint8_t) ERR_MEM_OVERRUN;};
+		ErrMemOverrun(const UartMessage& in) {data = in.getData();};
 		ParamType getPayload(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) 
@@ -386,7 +396,7 @@ class ErrMemOverrun : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm)
+inline std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm)
 {
 	os  << "payload: " << itm.getPayload();
 	return os;
@@ -396,6 +406,7 @@ class ErrUpdateWhilstRun : public UartMessage
 {
 	public:
 		ErrUpdateWhilstRun() :UartMessage() {data[0] = (uint8_t) ERR_UPDATE_WHILST_RUN;};
+		ErrUpdateWhilstRun(const UartMessage& in) {data = in.getData();};
 		ParamType getPayload(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) 
@@ -428,7 +439,7 @@ class ErrUpdateWhilstRun : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm)
+inline std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm)
 {
 	os  << "payload: " << itm.getPayload();
 	return os;
@@ -438,6 +449,7 @@ class ErrInvalidMsg : public UartMessage
 {
 	public:
 		ErrInvalidMsg() :UartMessage() {data[0] = (uint8_t) ERR_INVALID_MSG;};
+		ErrInvalidMsg(const UartMessage& in) {data = in.getData();};
 		ParamType getPayload(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) 
@@ -470,7 +482,7 @@ class ErrInvalidMsg : public UartMessage
 		};
 		friend std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm);
 };
-std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm)
+inline std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm)
 {
 	os  << "payload: " << itm.getPayload();
 	return os;
@@ -480,6 +492,7 @@ class Ack : public UartMessage
 {
 	public:
 		Ack() :UartMessage() {data[0] = (uint8_t) ACK;};
+		Ack(const UartMessage& in) {data = in.getData();};
 		ParamType getPayload(void) const
 		{
 			return (((ParamType) data[1]& 11111111 )) 
@@ -510,9 +523,17 @@ class Ack : public UartMessage
 			data[7] |= (dataIn & 0xFF);
 			dataIn >>= 8;
 		};
+		UartMessage getUnderlyingMsg(void) const
+		{
+			MessageType data = getData();
+			for(unsigned int i=0; i<(data.size()-1);i++)
+				data[i] = data[i+1];
+			data[data.size()-1]=0;
+			return UartMessage(data);
+		};
 		friend std::ostream& operator<<(std::ostream& os, const Ack& itm);
 };
-std::ostream& operator<<(std::ostream& os, const Ack& itm)
+inline std::ostream& operator<<(std::ostream& os, const Ack& itm)
 {
 	os  << "payload: " << itm.getPayload();
 	return os;

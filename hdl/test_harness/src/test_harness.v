@@ -4,10 +4,10 @@
 
 `include "uart_msg_consts.h"
 
-module test_harness(clk, uart_rx_pin, uart_tx_pin, led0, led1);
+module test_harness(clk, uart_rx_pin, uart_tx_pin, uart_rx_pmod, uart_tx_pmod, led0, led1);
 
 input clk, uart_rx_pin;
-output uart_tx_pin, led0, led1;
+output uart_tx_pin, uart_rx_pmod, uart_tx_pmod, led0, led1;
 
 parameter integer UART_DATA_WIDTH = 8;
 parameter integer UART_STOP_BITS = 1;
@@ -18,6 +18,9 @@ parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
 
 localparam integer UART_CLKS_PER_BAUD = (CLK_RATE / UART_BAUD);
 
+//For spying on UART comms
+assign uart_rx_pmod = uart_rx_pin;
+assign uart_tx_pmod = uart_tx_pin;
 
 //Reset
 reg n_reset;

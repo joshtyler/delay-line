@@ -36,12 +36,12 @@ class FtdiWrapper
 		void listDevs(void); //List available devices
 		void open(unsigned int idx, int baud); //Open the device of index chosen from listDevs()
 		int getBaud(void) {return context->baudrate;}; //Get the actual baud rate of the device
-		void write_blocking(const unsigned char *data, int size) {checkRet(ftdi_write_data(context, data, size));}; //Perform blocking r/w
-		void read_blocking(unsigned char *data, int size) {checkRet(ftdi_read_data(context, data, size));};
-		void write_request(unsigned char *data, int size); //Request for non blocking r/w
-		void read_request(unsigned char *data, int size);
-		bool write_done(void); //Status of previously requested r/w
-		bool read_done(void);
+		void writeBlocking(const unsigned char *data, int size) {checkRet(ftdi_write_data(context, data, size));}; //Perform blocking r/w
+		void readBlocking(unsigned char *data, int size) {checkRet(ftdi_read_data(context, data, size));};
+		void writeRequest(unsigned char *data, int size); //Request for non blocking r/w
+		void readRequest(unsigned char *data, int size);
+		bool writeDone(void); //Status of previously requested r/w
+		bool readDone(void);
 		void close(void);
 
 	private:

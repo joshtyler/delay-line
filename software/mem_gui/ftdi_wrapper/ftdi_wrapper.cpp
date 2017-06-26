@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip> //For setw
 #include "ftdi.h"
-#include "ftdi_wrapper.h"
+#include "ftdi_wrapper.hpp"
 
 FtdiWrapper::FtdiWrapper(int vidIn, int pidIn)
 :vid(vidIn), pid(pidIn), noDevs(0), state(false), readDoneFlag(true), writeDoneFlag(true)
@@ -110,24 +110,26 @@ void FtdiWrapper::checkRet(int ret)
 	}
 }
 
-void write_request(unsigned char *data, int size)
+void FtdiWrapper::writeRequest(unsigned char *data, int size)
 {
-	if(!writeDoneFlag)
+	if(writeDoneFlag == false) //If we are already writing
 	{
 		throw FtdiWrapperException("Attempt to write whilst active write request");
 	}
 	write_tc = ftdi_write_data_submit(context,data, size);
+	writeDoneFlag = false;
 }
-void read_request(unsigned char *data, int size)
+void FtdiWrapper::readRequest(unsigned char *data, int size)
 {
-	if(!readDoneFlag)
+	if(readDoneFlag == false) //If we are already reading
 	{
 		throw FtdiWrapperException("Attempt to read whilst active read request");
 	}
 	read_tc = ftdi_read_data_submit(context,data, size);
+	readDoneFlag = false; //signal that we have logged a read
 }
 
-bool write_done(void)
+bool FtdiWrapper::writeDone(void)
 {
 	if(!writeDoneFlag)
 	{
@@ -136,7 +138,7 @@ bool write_done(void)
 	return writeDoneFlag;
 }
 
-bool read_done(void)
+bool FtdiWrapper::readDone(void)
 {
 	if(!readDoneFlag)
 	{
