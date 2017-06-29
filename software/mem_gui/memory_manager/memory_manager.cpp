@@ -28,7 +28,6 @@ void MemoryManager::processMessage(UartMessage msg)
         ReplaceNumDone repMsg(msg);
         if(repMsg.getAddr() == addr)
         {
-            curVal = repMsg.getData(); //Always update, even if not expected
             if(!update.expected) //If not expected throw exception
             {
                 throw MemoryManagerException("Updated when not expecting update.");
@@ -36,10 +35,11 @@ void MemoryManager::processMessage(UartMessage msg)
 
             update.expected = false;
 
-            if(update.val != repMsg.getData())
+            if(curVal != repMsg.getData())
             {
-                throw MemoryManagerException("Expected update, but data was not the same as expected");
+                throw MemoryManagerException("Expected update, but data was not the same as old data.");
             }
+            curVal = update.val;
 
         } else {
             throw MemoryManagerException("Passed message for incorrect address.");

@@ -57,10 +57,18 @@ MainGui::MainGui(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refG
     builder->get_widget("mem_request_send", memRequestSend);
     memRequestSend->signal_clicked().connect(sigc::mem_fun(*this, &MainGui::onMemRequestSend));
 
+
+    //Setup memory viewer
+    builder->get_widget("mem_viewer", memViewer);
+    memViewerTreeModel = Gtk::ListStore::create(memViewerModel);
+    memViewer->set_model(memViewerTreeModel);
+    memViewer->append_column_numeric("Address", memViewerModel.addr, "%0d");
+    memViewer->append_column_numeric("Data (hex)", memViewerModel.val, "%09x");
+
+
     //Setup log
     builder->get_widget("log", log);
     logBuffer = Gtk::TextBuffer::create();
-    logStream << "Log window" << std::endl;
     log->set_buffer(logBuffer);
 
     //Set Idle function to be main loop
@@ -128,9 +136,17 @@ bool MainGui::onIdle(void)
                 uartManager.send((**it).getMessage());
             }
         }
+
+        //Update the memory viewer
+        updateMemViewer();
     }
 
-    logBuffer->set_text(logStream.str());
+    //Only update the text view when we have something to update it with
+    //Replacing the entire contents on every iteration causes jagged scrollbar behaviour
+    if(logStream.str() != logBuffer->get_text())
+    {
+        logBuffer->set_text(logStream.str());
+    }
 
     return true; //Idle task not complete
 }
@@ -159,7 +175,8 @@ void MainGui::onConnectClicked()
 
     serial.open(id,stoi(baudText));
 
-    //Disable port widgets now port is open
+    //Disable port widgets (and number of numbers widget) now port is open
+    noNums->set_sensitive(false);
     baud->set_sensitive(false);
     connect->set_sensitive(false);
     portComboBox->set_sensitive(false);
@@ -178,6 +195,7 @@ void MainGui::onConnectClicked()
 
     assert(memSize == memArr.size()); //Check that we have set up the array correctly
 
+    createMemViewer();
 
     //Ensure that system is not running before we send initial parameters
     //Don't use onRun for this because we don't want the initial parameters being overwritten
@@ -192,6 +210,7 @@ void MainGui::onConnectClicked()
 
 void MainGui::updatePortComboBox(void)
 {
+    portComboBoxRefTreeModel->clear();
     std::list<FtdiWrapper::devType> list = serial.listDevs();
     for(auto it = list.begin(); it != list.end(); it++)
     {
@@ -200,6 +219,28 @@ void MainGui::updatePortComboBox(void)
         row[portColumnModel.manufacturer] = it->manufacturer;
         row[portColumnModel.description] = it->description;
         portComboBox->set_active(row);
+    }
+
+}
+
+void MainGui::createMemViewer(void)
+{
+    for(auto it = memArr.begin(); it != memArr.end(); it++)
+    {
+        auto addr = std::distance(memArr.begin(),it);
+        Gtk::TreeModel::Row row = *(memViewerTreeModel->append());
+        row[memViewerModel.addr] = addr;
+        row[memViewerModel.val] = 0;
+    }
+
+}
+
+void MainGui::updateMemViewer(void)
+{
+    for(auto it = memViewerTreeModel->children().begin(); it != memViewerTreeModel->children().end(); it++)
+    {
+        auto addr = std::distance(memViewerTreeModel->children().begin(),it);
+        (*it)[memViewerModel.val] = memArr[addr]->getCurVal();
     }
 
 }
@@ -273,4 +314,5 @@ void MainGui::onResetParameters(void)
     testMode->set_active((bool)statusManager.getMemParams().testMode);
     pulseWidth->set_value(statusManager.getMemParams().pulseWidth);
     pulseGap->set_value(statusManager.getMemParams().pulseGap);
+
 }

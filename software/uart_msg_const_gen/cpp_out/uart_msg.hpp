@@ -1,5 +1,5 @@
 // UART Message Decoder and Encoder Classes 
-// Automatically generated  by uart_msg_const_gen.py at 06:22PM on June 26, 2017
+// Automatically generated  by uart_msg_const_gen.py at 07:53PM on June 29, 2017
 // DO NOT MODIFY MANUALLY
 
 #ifndef UART_MSG_HPP
@@ -40,9 +40,13 @@ class UartMessage
 		messageHeaders getHeader(void) const {return (messageHeaders) data[0];};
 		void setHeader(messageHeaders header) {data[0] = (uint8_t) header;};
 		std::string getHeaderStr(void) const {return headerStrings[getHeader()]; };
+		virtual void print(std::ostream& os) const {os << getBits(0, 63) << std::endl;};
 		UartMessage& operator=(const UartMessage& in) {data = in.data; return *this;};
 	protected:
 		MessageType data;
+		ParamType accessBits(unsigned int lower, unsigned int upper, bool set,MessageType *arr=nullptr, ParamType dataIn=0 ) const;
+		ParamType getBits(unsigned int lower, unsigned int upper) const {return accessBits(lower, upper, false);};
+		void setBits(unsigned int lower, unsigned int upper,ParamType dataIn) {accessBits(lower, upper, true, &data, dataIn);};
 		const std::string headerStrings[11]=
 		{
 			"received wrong num",
@@ -58,6 +62,7 @@ class UartMessage
 			"ack"
 		};
 };
+std::ostream& operator<<(std::ostream& os, const UartMessage& itm);
 
 //Derived Classes
 class ReceivedWrongNum : public UartMessage
@@ -65,465 +70,150 @@ class ReceivedWrongNum : public UartMessage
 	public:
 		ReceivedWrongNum() :UartMessage() {data[0] = (uint8_t) RECEIVED_WRONG_NUM;};
 		ReceivedWrongNum(const UartMessage& in) {data = in.getData();};
-		ParamType getAddr(void) const
+		ParamType getAddr(void) const {return getBits(8, 15);};
+		void setAddr(ParamType data) {setBits(8, 15, data);};
+		ParamType getData(void) const {return getBits(16, 51);};
+		void setData(ParamType data) {setBits(16, 51, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setAddr(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getData(void) const
-		{
-			return (((ParamType) data[2]& 11111111 )) 
-			| (((ParamType) data[3]) << (8 * 1))
-			| (((ParamType) data[4]) << (8 * 2))
-			| (((ParamType) data[5]) << (8 * 3))
-			| (((ParamType) data[6]& 00001111 )  << (8 * 4));
-		};
-		void setData(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[2] &= 11111111;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] &= 00001111;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm);
+			os << getHeaderStr() << ": "  << " addr: " << getAddr() << " data: " << getData()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ReceivedWrongNum& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
-	return os;
-}
 
 class ReplaceNum : public UartMessage
 {
 	public:
 		ReplaceNum() :UartMessage() {data[0] = (uint8_t) REPLACE_NUM;};
 		ReplaceNum(const UartMessage& in) {data = in.getData();};
-		ParamType getAddr(void) const
+		ParamType getAddr(void) const {return getBits(8, 15);};
+		void setAddr(ParamType data) {setBits(8, 15, data);};
+		ParamType getData(void) const {return getBits(16, 51);};
+		void setData(ParamType data) {setBits(16, 51, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setAddr(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getData(void) const
-		{
-			return (((ParamType) data[2]& 11111111 )) 
-			| (((ParamType) data[3]) << (8 * 1))
-			| (((ParamType) data[4]) << (8 * 2))
-			| (((ParamType) data[5]) << (8 * 3))
-			| (((ParamType) data[6]& 00001111 )  << (8 * 4));
-		};
-		void setData(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[2] &= 11111111;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] &= 00001111;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm);
+			os << getHeaderStr() << ": "  << " addr: " << getAddr() << " data: " << getData()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ReplaceNum& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
-	return os;
-}
 
 class ReplaceNumDone : public UartMessage
 {
 	public:
 		ReplaceNumDone() :UartMessage() {data[0] = (uint8_t) REPLACE_NUM_DONE;};
 		ReplaceNumDone(const UartMessage& in) {data = in.getData();};
-		ParamType getAddr(void) const
+		ParamType getAddr(void) const {return getBits(8, 15);};
+		void setAddr(ParamType data) {setBits(8, 15, data);};
+		ParamType getData(void) const {return getBits(16, 51);};
+		void setData(ParamType data) {setBits(16, 51, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setAddr(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getData(void) const
-		{
-			return (((ParamType) data[2]& 11111111 )) 
-			| (((ParamType) data[3]) << (8 * 1))
-			| (((ParamType) data[4]) << (8 * 2))
-			| (((ParamType) data[5]) << (8 * 3))
-			| (((ParamType) data[6]& 00001111 )  << (8 * 4));
-		};
-		void setData(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[2] &= 11111111;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] &= 00001111;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm);
+			os << getHeaderStr() << ": "  << " addr: " << getAddr() << " data: " << getData()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ReplaceNumDone& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "addr: " << itm.getAddr() << "data: " << itm.getData()<< std::endl;
-	return os;
-}
 
 class ModParams : public UartMessage
 {
 	public:
 		ModParams() :UartMessage() {data[0] = (uint8_t) MOD_PARAMS;};
 		ModParams(const UartMessage& in) {data = in.getData();};
-		ParamType getCyclesPerHalfPeriod(void) const
+		ParamType getCyclesPerHalfPeriod(void) const {return getBits(8, 13);};
+		void setCyclesPerHalfPeriod(ParamType data) {setBits(8, 13, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setCyclesPerHalfPeriod(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ModParams& itm);
+			os << getHeaderStr() << ": "  << " cycles per half period: " << getCyclesPerHalfPeriod()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ModParams& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "cycles per half period: " << itm.getCyclesPerHalfPeriod()<< std::endl;
-	return os;
-}
 
 class SysStatus : public UartMessage
 {
 	public:
 		SysStatus() :UartMessage() {data[0] = (uint8_t) SYS_STATUS;};
 		SysStatus(const UartMessage& in) {data = in.getData();};
-		ParamType getRun(void) const
+		ParamType getRun(void) const {return getBits(8, 8);};
+		void setRun(ParamType data) {setBits(8, 8, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setRun(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const SysStatus& itm);
+			os << getHeaderStr() << ": "  << " run: " << getRun()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const SysStatus& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "run: " << itm.getRun()<< std::endl;
-	return os;
-}
 
 class MemParams : public UartMessage
 {
 	public:
 		MemParams() :UartMessage() {data[0] = (uint8_t) MEM_PARAMS;};
 		MemParams(const UartMessage& in) {data = in.getData();};
-		ParamType getNoNums(void) const
+		ParamType getNoNums(void) const {return getBits(8, 15);};
+		void setNoNums(ParamType data) {setBits(8, 15, data);};
+		ParamType getTestMode(void) const {return getBits(16, 16);};
+		void setTestMode(ParamType data) {setBits(16, 16, data);};
+		ParamType getPulseWidth(void) const {return getBits(17, 26);};
+		void setPulseWidth(ParamType data) {setBits(17, 26, data);};
+		ParamType getPulseGap(void) const {return getBits(27, 36);};
+		void setPulseGap(ParamType data) {setBits(27, 36, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) ;
-		};
-		void setNoNums(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getTestMode(void) const
-		{
-			return (((ParamType) data[2]& 11111111 )) ;
-		};
-		void setTestMode(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[2] &= 11111111;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getPulseWidth(void) const
-		{
-			return (((ParamType) data[2]& 11111110 )) 
-			| (((ParamType) data[3]& 00000111 )  << (8 * 1));
-		};
-		void setPulseWidth(ParamType dataIn)
-		{
-			dataIn <<= 1;
-			data[2] &= 11111110;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] &= 00000111;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		ParamType getPulseGap(void) const
-		{
-			return (((ParamType) data[3]& 11111000 )) 
-			| (((ParamType) data[4]& 00011111 )  << (8 * 1));
-		};
-		void setPulseGap(ParamType dataIn)
-		{
-			dataIn <<= 3;
-			data[3] &= 11111000;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] &= 00011111;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const MemParams& itm);
+			os << getHeaderStr() << ": "  << " no nums: " << getNoNums() << " test mode: " << getTestMode() << " pulse width: " << getPulseWidth() << " pulse gap: " << getPulseGap()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const MemParams& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "no nums: " << itm.getNoNums() << "test mode: " << itm.getTestMode() << "pulse width: " << itm.getPulseWidth() << "pulse gap: " << itm.getPulseGap()<< std::endl;
-	return os;
-}
 
 class ErrFifoFull : public UartMessage
 {
 	public:
 		ErrFifoFull() :UartMessage() {data[0] = (uint8_t) ERR_FIFO_FULL;};
 		ErrFifoFull(const UartMessage& in) {data = in.getData();};
-		ParamType getPayload(void) const
+		ParamType getPayload(void) const {return getBits(8, 63);};
+		void setPayload(ParamType data) {setBits(8, 63, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) 
-			| (((ParamType) data[2]) << (8 * 1))
-			| (((ParamType) data[3]) << (8 * 2))
-			| (((ParamType) data[4]) << (8 * 3))
-			| (((ParamType) data[5]) << (8 * 4))
-			| (((ParamType) data[6]) << (8 * 5))
-			| (((ParamType) data[7]& 11111111 )  << (8 * 6));
-		};
-		void setPayload(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[7] &= 11111111;
-			data[7] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm);
+			os << getHeaderStr() << ": "  << " payload: " << getPayload()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ErrFifoFull& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
-	return os;
-}
 
 class ErrMemOverrun : public UartMessage
 {
 	public:
 		ErrMemOverrun() :UartMessage() {data[0] = (uint8_t) ERR_MEM_OVERRUN;};
 		ErrMemOverrun(const UartMessage& in) {data = in.getData();};
-		ParamType getPayload(void) const
+		ParamType getPayload(void) const {return getBits(8, 63);};
+		void setPayload(ParamType data) {setBits(8, 63, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) 
-			| (((ParamType) data[2]) << (8 * 1))
-			| (((ParamType) data[3]) << (8 * 2))
-			| (((ParamType) data[4]) << (8 * 3))
-			| (((ParamType) data[5]) << (8 * 4))
-			| (((ParamType) data[6]) << (8 * 5))
-			| (((ParamType) data[7]& 11111111 )  << (8 * 6));
-		};
-		void setPayload(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[7] &= 11111111;
-			data[7] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm);
+			os << getHeaderStr() << ": "  << " payload: " << getPayload()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ErrMemOverrun& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
-	return os;
-}
 
 class ErrUpdateWhilstRun : public UartMessage
 {
 	public:
 		ErrUpdateWhilstRun() :UartMessage() {data[0] = (uint8_t) ERR_UPDATE_WHILST_RUN;};
 		ErrUpdateWhilstRun(const UartMessage& in) {data = in.getData();};
-		ParamType getPayload(void) const
+		ParamType getPayload(void) const {return getBits(8, 63);};
+		void setPayload(ParamType data) {setBits(8, 63, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) 
-			| (((ParamType) data[2]) << (8 * 1))
-			| (((ParamType) data[3]) << (8 * 2))
-			| (((ParamType) data[4]) << (8 * 3))
-			| (((ParamType) data[5]) << (8 * 4))
-			| (((ParamType) data[6]) << (8 * 5))
-			| (((ParamType) data[7]& 11111111 )  << (8 * 6));
-		};
-		void setPayload(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[7] &= 11111111;
-			data[7] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm);
+			os << getHeaderStr() << ": "  << " payload: " << getPayload()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ErrUpdateWhilstRun& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
-	return os;
-}
 
 class ErrInvalidMsg : public UartMessage
 {
 	public:
 		ErrInvalidMsg() :UartMessage() {data[0] = (uint8_t) ERR_INVALID_MSG;};
 		ErrInvalidMsg(const UartMessage& in) {data = in.getData();};
-		ParamType getPayload(void) const
+		ParamType getPayload(void) const {return getBits(8, 63);};
+		void setPayload(ParamType data) {setBits(8, 63, data);};
+		void print(std::ostream& os) const
 		{
-			return (((ParamType) data[1]& 11111111 )) 
-			| (((ParamType) data[2]) << (8 * 1))
-			| (((ParamType) data[3]) << (8 * 2))
-			| (((ParamType) data[4]) << (8 * 3))
-			| (((ParamType) data[5]) << (8 * 4))
-			| (((ParamType) data[6]) << (8 * 5))
-			| (((ParamType) data[7]& 11111111 )  << (8 * 6));
-		};
-		void setPayload(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[7] &= 11111111;
-			data[7] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
-		friend std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm);
+			os << getHeaderStr() << ": "  << " payload: " << getPayload()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const ErrInvalidMsg& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
-	return os;
-}
 
 class Ack : public UartMessage
 {
 	public:
 		Ack() :UartMessage() {data[0] = (uint8_t) ACK;};
 		Ack(const UartMessage& in) {data = in.getData();};
-		ParamType getPayload(void) const
-		{
-			return (((ParamType) data[1]& 11111111 )) 
-			| (((ParamType) data[2]) << (8 * 1))
-			| (((ParamType) data[3]) << (8 * 2))
-			| (((ParamType) data[4]) << (8 * 3))
-			| (((ParamType) data[5]) << (8 * 4))
-			| (((ParamType) data[6]) << (8 * 5))
-			| (((ParamType) data[7]& 11111111 )  << (8 * 6));
-		};
-		void setPayload(ParamType dataIn)
-		{
-			dataIn <<= 0;
-			data[1] &= 11111111;
-			data[1] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[2] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[3] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[4] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[5] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[6] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-			data[7] &= 11111111;
-			data[7] |= (dataIn & 0xFF);
-			dataIn >>= 8;
-		};
+		ParamType getPayload(void) const {return getBits(8, 63);};
+		void setPayload(ParamType data) {setBits(8, 63, data);};
 		UartMessage getUnderlyingMsg(void) const
 		{
 			MessageType data = getData();
@@ -532,13 +222,11 @@ class Ack : public UartMessage
 			data[data.size()-1]=0;
 			return UartMessage(data);
 		};
-		friend std::ostream& operator<<(std::ostream& os, const Ack& itm);
+		void print(std::ostream& os) const
+		{
+			os << getHeaderStr() << ": "  << " payload: " << getPayload()<< std::endl;
+		}
 };
-inline std::ostream& operator<<(std::ostream& os, const Ack& itm)
-{
-	os << itm.getHeaderStr() << ": " << std::hex  << "payload: " << itm.getPayload()<< std::endl;
-	return os;
-}
 
 
 #endif

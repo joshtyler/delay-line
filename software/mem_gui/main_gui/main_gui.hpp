@@ -83,6 +83,22 @@ class MainGui : public Gtk::Window
         Gtk::Button *memRequestSend;
         void onMemRequestSend(void);
 
+        //Memory viewer
+        class MemViewerModel : public Gtk::TreeModel::ColumnRecord
+        {
+            public:
+
+                MemViewerModel()
+                { add(addr); add(val);};
+
+                Gtk::TreeModelColumn<unsigned int> addr;
+                Gtk::TreeModelColumn<unsigned int> val;
+        };
+        MemViewerModel memViewerModel;
+        Gtk::TreeView* memViewer;
+        Glib::RefPtr<Gtk::ListStore> memViewerTreeModel;
+        void updateMemViewer(void);
+        void createMemViewer(void);
 
         //Log
         Gtk::TextView *log;

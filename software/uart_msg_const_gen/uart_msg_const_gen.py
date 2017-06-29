@@ -206,40 +206,16 @@ def cpp_gen_mask(low_keep, high_keep):
         arr = val + arr
     return arr
 
+
 #Generate a getter and setter for a paramter
 def cpp_gen_getter_setter_printer(name, low_bit, high_bit):
-    low_word = math.floor(low_bit / word_len) # Get word containing low_bit
-    high_word = math.floor(high_bit / word_len)
-    low_bit = low_bit - low_word * word_len # Get position of lowest bit to keep in low word
-    high_bit = high_bit - high_word * word_len
     name = to_cpp_class_style(name)
 
     #Getter
-    get = cpp_ret_type_fmtd+ ' get'+ name +'(void) const\n{\n\treturn '
-    for i in range(low_word, high_word+1):
-        if i > low_word:
-            get += '\n\t| '
-        get += '((('+cpp_ret_type_fmtd+') data[' + str(i) + ']'
-        if i == low_word:
-             get += '& '+ cpp_gen_mask(low_bit, word_len-1) +' )) '
-        else:
-            if i == high_word:
-                get += '& '+ cpp_gen_mask(0, high_bit) +' ) '
-            else:
-                get += ')'
-            get += ' << ('+str(word_len)+' * '+str(i-low_word)+'))'
-    get += ';\n};'
+    get = cpp_ret_type_fmtd+ ' get'+ name +'(void) const {return getBits('+str(low_bit)+', '+str(high_bit)+');};'
 
     #Setter
-    set = 'void set'+name+'('+cpp_ret_type_fmtd+' dataIn)\n{\n'
-    set += '\tdataIn <<= '+str(low_bit)+';\n' # Shift dataIn to align with words
-    for i in range(low_word, high_word + 1):
-        if i == low_word:
-            set+= '\tdata['+str(i)+'] &= '+cpp_gen_mask(low_bit, word_len-1)+';\n' # Clear relevant bits from data
-        elif i == high_word:
-            set += '\tdata['+str(i)+'] &= '+cpp_gen_mask(0, high_bit)+';\n' #Clear relevant bits
-        set+= '\tdata['+str(i)+'] |= (dataIn & 0xFF);\n\tdataIn >>= 8;\n' #Clear and shift ready for next bit
-    set += '};'
+    set = 'void set' + name + '('+cpp_ret_type_fmtd+' data) {setBits(' + str(low_bit) + ', ' + str(high_bit) + ', data);};'
 
     return [get, set]
 
@@ -286,6 +262,7 @@ public = [name +'(' + cpp_msg_var_fmtd + ' dataIn) :data(dataIn) {};',
           cpp_enum_name_fmtd+' getHeader(void) const {return ('+cpp_enum_name_fmtd+') data[0];};',
           'void setHeader('+cpp_enum_name_fmtd+' header) {data[0] = (uint8_t) header;};',
           'std::string getHeaderStr(void) const {return '+to_cpp_style(cpp_string_lookup_name)+'[getHeader()]; };',
+          'virtual void print(std::ostream& os) const {os << getBits(0, '+str(msg_len*word_len-1)+') << std::endl;};',
           cpp_base_class_fmtd + '& operator=(const '+cpp_base_class_fmtd+'& in) {data = in.data; return *this;};',
           ]
 
@@ -298,25 +275,21 @@ type_enum = type_enum[0:-2]  #Get rid of comma
 type_enum += '\n};'
 public.insert(0,type_enum)
 
-#Upgrade type function
-#upgrade = 'auto upgradeType(void) const\n'
-#upgrade += '{\n\tauto recd;\n\tswitch(in.getHeader())\n\t{'
-#for param in msg_types:
-#    upgrade += '\t case '+to_guard(param[0])+':\n'
-#    upgrade += '\t\trecd = '+to_cpp_class_style(param[0])+'(*this);\n'
-#    upgrade += '\t\tbreak;\n'
-#upgrade += '\t}\n\treturn recd;\n}\n'
-#public.append(upgrade)
 
-
-protected = [cpp_msg_var_fmtd + ' data;',]
+protected = [cpp_msg_var_fmtd + ' data;',
+             cpp_ret_type_fmtd+ ' accessBits(unsigned int lower, unsigned int upper, bool set,'+cpp_msg_var_fmtd+' *arr=nullptr, '+cpp_ret_type_fmtd+' dataIn=0 ) const;',
+             cpp_ret_type_fmtd+ ' getBits(unsigned int lower, unsigned int upper) const {return accessBits(lower, upper, false);};',
+             'void setBits(unsigned int lower, unsigned int upper,'+cpp_ret_type_fmtd+' dataIn) {accessBits(lower, upper, true, &data, dataIn);};']
 type_strings = 'const std::string '+ to_cpp_style(cpp_string_lookup_name)+'['+str(len(msg_types))+']=\n{\n'
 for param in msg_types:
     type_strings += '\t'+'"'+param[0]+'",\n'
 type_strings = type_strings[0:-2]  # Get rid of comma
 type_strings += '\n};'
 protected.append(type_strings)
-cpp_file.write(cpp_create_class(name, public, protected))
+
+extra = ['std::ostream& operator<<(std::ostream& os, const '+cpp_base_class_fmtd+'& itm);',]
+
+cpp_file.write(cpp_create_class(name, public, protected,extra))
 
 cpp_file.write('//Derived Classes\n')
 msg_ident = 0
@@ -344,18 +317,18 @@ for msg_type in msg_types:
                                           '};')
 
     #Pretty printer
-    printer_class = 'friend std::ostream& operator<<(std::ostream& os, const '+name+'& itm);' #Friend entry to go inside class
-    public.append(printer_class)
-
-    printer_extra = ('inline std::ostream& operator<<(std::ostream& os, const '+name+'& itm)\n' #Operator itself, inline is a dirty trick to allow multiple definition
+    printer_class = ('void print(std::ostream& os) const\n'
                      '{\n'
-                     '\tos << itm.getHeaderStr() << ": " << std::hex '
+                     '\tos << getHeaderStr() << ": " '
                      )
     for param in msg_type[1:]:
-        printer_extra += ' << "'+param[0]+': " << itm.get'+to_cpp_class_style(param[0])+'()'
-    printer_extra += '<< std::endl;\n\treturn os;\n}'
+        printer_class += ' << " '+param[0]+': " << get'+to_cpp_class_style(param[0])+'()'
 
-    cpp_file.write(cpp_create_class(name + ' : public '+cpp_base_class_fmtd, public,(),[printer_extra,]))
+    printer_class += '<< std::endl;\n}'
+
+    public.append(printer_class)
+
+    cpp_file.write(cpp_create_class(name + ' : public '+cpp_base_class_fmtd, public,(),()))
     msg_ident = msg_ident + 1
 
 # Close files
