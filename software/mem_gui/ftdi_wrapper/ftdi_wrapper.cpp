@@ -35,26 +35,39 @@ void FtdiWrapper::refresh(void)
 	noDevs = ret;
 }
 
-void FtdiWrapper::listDevs(void)
+std::list<FtdiWrapper::devType> FtdiWrapper::listDevs(bool display)
 {
 	struct ftdi_device_list *curDev;
 	const int bufSize = 30;
 	char manufacturer[bufSize];
 	char description[bufSize];
 
+	std::list<FtdiWrapper::devType> retList;
+
 
 	refresh();
 
-	std::cout << "Index\t" << std::left << std::setw(bufSize-1) << "Manufacturer"  << "Description" << std::endl;
+	if(display)
+	{
+		std::cout << "Index\t" << std::left << std::setw(bufSize-1) << "Manufacturer"  << "Description" << std::endl;
+	}
 
-	int i;
+	unsigned int i;
 	for(curDev = devList, i = 0; curDev != NULL; curDev = curDev->next, i++)
 	{
 
 		checkRet(ftdi_usb_get_strings(context, curDev->dev, manufacturer, bufSize, description, bufSize, NULL, 0));
 
-		std::cout << i << "\t" << std::left << std::setw(bufSize-1) << manufacturer << description  << std::endl;
+		retList.push_back(devType(i, manufacturer, description));
+
+		if(display)
+		{
+			std::cout << i << "\t" << std::left << std::setw(bufSize-1) << manufacturer << description  << std::endl;
+		}
+
 	}
+
+	return retList;
 }
 
 void FtdiWrapper::open(unsigned int idx, int baud)
@@ -82,6 +95,7 @@ void FtdiWrapper::open(unsigned int idx, int baud)
 
 	//Open
 	checkRet(ftdi_usb_open_dev(context, curDev->dev));
+	state = true; //Port is now open
 
 	//Set baud rate
 	checkRet(ftdi_set_baudrate(context, baud)); 
@@ -90,7 +104,7 @@ void FtdiWrapper::open(unsigned int idx, int baud)
 
 void FtdiWrapper::close(void)
 {
-	checkState(false); //Check open
+	checkState(true); //Check open
 	
 }
 

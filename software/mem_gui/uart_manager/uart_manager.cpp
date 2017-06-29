@@ -77,13 +77,18 @@ void UartManager::processReceivedMessage(UartMessage msg)
 
         switch(msg.getHeader())
         {
-            case UartMessage::RECEIVED_WRONG_NUM:
             case UartMessage::REPLACE_NUM:
-            case UartMessage::REPLACE_NUM_DONE:
             case UartMessage::MOD_PARAMS:
             case UartMessage::SYS_STATUS:
             case UartMessage::MEM_PARAMS:
                 throw(UartManagerException("Received unexpected message type from FPGA"));
+
+            case UartMessage::RECEIVED_WRONG_NUM:
+                log << ReceivedWrongNum(msg);
+                throw(FpgaMessageError("FPGA received wrong number"));
+
+            case UartMessage::REPLACE_NUM_DONE:
+                log << ReplaceNumDone(msg);
                 break;
 
             case UartMessage::ERR_FIFO_FULL:
@@ -103,29 +108,52 @@ void UartManager::processReceivedMessage(UartMessage msg)
                 throw(FpgaMessageError("Received invalid message"));
                 break;
             case UartMessage::ACK:
-                if(ackQueue.size() > 0)
+            {
+                UartMessage underlying = Ack(msg).getUnderlyingMsg();
+                if (ackQueue.size() > 0)
                 {
                     ackType ackPacket = ackQueue.front();
                     ackQueue.pop();
 
                     //Handle case of expired packet
-                    if(clock() > ackPacket.latestTime)
+                    if (clock() > ackPacket.latestTime)
                     {
                         throw UartManagerException("FGPA took too long to ACK");
                     }
 
                     //Check that acked packet is identical to what is expected
-                    if(Ack(msg).getUnderlyingMsg().getData() != ackPacket.msg.getData())
+                    if (underlying.getData() != ackPacket.msg.getData())
                     {
                         throw UartManagerException("ACK packet was not the same as transmitted packet");
                     }
 
-                } else {
-                    throw(UartManagerException("Recieved ACK, but no messages are waiting in ACK queue"));
+                } else
+                {
+                    throw (UartManagerException("Recieved ACK, but no messages are waiting in ACK queue"));
                 }
 
-                log << Ack(msg);
+                //Display full message for ack
+                log << "Ack: ";
+                switch (underlying.getHeader())
+                {
+                    case UartMessage::REPLACE_NUM:
+                        log << ReplaceNum(underlying);
+                        break;
+                    case UartMessage::MOD_PARAMS:
+                        log << ModParams(underlying);
+                        break;
+                    case UartMessage::SYS_STATUS:
+                        log << SysStatus(underlying);
+                        break;
+                    case UartMessage::MEM_PARAMS:
+                        log << MemParams(underlying);
+                        break;
+                    default:
+                        log << Ack(msg);
+                        break;
+                }
                 break;
+            }
             default:
                 throw(UartManagerException("Received message of unknown header"));
         }

@@ -4,8 +4,9 @@
 #ifndef FTDI_WRAPPER_H
 #define FTDI_WRAPPER_H
 
-#include <generic_classes.hpp>
+#include "../generic_classes/generic_classes.hpp"
 #include "ftdi.h"
+#include <list>
 
 //Exception classes
 class FtdiLibException : public GenericException
@@ -29,8 +30,16 @@ class FtdiWrapper
 		FtdiWrapper(int vidIn, int pidIn);
 		~FtdiWrapper();
 		int getNoDevs(void) { refresh(); return noDevs; }; //Get number of devices available
-		void listDevs(void); //List available devices
+        struct devType
+        {
+            unsigned int id;
+            std::string manufacturer;
+            std::string description;
+            devType(int idIn, std::string manIn, std::string descIn) :id(idIn), manufacturer(manIn), description(descIn) {};
+        };
+        std::list<FtdiWrapper::devType> listDevs(bool display=false); //List available devices, return a structure containing the info
 		void open(unsigned int idx, int baud); //Open the device of index chosen from listDevs()
+		bool isOpen(void) {return state;}; // Tell client if they have opened the port
 		int getBaud(void) {return context->baudrate;}; //Get the actual baud rate of the device
 		void writeBlocking(unsigned char *data, int size); //Perform blocking r/w
 		void readBlocking(unsigned char *data, int size);

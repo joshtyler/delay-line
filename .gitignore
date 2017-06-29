@@ -1,1 +1,4 @@
+# Reference docs, e.g. datasheets etc.
 reference/*
+#Files ending in ~ (temp files)
+*~
