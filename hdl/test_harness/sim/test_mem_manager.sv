@@ -155,7 +155,7 @@ begin
 	test_mode = 0;
 	pulse_width = 10;
 	pulse_gap = 10;
-	#100ns;
+	#100us; //Wait for memory to reset
 	run = 1;
 	#100us;
 	sendUpdateRequest(4,1);

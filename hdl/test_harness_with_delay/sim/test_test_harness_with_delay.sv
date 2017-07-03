@@ -1,7 +1,7 @@
 //Test top level test harness module
 `include "../src/uart_msg_consts.h"
 
-module test_test_harness;
+module test_test_harness_with_delay;
 
 parameter integer DATA_WIDTH = 8;
 parameter integer STOP_BITS = 1;
@@ -19,20 +19,22 @@ logic clk = 0;
 always #(CLK_PERIOD/2) clk = !clk;
 
 //DUT
-logic uart_tb_tx_fpga_rx, uart_tb_rx_fpga_tx, in =0, out;
-test_harness_wrapper dut(.clk_in(clk), .uart_rx_pin(uart_tb_tx_fpga_rx), .in(in), .uart_tx_pin(uart_tb_rx_fpga_tx), .out(out));
-defparam dut.pll0.uut.CLK_FREQ = 12_000_000; //12MHz
+logic uart_tb_tx_fpga_rx, uart_tb_rx_fpga_tx, harness_in, delay_line_in, harness_out, delay_line_out;
 
-//Emulate delay line
-//Delay is number of numbers * bits per number * bit period
-localparam integer no_nums = 16;
-localparam time pulse_width = 1us;
-localparam time pulse_gap = 1us;
-always @(out)
-begin
-	automatic realtime delay = (no_nums * `UART_RECEIVED_WRONG_NUM_DATA_WIDTH *(pulse_width + pulse_gap));
-	in <= #delay out;
-end
+assign harness_in = delay_line_out;
+assign delay_line_in = harness_out;
+
+test_harness_with_delay dut
+(
+	.clk_in(clk),
+	.harness_in(harness_in),
+	.delay_line_in(delay_line_in),
+	.uart_rx_pin(uart_tb_tx_fpga_rx),
+	.harness_out(harness_out),
+	.delay_line_out(delay_line_out),
+	.uart_tx_pin(uart_tb_rx_fpga_tx)
+);
+defparam dut.pll0.uut.CLK_FREQ = 81_000_000; //81Mhz
 
 //UART Receiver
 reg [DATA_WIDTH-1:0] received_num;
@@ -127,16 +129,16 @@ begin
 	payload = 0;
 	payload `UART_MEM_PARAMS_NO_NUMS_PAYLOAD_BITS = 16; //16 Numbers
 	payload `UART_MEM_PARAMS_TEST_MODE_PAYLOAD_BITS = 0; //Test mode off
-	payload `UART_MEM_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 12; // 1us at 12MHz
-	payload `UART_MEM_PARAMS_PULSE_GAP_PAYLOAD_BITS = 12; // 1us at 12MHz
+	payload `UART_MEM_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 73; // 900ns @ 81Mhz
+	payload `UART_MEM_PARAMS_PULSE_GAP_PAYLOAD_BITS = 81; // 1us @ 81Mhz
 	uart_transmit_packet(`UART_HEADER_MEM_PARAMS,payload); //Setup memory manager
 
 	payload = 0;
-	payload `UART_MOD_PARAMS_CYCLES_PER_HALF_PERIOD_PAYLOAD_BITS = 1; //Close enough at 12MHz
+	payload `UART_MOD_PARAMS_CYCLES_PER_HALF_PERIOD_PAYLOAD_BITS = 3; //81Mhz
 	uart_transmit_packet(`UART_HEADER_MOD_PARAMS,payload); //Setup modulator
 
 	payload = 0;
-	payload `UART_DEMOD_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 18; //1.5us at 12MHz
+	payload `UART_DEMOD_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 122; //1.5us at 81MHz
 	uart_transmit_packet(`UART_HEADER_DEMOD_PARAMS,payload); //Setup demodulator
 
 

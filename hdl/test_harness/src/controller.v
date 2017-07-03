@@ -7,7 +7,8 @@ module controller(clk, n_reset, run,
                   uart_out_full, uart_out_msg, uart_out_req,
                   mem_received_num, mem_received_replaced, mem_received_valid, mem_received_overrun, mem_received_ack,
                   mem_replace_num, mem_replace_valid, mem_params,
-                  mod_params);
+                  mod_params,
+                  demod_params);
 
 //Clocking/reset inputs
 input clk, n_reset;
@@ -39,11 +40,15 @@ output reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; //Memory manager para
 //Modulator IO
 output reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE mod_params;
 
+//Demodulator IO
+output reg `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE demod_params;
+
 enum logic[2:0] {SM_POLL_MEM_MANAGER, SM_POLL_UART_IN, SM_UART_IN_MSG, SM_POLL_UART_OUT, SM_HALT} state;
 
 reg `UART_MSG_SIZE next_uart_out_msg;
 reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE next_mem_params;
 reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE next_mod_params;
+reg `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE next_demod_params;
 reg next_run;
 reg next_mem_received_ack; //This needs to be registered to avoid a logic loop
 
@@ -56,6 +61,7 @@ begin
 		run <= 0;
 		mod_params <= `DEFAULT_MOD_PARAMS;
 		mem_params <= `DEFAULT_MEM_PARAMS;
+		demod_params <= `DEFAULT_DEMOD_PARAMS;
 		mem_received_ack <= 0;
 		
 	end else begin
@@ -63,6 +69,7 @@ begin
 		run <= next_run;
 		mod_params <= next_mod_params;
 		mem_params <= next_mem_params;
+		demod_params <= next_demod_params;
 		mem_received_ack <= next_mem_received_ack;
 		case(state)
 			SM_POLL_MEM_MANAGER:
@@ -90,6 +97,8 @@ begin
 					else
 						state <= SM_POLL_MEM_MANAGER; //If we can send the message, otherwise wait
 				end
+			SM_HALT:
+				state <= SM_POLL_MEM_MANAGER; //Run has been reset to 0, so we can start again
 		endcase
 	end
 end
@@ -106,6 +115,7 @@ begin
 	mem_replace_valid = 0;
 	next_mod_params = mod_params;
 	next_mem_params = mem_params;
+	next_demod_params = demod_params;
 
 	case(state)
 		SM_POLL_MEM_MANAGER:
@@ -145,6 +155,11 @@ begin
 						next_uart_out_msg = genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN);
 					else
 						next_mod_params = uart_in_msg`UART_MOD_PARAMS_TOTAL_PAYLOAD_BITS;
+				`UART_HEADER_DEMOD_PARAMS :
+					if(run)
+						next_uart_out_msg = genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN);
+					else
+						next_demod_params = uart_in_msg`UART_DEMOD_PARAMS_TOTAL_PAYLOAD_BITS;
 				`UART_HEADER_MEM_PARAMS :
 					if(run)
 						next_uart_out_msg = genAckErrMsg(uart_in_msg, `UART_HEADER_ERR_UPDATE_WHILST_RUN);

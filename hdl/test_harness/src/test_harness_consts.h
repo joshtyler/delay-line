@@ -5,6 +5,7 @@
 
 `include "../src/uart_msg_consts.h"
 
+`define DEFAULT_DEMOD_PARAMS 0 //Fill in with something useful!
 `define DEFAULT_MOD_PARAMS 0 //Fill in with something useful!
 `define DEFAULT_MEM_PARAMS 0 //Fill in with something useful!
 
@@ -12,7 +13,8 @@
 function isFatalErrorMessage;
 input `UART_HEADER_SIZE head;
 	isFatalErrorMessage = (//head == `UART_HEADER_ERR_INVALID_MSG ||
-	                  //head == `UART_HEADER_ERR_UPDATE_WHILST_RUN || 
+	                  //head == `UART_HEADER_ERR_UPDATE_WHILST_RUN ||
+	                  head == `UART_HEADER_RECEIVED_WRONG_NUM ||
 	                  head == `UART_HEADER_ERR_MEM_OVERRUN || 
 	                  head == `UART_HEADER_ERR_FIFO_FULL);
 endfunction

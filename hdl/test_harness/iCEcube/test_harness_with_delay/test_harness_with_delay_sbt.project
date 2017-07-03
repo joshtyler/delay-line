@@ -1,13 +1,13 @@
 [Project]
 ProjectVersion=2.0
 Version=Lattice Semiconductor Corporation iCEcube - Release: 2017.01.27914 - Build Date: Jan 13 2017 02:48:34
-ProjectName=test_harness
+ProjectName=test_harness_with_delay
 Vendor=SiliconBlue
 Synthesis=synplify
-ProjectVFiles=../../src/controller.v=work,../../src/mem_manager.v=work,../../src/msg_asm.v=work,../../src/msg_disasm.v=work,../../src/replace_num_mem.v=work,../../src/shift_register.v=work,../../src/test_harness.v=work,../../src/uart_rx.v=work,../../src/uart_tx.v=work,../../../common/src/fifo.v=work,../../../common/src/power_on_reset.v=work,../../../common/src/dual_port_ram.v=work,../../src/modulator.v,../../src/demodulator.v
+ProjectVFiles=/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness_with_delay/src/pll.v=work,/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness_with_delay/src/test_harness_with_delay.v=work,../../../delay_line/src/comparator.v=work,../../../delay_line/src/delay_line.v=work,../../../delay_line/src/edge_detect.v=work,../../../delay_line/src/pulse_gen.v=work,../../src/controller.v=work,../../src/demodulator.v=work,../../src/mem_manager.v=work,../../src/modulator.v=work,../../src/msg_asm.v=work,../../src/msg_disasm.v=work,../../src/replace_num_mem.v=work,../../src/shift_register.v=work,../../src/test_harness.v=work,../../src/uart_rx.v=work,../../src/uart_tx.v=work,../../../common/src/dual_port_ram.v=work,../../../common/src/fifo.v=work,../../../common/src/power_on_reset.v=work
 ProjectCFiles=
-CurImplementation=test_harness_Implmnt
-Implementations=test_harness_Implmnt
+CurImplementation=test_harness_with_delay_Implmnt
+Implementations=test_harness_with_delay_Implmnt
 StartFromSynthesis=yes
 IPGeneration=false
 
@@ -38,21 +38,21 @@ UseIORegister=Auto
 VHDL2008=False
 VerilogIncludeSearchPath=
 
-[test_harness_Implmnt]
+[test_harness_with_delay_Implmnt]
 DeviceFamily=iCE40
 Device=HX1K
 DevicePackage=TQ144
 DevicePower=
-NetlistFile=test_harness_Implmnt/test_harness.edf
+NetlistFile=test_harness_with_delay_Implmnt/test_harness_with_delay.edf
 AdditionalEDIFFile=
 IPEDIFFile=
-DesignLib=test_harness_Implmnt/sbt/netlist/oadb-test_harness
-DesignView=_rt
-DesignCell=test_harness
-SynthesisSDCFile=test_harness_Implmnt/test_harness.scf
+DesignLib=test_harness_with_delay_Implmnt/sbt/netlist/oadb-test_harness_with_delay
+DesignView=_ep
+DesignCell=test_harness_with_delay
+SynthesisSDCFile=test_harness_with_delay_Implmnt/test_harness_with_delay.scf
 UserPinConstraintFile=
-UserSDCFile=../../src/test_harness_timing.sdc
-PhysicalConstraintFile=test_harness_Implmnt/sbt/constraint/test_harness_pcf_sbt.pcf
+UserSDCFile=
+PhysicalConstraintFile=/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness_with_delay/src/icestick.pcf
 BackendImplPathName=
 Devicevoltage=1.14
 DevicevoltagePerformance=+/-5%(datasheet default)
@@ -67,7 +67,7 @@ derValue=0.701346
 TimingPathNumberStick=0
 
 [tool options]
-PlacerEffortLevel=std
+PlacerEffortLevel=mid
 PlacerAutoLutCascade=yes
 PlacerAutoRamCascade=yes
 PlacerPowerDriven=no

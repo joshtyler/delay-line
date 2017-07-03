@@ -116,6 +116,7 @@ reg `UART_REPLACE_NUM_DATA_SIZE  replace_num_data;
 reg replace_num_valid;
 wire read_replacement_num = (output_clk_falling_edge && bit_ctr_reset); //Load during last bit of output word
 replace_num_mem mem0 (.clk(clk),
+                      .n_reset(run),
                       .wr_packet(mem_replace_num),
                       .rd_addr(next_word_ctr),
                       .rd_en(read_replacement_num), .wr_en(mem_replace_valid),

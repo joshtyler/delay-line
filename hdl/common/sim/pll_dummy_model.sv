@@ -15,7 +15,7 @@ parameter DIVQ;
 parameter FILTER_RANGE;
 
 //Clock
-localparam integer CLK_FREQ = 135_000_000; //135Mhz System clock frequency
+parameter integer CLK_FREQ = 1; //1Hz system clock (override with real value in instantiation)
 localparam realtime CLK_PERIOD = (1.0s / CLK_FREQ);
 reg clk = 0;
 always #(CLK_PERIOD/2) clk = !clk;

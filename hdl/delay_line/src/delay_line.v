@@ -1,8 +1,8 @@
 // Top level module
 
-module delay_line(clk_in, in, led0, led1, out);
+module delay_line(clk, n_reset, in, out);
 
-parameter integer FIFO_DEPTH = 600; //Depth of main FIFO (How many pulses can be stored)
+parameter integer FIFO_DEPTH = 512; //Depth of main FIFO (How many pulses can be stored)
 parameter integer MODULATION_FREQ = 13_500_000; //13.5MHz
 parameter integer CLK_FREQ = 135_000_000; //135Mhz - must be an even multiple of modulation freq
 parameter real EDGE_DETECT_TIMEOUT = 1.5e-6; //Timeout for edge detector
@@ -19,16 +19,8 @@ localparam integer CTR_WIDTH = $clog2(DELAY_CYCLES); //Counter must not overflow
 
 localparam integer DELAY = DELAY_CYCLES - 2 - 1 - 1; // We lose two clock cycles due to synchronisation flip flops, one in edge detector, and one in output stage
 
-input clk_in, in;
-output led0, led1, out; //LED0 is PLL lock, // LED1 is FIFO full
-
-//PLL
-wire clk;
-pll pll0(clk_in, clk, led0);
-
-//Power on reset
-reg n_reset;
-power_on_reset por0 (.*);
+input clk, n_reset, in;
+output out;
 
 //Synchronisation flip flops
 reg in_sync_intermediate, in_sync;
@@ -55,7 +47,6 @@ edge_detect #(EDGE_DETECT_TIMEOUT_CYCLES) edge0(clk, n_reset, in_sync, fifo_wren
 wire fifo_empty, fifo_full, fifo_rden;
 reg [CTR_WIDTH-1:0] fifo_data_out;
 fifo #(CTR_WIDTH, FIFO_DEPTH)  fifo0(clk, n_reset, fifo_data_in, fifo_wren, fifo_data_out, fifo_rden, fifo_empty, fifo_full);
-assign led1 = fifo_full;
 
 //Comparator
 wire pulse_gen_trigger;

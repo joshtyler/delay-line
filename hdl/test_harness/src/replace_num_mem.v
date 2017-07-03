@@ -1,8 +1,9 @@
 //Memory To store replacement number
-//Note that this block is not reset, so numbers will continue to be replaced after shutdown
+//The n_reset is syncronous, and must be valid for long enough that the module can erase its memory
 `include "uart_msg_consts.h"
 
 module replace_num_mem(clk,
+                       n_reset,
                        wr_packet,
                        rd_addr,
                        rd_en, wr_en,
@@ -11,7 +12,7 @@ module replace_num_mem(clk,
                        );
 
 //Clocking/reset inputs
-input clk;
+input clk, n_reset;
 
 //Data input
 input `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE wr_packet; //Address and data to write
@@ -38,30 +39,44 @@ reg [`UART_REPLACE_NUM_DATA_WIDTH:0] wr_data_mem;
 reg clear; //Request to clear location
 reg `UART_REPLACE_NUM_ADDR_SIZE clear_addr;
 
+//Signals for erasing the memory when stopped
+reg `UART_REPLACE_NUM_ADDR_SIZE erase_ctr =0; //NOTE THAT WE INITIALISE TO ZERO HERE. This is allowed because Lattice guarantees registers will initialise to 0
+
+
 //This block handles clearing of a write request after reading
 //It asumes that there will be at least one clock cycle where we are not writing before the next read
 //This is a reasonable assumption!
 always @(posedge clk)
 begin
-	wr_en_mem <= wr_en; //Default to write enable signals
-	wr_addr_mem <= wr_addr;
-	wr_data_mem <= {1'b1, wr_data}; //The '1' is the write flag
-
-	//If we are waiting to clear, and we are not writing this cycle
-	if(clear && !wr_en) 
+	if(!n_reset)
 	begin
-		clear <= 0;
+		//Clear the memory
 		wr_en_mem <= 1;
-		wr_addr_mem <= clear_addr;
-		wr_data_mem <= {1'b0, data_out};
-	end
-
-	//Check if we have a new location to clear
-	//If so, store for later
-	if(rd_en)
-	begin
-		clear <= 1;
-		clear_addr <= rd_addr;
+		wr_addr_mem <= erase_ctr;
+		wr_data_mem <= 0;
+		erase_ctr <= erase_ctr +1;
+	end else begin
+		erase_ctr <= 0;
+		wr_en_mem <= wr_en; //Default to write enable signals
+		wr_addr_mem <= wr_addr;
+		wr_data_mem <= {1'b1, wr_data}; //The '1' is the write flag
+	
+		//If we are waiting to clear, and we are not writing this cycle
+		if(clear && !wr_en) 
+		begin
+			clear <= 0;
+			wr_en_mem <= 1;
+			wr_addr_mem <= clear_addr;
+			wr_data_mem <= {1'b0, data_out};
+		end
+	
+		//Check if we have a new location to clear
+		//If so, store for later
+		if(rd_en)
+		begin
+			clear <= 1;
+			clear_addr <= rd_addr;
+		end
 	end
 end
 

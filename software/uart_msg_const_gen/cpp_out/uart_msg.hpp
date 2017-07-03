@@ -1,5 +1,5 @@
 // UART Message Decoder and Encoder Classes 
-// Automatically generated  by uart_msg_const_gen.py at 07:53PM on June 29, 2017
+// Automatically generated  by uart_msg_const_gen.py at 03:41PM on July 03, 2017
 // DO NOT MODIFY MANUALLY
 
 #ifndef UART_MSG_HPP
@@ -24,13 +24,14 @@ class UartMessage
 			REPLACE_NUM=1,
 			REPLACE_NUM_DONE=2,
 			MOD_PARAMS=3,
-			SYS_STATUS=4,
-			MEM_PARAMS=5,
-			ERR_FIFO_FULL=6,
-			ERR_MEM_OVERRUN=7,
-			ERR_UPDATE_WHILST_RUN=8,
-			ERR_INVALID_MSG=9,
-			ACK=10
+			DEMOD_PARAMS=4,
+			SYS_STATUS=5,
+			MEM_PARAMS=6,
+			ERR_FIFO_FULL=7,
+			ERR_MEM_OVERRUN=8,
+			ERR_UPDATE_WHILST_RUN=9,
+			ERR_INVALID_MSG=10,
+			ACK=11
 		};
 		UartMessage(MessageType dataIn) :data(dataIn) {};
 		UartMessage() { data.fill(0);};
@@ -47,12 +48,13 @@ class UartMessage
 		ParamType accessBits(unsigned int lower, unsigned int upper, bool set,MessageType *arr=nullptr, ParamType dataIn=0 ) const;
 		ParamType getBits(unsigned int lower, unsigned int upper) const {return accessBits(lower, upper, false);};
 		void setBits(unsigned int lower, unsigned int upper,ParamType dataIn) {accessBits(lower, upper, true, &data, dataIn);};
-		const std::string headerStrings[11]=
+		const std::string headerStrings[12]=
 		{
 			"received wrong num",
 			"replace num",
 			"replace num done",
 			"mod params",
+			"demod params",
 			"sys status",
 			"mem params",
 			"err fifo full",
@@ -120,6 +122,19 @@ class ModParams : public UartMessage
 		void print(std::ostream& os) const
 		{
 			os << getHeaderStr() << ": "  << " cycles per half period: " << getCyclesPerHalfPeriod()<< std::endl;
+		}
+};
+
+class DemodParams : public UartMessage
+{
+	public:
+		DemodParams() :UartMessage() {data[0] = (uint8_t) DEMOD_PARAMS;};
+		DemodParams(const UartMessage& in) {data = in.getData();};
+		ParamType getPulseWidth(void) const {return getBits(8, 15);};
+		void setPulseWidth(ParamType data) {setBits(8, 15, data);};
+		void print(std::ostream& os) const
+		{
+			os << getHeaderStr() << ": "  << " pulse width: " << getPulseWidth()<< std::endl;
 		}
 };
 

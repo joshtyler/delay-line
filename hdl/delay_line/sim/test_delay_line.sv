@@ -19,10 +19,10 @@ localparam integer PULSES = $floor(PULSE_WIDTH / MOD_PERIOD);
 localparam realtime DELAY_TOLERANCE = CLK_PERIOD;
  
 
-logic clk, clk_in, in, led0, led1, out;
+logic clk, clk_in, in, out;
 
 clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
-delay_line dut(.*);
+delay_line_wrapper dut(.*);
 
 assign clk_in = clk;
 

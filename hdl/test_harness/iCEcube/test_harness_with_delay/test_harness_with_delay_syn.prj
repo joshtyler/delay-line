@@ -1,15 +1,23 @@
 #--  Synopsys, Inc.
 #--  Version L-2016.09L+ice40
-#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/delay_line/iCEcube/test_harness/test_harness_syn.prj
-#--  Written on Wed Jun 14 15:36:56 2017
+#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness/iCEcube/test_harness_with_delay/test_harness_with_delay_syn.prj
+#--  Written on Mon Jul  3 19:25:35 2017
 
 
 #project files
 
 
 
+add_file -verilog -lib work "/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness_with_delay/src/pll.v" 
+add_file -verilog -lib work "/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness_with_delay/src/test_harness_with_delay.v" 
+add_file -verilog -lib work "../../../delay_line/src/comparator.v" 
+add_file -verilog -lib work "../../../delay_line/src/delay_line.v" 
+add_file -verilog -lib work "../../../delay_line/src/edge_detect.v" 
+add_file -verilog -lib work "../../../delay_line/src/pulse_gen.v" 
 add_file -verilog -lib work "../../src/controller.v" 
+add_file -verilog -lib work "../../src/demodulator.v" 
 add_file -verilog -lib work "../../src/mem_manager.v" 
+add_file -verilog -lib work "../../src/modulator.v" 
 add_file -verilog -lib work "../../src/msg_asm.v" 
 add_file -verilog -lib work "../../src/msg_disasm.v" 
 add_file -verilog -lib work "../../src/replace_num_mem.v" 
@@ -17,13 +25,11 @@ add_file -verilog -lib work "../../src/shift_register.v"
 add_file -verilog -lib work "../../src/test_harness.v" 
 add_file -verilog -lib work "../../src/uart_rx.v" 
 add_file -verilog -lib work "../../src/uart_tx.v" 
+add_file -verilog -lib work "../../../common/src/dual_port_ram.v" 
 add_file -verilog -lib work "../../../common/src/fifo.v" 
 add_file -verilog -lib work "../../../common/src/power_on_reset.v" 
-add_file -verilog -lib work "../../../common/src/dual_port_ram.v" 
-add_file -verilog -lib work "../../src/modulator.v" 
-add_file -verilog -lib work "../../src/demodulator.v" 
-#implementation: "test_harness_Implmnt"
-impl -add test_harness_Implmnt -type fpga
+#implementation: "test_harness_with_delay_Implmnt"
+impl -add test_harness_with_delay_Implmnt -type fpga
 
 #
 #implementation attributes
@@ -78,6 +84,6 @@ set_option -auto_infer_blackbox 0
 set_option -write_apr_constraint 1
 
 #set result format/file last
-project -result_file "test_harness_Implmnt/test_harness.edf"
-impl -active test_harness_Implmnt
+project -result_file "test_harness_with_delay_Implmnt/test_harness_with_delay.edf"
+impl -active test_harness_with_delay_Implmnt
 project -run synthesis -clean
