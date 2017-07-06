@@ -17,7 +17,11 @@ input clk, n_reset, data_in;
 output reg valid;
 output reg [DATA_BITS-1:0] data_out;
 
-enum reg[1:0] {START, DATA, STOP} state;
+reg[1:0] state;
+localparam START = 2'b00;
+localparam DATA = 2'b01;
+localparam STOP = 2'b10;
+
 
 reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr;
 

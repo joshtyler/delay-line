@@ -8,12 +8,16 @@ parameter PULSES = 3;
 input clk, n_reset, en;
 output out;
 
-localparam PERIOD_CTR_WIDTH = $clog2(CLKS_PER_HALF_PERIOD);
-localparam PULSE_CTR_WIDTH = $clog2(PULSES);
+parameter PERIOD_CTR_WIDTH = $clog2(CLKS_PER_HALF_PERIOD);
+parameter PULSE_CTR_WIDTH = $clog2(PULSES);
 reg [PERIOD_CTR_WIDTH-1:0] period_ctr, next_period_ctr;
 reg [PULSE_CTR_WIDTH-1:0] pulse_ctr, next_pulse_ctr;
 
-enum reg[1:0] {WAIT, HIGH, LOW} state; //This is actually systemverilog, but widely supported
+reg[1:0] state;
+localparam WAIT = 2'b00;
+localparam HIGH = 2'b01;
+localparam LOW = 2'b10;
+
 
 wire period_done, pulse_done;
 assign period_done = (period_ctr == (CLKS_PER_HALF_PERIOD - 1));
@@ -41,7 +45,7 @@ begin
 					else
 						state <= HIGH;
 				end
-		endcase;
+		endcase
 	
 		period_ctr <= next_period_ctr;
 		pulse_ctr <= next_pulse_ctr;
@@ -79,7 +83,7 @@ begin
 				next_period_ctr = period_ctr + 1;
 		end
 
-	endcase;
+	endcase
 end
 
 assign out = (state == HIGH);

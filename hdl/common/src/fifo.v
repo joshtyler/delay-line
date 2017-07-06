@@ -6,8 +6,8 @@ module fifo(clk, n_reset, data_in, wr_en, data_out, rd_en, empty, full);
 
 parameter WIDTH = 8;
 parameter DEPTH = 10;
-localparam ADDR_WIDTH = $clog2(DEPTH); //ceiling applied to log2. Technically SystemVerilog...
-localparam CTR_WIDTH = $clog2(DEPTH+1); //The counter must be able to count from 0 to depth, not depth-1
+parameter ADDR_WIDTH = $clog2(DEPTH); //ceiling applied to log2. Technically SystemVerilog...
+parameter CTR_WIDTH = $clog2(DEPTH+1); //The counter must be able to count from 0 to depth, not depth-1
 
 input clk, n_reset, wr_en, rd_en;
 input [WIDTH-1:0] data_in;

@@ -10,7 +10,7 @@ output uart_tx_pin, out;
 parameter integer UART_DATA_WIDTH = 8;
 parameter integer UART_STOP_BITS = 1;
 parameter integer UART_BAUD = 9600;
-parameter integer CLK_RATE = 12_000_000; //12MHz
+parameter integer CLK_RATE = 24_000_000;
 parameter integer MSG_ASM_FIFO_DEPTH = 8; //8 Packets
 parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
 
@@ -50,11 +50,11 @@ uart_rx #(
 //Message Assembler (and FIFO) (takes input from UART RX and outputs to controller)
 localparam integer ASM_DISASM_WORDS_PER_PACKET = `UART_MSG_WIDTH / UART_DATA_WIDTH;
 
-reg `UART_MSG_SIZE asm_data_out, uart_in_data;
-reg asm_data_valid;
-reg uart_in_req;
-reg uart_in_full;
-reg uart_in_fifo_empty;
+wire `UART_MSG_SIZE asm_data_out, uart_in_data;
+wire asm_data_valid;
+wire uart_in_req;
+wire uart_in_full;
+wire uart_in_fifo_empty;
 
 msg_asm #(
 		.WORD_SIZE(UART_DATA_WIDTH),
@@ -83,9 +83,9 @@ fifo #(
 	);
 
 //Message disassembler (and FIFO)(takes input from controller and outputs to UART TX)
-reg `UART_MSG_SIZE uart_out_data, disasm_data_in;
-reg disasm_req;
-reg uart_out_full, disasm_fifo_empty, uart_out_req;
+wire `UART_MSG_SIZE uart_out_data, disasm_data_in;
+wire disasm_req;
+wire uart_out_full, disasm_fifo_empty, uart_out_req;
 msg_disasm #(
 		.WORD_SIZE(UART_DATA_WIDTH),
 		.WORDS_PER_PACKET(ASM_DISASM_WORDS_PER_PACKET)
@@ -115,14 +115,14 @@ fifo #(
 	);
 
 //Controller
-reg run;
+wire run;
 
-reg `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
-reg mem_received_valid, mem_received_overrun, mem_received_ack, mem_replace_valid, mem_received_replaced;
-reg `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; 
-reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; 
-reg `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE demod_params; 
-reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE mod_params;
+wire `UART_RECEIVED_WRONG_NUM_TOTAL_PAYLOAD_SIZE mem_received_num;
+wire mem_received_valid, mem_received_overrun, mem_received_ack, mem_replace_valid, mem_received_replaced;
+wire `UART_REPLACE_NUM_TOTAL_PAYLOAD_SIZE mem_replace_num; 
+wire `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE mem_params; 
+wire `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE demod_params; 
+wire `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE mod_params;
 
 controller controller_0
 (

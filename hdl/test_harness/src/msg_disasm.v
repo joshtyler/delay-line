@@ -24,7 +24,11 @@ input uart_ready;
 output reg [WORD_SIZE-1:0] data_out;
 output data_out_req;
 
-enum reg[1:0] {SM_RX, SM_RX_REQ, SM_TX_REQ, SM_TX} state;
+reg[1:0] state;
+localparam SM_RX = 2'b00;
+localparam SM_RX_REQ = 2'b01;
+localparam SM_TX_REQ = 2'b10;
+localparam SM_TX = 2'b11;
 
 reg [CTR_WIDTH-1:0] ctr;
 
@@ -40,13 +44,13 @@ always @(posedge clk)
 	end
 
 //Transmit word
-reg [WORD_SIZE-1:0] mem [2**CTR_WIDTH-1:0];
+wire [WORD_SIZE-1:0] mem [WORDS_PER_PACKET-1:0];
 always @(posedge clk)
 		data_out <= mem[ctr];
 
 //Combinationally assign input to the entire contents of memory
 genvar i;
-for(i=0; i< WORDS_PER_PACKET; i++)
+for(i=0; i< WORDS_PER_PACKET; i=i+1)
 	assign mem[i] = data_in[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)];
 
 //State logic

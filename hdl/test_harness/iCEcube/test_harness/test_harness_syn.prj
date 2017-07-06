@@ -1,8 +1,11 @@
 #--  Synopsys, Inc.
 #--  Version L-2016.09L+ice40
-#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/delay_line/iCEcube/test_harness/test_harness_syn.prj
-#--  Written on Wed Jun 14 15:36:56 2017
+#--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness/iCEcube/test_harness/test_harness_syn.prj
+#--  Written on Wed Jul  5 16:55:50 2017
 
+
+#project folders
+add_folder {Constraint}  
 
 #project files
 
@@ -22,6 +25,8 @@ add_file -verilog -lib work "../../../common/src/power_on_reset.v"
 add_file -verilog -lib work "../../../common/src/dual_port_ram.v" 
 add_file -verilog -lib work "../../src/modulator.v" 
 add_file -verilog -lib work "../../src/demodulator.v" 
+add_file -verilog -lib work "../../src/test_harness_wrapper.v" 
+add_file -verilog -lib work "../../src/pll.v" 
 #implementation: "test_harness_Implmnt"
 impl -add test_harness_Implmnt -type fpga
 

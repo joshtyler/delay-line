@@ -43,7 +43,13 @@ output reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE mod_params;
 //Demodulator IO
 output reg `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE demod_params;
 
-enum logic[2:0] {SM_POLL_MEM_MANAGER, SM_POLL_UART_IN, SM_UART_IN_MSG, SM_POLL_UART_OUT, SM_HALT} state;
+reg[2:0] state;
+localparam SM_POLL_MEM_MANAGER = 3'b000;
+localparam SM_POLL_UART_IN = 3'b001;
+localparam SM_UART_IN_MSG = 3'b010;
+localparam SM_POLL_UART_OUT = 3'b011;
+localparam SM_HALT = 3'b100;
+
 
 reg `UART_MSG_SIZE next_uart_out_msg;
 reg `UART_MEM_PARAMS_TOTAL_PAYLOAD_SIZE next_mem_params;
@@ -51,6 +57,23 @@ reg `UART_MOD_PARAMS_TOTAL_PAYLOAD_SIZE next_mod_params;
 reg `UART_DEMOD_PARAMS_TOTAL_PAYLOAD_SIZE next_demod_params;
 reg next_run;
 reg next_mem_received_ack; //This needs to be registered to avoid a logic loop
+
+//Used to determine if the system should HALT or not
+function isFatalErrorMessage;
+input `UART_HEADER_SIZE head;
+	isFatalErrorMessage = (//head == `UART_HEADER_ERR_INVALID_MSG ||
+	                  //head == `UART_HEADER_ERR_UPDATE_WHILST_RUN ||
+	                  head == `UART_HEADER_RECEIVED_WRONG_NUM ||
+	                  head == `UART_HEADER_ERR_MEM_OVERRUN || 
+	                  head == `UART_HEADER_ERR_FIFO_FULL);
+endfunction
+
+//Create an acknowledge/invalid message message
+function `UART_MSG_SIZE genAckErrMsg;
+input `UART_MSG_SIZE msg_in;
+input `UART_HEADER_SIZE header;
+	genAckErrMsg = {msg_in[(`UART_MSG_WIDTH-`UART_HEADER_WIDTH-1):0], header};
+endfunction
 
 //Next state logic
 always @(posedge clk)

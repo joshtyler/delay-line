@@ -2,6 +2,7 @@
 // SEQ_MODE is the timing paramer and base on the cbit[19:16] of logic cell
 // C_ON parameter is the nontiming parameter base on cbit[20] of logic cell and used for carry logic
 // LUT_INIT parameter is the nontiming parameter base on cbit[15:0] of the logic cell. It is same as the LUT_INIT parameter in EDIF file.
+`timescale 1ps/1ps
 module LogicCell ( carryout, lcout, carryin, clk, clkb, in0,
      in1, in2, in3, sr );
 

@@ -1,7 +1,7 @@
 #--  Synopsys, Inc.
 #--  Version L-2016.09L+ice40
 #--  Project file /home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness/iCEcube/test_harness_with_delay/test_harness_with_delay_syn.prj
-#--  Written on Mon Jul  3 19:25:35 2017
+#--  Written on Mon Jul  3 19:37:04 2017
 
 
 #project files
@@ -34,8 +34,11 @@ impl -add test_harness_with_delay_Implmnt -type fpga
 #
 #implementation attributes
 
-set_option -vlog_std sysv
+set_option -vlog_std v2001
 set_option -project_relative_includes 1
+
+#pr_1 attributes
+set_option -job pr_1 -add par
 
 #device options
 set_option -technology SBTiCE40

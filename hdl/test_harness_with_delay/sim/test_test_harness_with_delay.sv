@@ -138,7 +138,7 @@ begin
 	uart_transmit_packet(`UART_HEADER_MOD_PARAMS,payload); //Setup modulator
 
 	payload = 0;
-	payload `UART_DEMOD_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 122; //1.5us at 81MHz
+	payload `UART_DEMOD_PARAMS_PULSE_WIDTH_PAYLOAD_BITS = 121; //1.5us at 81MHz
 	uart_transmit_packet(`UART_HEADER_DEMOD_PARAMS,payload); //Setup demodulator
 
 
@@ -149,7 +149,13 @@ begin
 	payload `UART_REPLACE_NUM_DATA_PAYLOAD_BITS = 1;
 	uart_transmit_packet(`UART_HEADER_REPLACE_NUM,payload); //Replace the number at address 1 with 1
 
-	#END_DELAY;
+	#SPACE_DELAY;
+	payload = 0;
+	payload `UART_REPLACE_NUM_ADDR_PAYLOAD_BITS = 1;
+	payload `UART_REPLACE_NUM_DATA_PAYLOAD_BITS = 0;
+	uart_transmit_packet(`UART_HEADER_REPLACE_NUM,payload);
+
+	#SPACE_DELAY;
 	$finish;
 end
 

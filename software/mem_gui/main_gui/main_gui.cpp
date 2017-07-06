@@ -40,6 +40,11 @@ MainGui::MainGui(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refG
     builder->get_widget("mod_send", modSend);
     modSend->signal_clicked().connect(sigc::mem_fun(*this, &MainGui::onModSend));
 
+    //Setup demodulator parameters
+    builder->get_widget("demod_pulse_width",demodPulseWidth);
+    builder->get_widget("demod_send", demodSend);
+    demodSend->signal_clicked().connect(sigc::mem_fun(*this, &MainGui::onDemodSend));
+
     //Setup memory manager parameters
     builder->get_widget("test_mode", testMode);
     builder->get_widget("pulse_width", pulseWidth);
@@ -119,6 +124,18 @@ bool MainGui::onIdle(void)
                     }
                     //We do not need to process other types
                 }
+                break;
+                case UartMessage::RECEIVED_WRONG_NUM:
+                {
+                    //Stop and clear memory
+                    run->set_active(false);
+                    onRun();
+                    for (auto it = memArr.begin(); it != memArr.end(); it++)
+                    {
+                        (*it)->clear();
+                    }
+                }
+                    break;
                 default:
                     break; //We do not need to handle these message types
             }
@@ -205,6 +222,7 @@ void MainGui::onConnectClicked()
 
     onMemSend(); //Write defaults from glade file
     onModSend();
+    onDemodSend();
     onRun(); //
 }
 
@@ -251,6 +269,14 @@ void MainGui::onModSend(void)
     StatusManager::modParams newParams;
     newParams.cyclesPerHalfPeriod = (unsigned int) cyclesPerHalfPeriod->get_value_as_int();
     statusManager.setModParams(newParams);
+}
+
+//What to do if someone wants to send modulator paramters
+void MainGui::onDemodSend(void)
+{
+    StatusManager::demodParams newParams;
+    newParams.pulseWidth = (unsigned int) demodPulseWidth->get_value_as_int();
+    statusManager.setDemodParams(newParams);
 }
 
 //What to do if someone wants to send memory paramters

@@ -3,3 +3,10 @@
 *stdout.log.bak
 *synlog.tcl
 *syn.prd
+*/.vdbs/*
+*.twr
+*.arearep
+*_drc.log
+*_prim.v
+*xxx_lse*
+

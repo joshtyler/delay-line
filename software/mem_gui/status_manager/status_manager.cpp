@@ -11,6 +11,13 @@ void StatusManager::setModParams(StatusManager::modParams newParams)
     messageQueue.push(msg);
 }
 
+void StatusManager::setDemodParams(StatusManager::demodParams newParams)
+{
+    DemodParams msg;
+    msg.setPulseWidth(newParams.pulseWidth);
+    messageQueue.push(msg);
+}
+
 void StatusManager::setMemParams(StatusManager::memParams newParams)
 {
     MemParams msg;
@@ -68,5 +75,6 @@ void StatusManager::processMessage(UartMessage msg)
         throw StatusManagerException("Asked to process non ACK message.");
     }
 }
+
 
 

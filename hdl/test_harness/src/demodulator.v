@@ -19,7 +19,10 @@ assign pulse_width = demod_params `UART_DEMOD_PARAMS_PULSE_WIDTH_PAYLOAD_BITS;
 
 reg `UART_DEMOD_PARAMS_PULSE_WIDTH_SIZE ctr, next_ctr;
 
-enum logic[1:0] {SM_WAIT, SM_COUNT} state;
+reg[0:0] state;
+localparam SM_WAIT = 1'b0;
+localparam SM_COUNT = 1'b1;
+
 
 //Next state logic
 always @(posedge clk)
@@ -30,7 +33,7 @@ always @(posedge clk)
 		case(state)
 			SM_WAIT: if(in) state <= SM_COUNT;
 			SM_COUNT: if(ctr >= pulse_width-1) state <= SM_WAIT;
-		endcase;
+		endcase
 		ctr <= next_ctr;
 	end
 

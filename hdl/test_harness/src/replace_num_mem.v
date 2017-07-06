@@ -80,7 +80,7 @@ begin
 	end
 end
 
-reg [`UART_REPLACE_NUM_DATA_WIDTH:0] rd_data_mem;
+wire [`UART_REPLACE_NUM_DATA_WIDTH:0] rd_data_mem;
 assign valid_out = rd_data_mem[`UART_REPLACE_NUM_DATA_WIDTH];
 assign data_out = rd_data_mem[`UART_REPLACE_NUM_DATA_WIDTH-1:0];
 

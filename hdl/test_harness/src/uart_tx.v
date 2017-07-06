@@ -19,7 +19,12 @@ reg [DATA_BITS-1:0] data_reg;
 output ready;
 output reg out;
 
-enum reg[2:0] {READY, SYNC, START, DATA, STOP} state;
+reg[2:0] state;
+localparam READY = 3'b000;
+localparam SYNC = 3'b001;
+localparam START = 3'b010;
+localparam DATA = 3'b011;
+localparam STOP = 3'b100;
 
 reg [BIT_CTR_WIDTH-1:0] bit_ctr, next_bit_ctr;
 

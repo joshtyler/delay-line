@@ -67,6 +67,11 @@ class MainGui : public Gtk::Window
         Gtk::Button *modSend;
         void onModSend(void);
 
+        //Demodulator parameters
+        Gtk::SpinButton *demodPulseWidth;
+        Gtk::Button *demodSend;
+        void onDemodSend(void);
+
         //memory manager parameters
         Gtk::ToggleButton *testMode;
         Gtk::SpinButton *pulseWidth, *pulseGap;

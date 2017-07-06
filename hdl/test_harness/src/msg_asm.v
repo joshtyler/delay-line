@@ -17,10 +17,12 @@ input clk, n_reset;
 input [WORD_SIZE-1:0] data_in;
 input data_in_valid;
 
-output reg [OUTPUT_WIDTH-1:0] data_out;
+output [OUTPUT_WIDTH-1:0] data_out;
 output data_out_valid;
 
-enum reg[0:0] {SM_RX, SM_TX} state;
+reg[0:0] state;
+localparam SM_RX = 1'b0;
+localparam SM_TX = 1'b1;
 
 reg [CTR_WIDTH-1:0] ctr;
 
@@ -43,7 +45,7 @@ always @(posedge clk)
 
 //Combinationally assign output to the entire contents of memory
 genvar i;
-for(i=0; i< WORDS_PER_PACKET; i++)
+for(i=0; i< WORDS_PER_PACKET; i=i+1)
 	assign data_out[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)] = mem[i];
 
 //State logic

@@ -10,10 +10,14 @@ parameter TIMEOUT = 20;
 input clk, n_reset, in;
 output out;
 
-localparam CTR_WIDTH = $clog2(TIMEOUT); //This is actually systemverilog, but widely supported
+parameter CTR_WIDTH = $clog2(TIMEOUT);
 reg [CTR_WIDTH-1:0] ctr, next_ctr;
 
-enum reg[1:0] {SM_WAIT, SM_ASSERT, SM_TIMEOUT} state; //This is actually systemverilog, but widely supported
+reg[1:0] state;
+localparam SM_WAIT = 2'b00;
+localparam SM_ASSERT = 2'b01;
+localparam SM_TIMEOUT = 2'b10;
+
 
 //Next state logic
 always @(posedge clk)
@@ -31,7 +35,7 @@ begin
 			SM_TIMEOUT:
 				if(ctr == (TIMEOUT-1))
 					state <= SM_WAIT;
-		endcase;
+		endcase
 		ctr <= next_ctr;
 	end
 end

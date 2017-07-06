@@ -11,8 +11,8 @@
 -optimization_goal Area
 -twr_paths 3
 -bram_utilization 100.00
--ramstyle Auto
--romstyle Auto
+-ramstyle Block_RAM
+-romstyle ebr
 -use_carry_chain 1
 -carry_chain_length 0
 -resource_sharing 1
@@ -53,4 +53,4 @@
 -output_edif test_harness_with_delay_Implmnt/test_harness_with_delay.edf
 
 #set log file
--logfile "/home/josh/Dropbox/My Documents/Uni work/MSc/Embedded Systems/Project/repository/hdl/test_harness/iCEcube/test_harness_with_delay/test_harness_with_delay_Implmnt/test_harness_with_delay_lse.log"
+-logfile "test_harness_with_delay_Implmnt/test_harness_with_delay_lse.log"

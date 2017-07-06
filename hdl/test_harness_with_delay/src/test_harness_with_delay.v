@@ -9,7 +9,7 @@ localparam integer CLK_FREQ = 81_000_000; //81Mhz (out of PLL)
 localparam real BIT_TIME = 1.9e-6; //Time per bit
 localparam real BITS = 576; //Number of bits in a delay line
 
-localparam DELAY = BIT_TIME * BITS; //Make delay slighty shorter so that we hit the middle of the clock pulse
+//localparam DELAY = BIT_TIME * BITS; //Make delay slighty shorter so that we hit the middle of the clock pulse
 
 
 //PLL
@@ -22,7 +22,7 @@ pll pll0
 );
 
 //Power on reset
-reg n_reset;
+wire n_reset;
 power_on_reset por0
 (
 	.clk(clk),
@@ -44,8 +44,8 @@ test_harness #(
 
 //Delay line
 delay_line #(
-	.CLK_FREQ(CLK_FREQ),
-	.DELAY_TIME(DELAY)
+	.CLK_FREQ(CLK_FREQ)
+//	.DELAY_TIME(DELAY)
 )  delay_line_0 (
 	.clk(clk),
 	.n_reset(n_reset),

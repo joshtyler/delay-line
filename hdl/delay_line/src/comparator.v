@@ -10,7 +10,12 @@ input clk, n_reset, empty;
 input [WIDTH-1:0] data_in, count;
 output req_data, trigger;
 
-enum reg[1:0] {SM_WAIT_FOR_DATA, SM_REQUEST, SM_WAIT, SM_ASSERT} state; //This is actually systemverilog, but widely supported
+reg[1:0] state; //State machine
+localparam SM_WAIT_FOR_DATA = 2'b00;
+localparam SM_REQUEST = 2'b01;
+localparam SM_WAIT = 2'b10;
+localparam SM_ASSERT = 2'b11;
+
 
 //Next state logic
 always @(posedge clk)

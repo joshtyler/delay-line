@@ -19,7 +19,7 @@ reg [WIDTH-1:0] mem [DEPTH-1:0];
 integer i;
 initial
 	for(i=0; i < DEPTH; i=i+1)
-		mem[i] = 0;
+		mem[i] <= 0;
 
 always @(posedge clk)
 begin

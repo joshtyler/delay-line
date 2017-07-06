@@ -67,6 +67,7 @@ void UartManager::update(void)
         currentWrite = sendQueue.front();
         sendQueue.pop();
         uart.writeRequest(currentWrite.getDataRef(),UartMsgLen);
+        log << "Raw transmit packet: " << std::hex << currentWrite << std::dec;
         ackQueue.push({currentWrite, (clock() + timeout)}); //We expect the packet to be ACKed. Log this in the ACK queue
         writeLogged = true;
     }
@@ -74,7 +75,7 @@ void UartManager::update(void)
 
 void UartManager::processReceivedMessage(UartMessage msg)
 {
-
+        log << "Raw received packet:" << std::hex << msg << std::dec;
         switch(msg.getHeader())
         {
             case UartMessage::REPLACE_NUM:
@@ -85,7 +86,7 @@ void UartManager::processReceivedMessage(UartMessage msg)
 
             case UartMessage::RECEIVED_WRONG_NUM:
                 log << ReceivedWrongNum(msg);
-                throw(FpgaMessageError("FPGA received wrong number"));
+//                throw(FpgaMessageError("FPGA received wrong number"));
 
             case UartMessage::REPLACE_NUM_DONE:
                 log << ReplaceNumDone(msg);
@@ -124,6 +125,8 @@ void UartManager::processReceivedMessage(UartMessage msg)
                     //Check that acked packet is identical to what is expected
                     if (underlying.getData() != ackPacket.msg.getData())
                     {
+                        std::cerr << "Transmitted packet :" << std::hex <<ackPacket.msg << std::dec << std::endl;
+                        std::cerr << "Received ack :" << std::hex << msg << std::dec << std::endl;
                         throw UartManagerException("ACK packet was not the same as transmitted packet");
                     }
 
@@ -141,6 +144,9 @@ void UartManager::processReceivedMessage(UartMessage msg)
                         break;
                     case UartMessage::MOD_PARAMS:
                         log << ModParams(underlying);
+                        break;
+                    case UartMessage::DEMOD_PARAMS:
+                        log << DemodParams(underlying);
                         break;
                     case UartMessage::SYS_STATUS:
                         log << SysStatus(underlying);

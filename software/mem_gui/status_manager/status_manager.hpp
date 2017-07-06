@@ -25,6 +25,11 @@ class StatusManager : public MessageCreator
             ParamType cyclesPerHalfPeriod;
             modParams() : cyclesPerHalfPeriod(0) {};
         };
+        struct demodParams
+        {
+            ParamType pulseWidth;
+            demodParams() : pulseWidth(0) {};
+        };
         struct memParams
         {
             ParamType noNums;
@@ -41,14 +46,17 @@ class StatusManager : public MessageCreator
 
         void processMessage(UartMessage msg); //Process a status message from FPGA
         void setModParams(modParams newParams); //Send out a request to update to these parameters
+        void setDemodParams(demodParams newParams);
         void setMemParams(memParams newParams);
         void setSysStatus(sysStatus newStatus);
         modParams getModParams(void) const {return currModParams;};
+        demodParams getDemodParams(void) const {return currDemodParams;};
         memParams getMemParams(void) const {return currMemParams;};
         sysStatus getSysParams(void) const {return currSysStatus;};
 
     private:
         modParams currModParams;
+        demodParams currDemodParams;
         memParams currMemParams;
         sysStatus currSysStatus;
 };

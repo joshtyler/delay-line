@@ -10000,144 +10000,144 @@ endmodule //Sbt_DS_PLL
 */ 
 
 
-////-----------------------------------------------------
-//// ------------ SB_PLL40_CORE  ------------------------
-////-----------------------------------------------------
-
-`timescale 1ps/1ps
-module SB_PLL40_CORE (
-		REFERENCECLK,			//Driven by core logic
-		PLLOUTCORE,			//PLL output to core logic
-		PLLOUTGLOBAL,	   		//PLL output to global network
-		EXTFEEDBACK,  			//Driven by core logic
-		DYNAMICDELAY,			//Driven by core logic
-		LOCK,				//Output of PLL
-		BYPASS,				//Driven by core logic
-		RESETB,				//Driven by core logic
-		SDI,				//Driven by core logic. Test Pin
-		SDO,				//Output to RB Logic Tile. Test Pin
-		SCLK,				//Driven by core logic. Test Pin
-		LATCHINPUTVALUE 		//iCEGate signal
-);
-
-input 	REFERENCECLK;				//Driven by core logic
-output 	PLLOUTCORE;				//PLL output to core logic
-output	PLLOUTGLOBAL;	   			//PLL output to global network
-input	EXTFEEDBACK;  				//Driven by core logic
-input	[7:0] DYNAMICDELAY;  			//Driven by core logic
-output	LOCK;					//Output of PLL
-input	BYPASS;					//Driven by core logic
-input	RESETB;					//Driven by core logic
-input	LATCHINPUTVALUE; 			//iCEGate signal
-
-//Test/Dynamic PLL configuration Pins
-output	SDO;					//Output of PLL to core logic. 
-input	SDI;					//Driven by core logic
-input	SCLK;					//Driven by core logic
-
-wire SPLLOUT1net;
-wire SPLLOUT2net;
-
-// Parameters 
-parameter FEEDBACK_PATH = "SIMPLE";			//String  (simple, delay, phase_and_delay, external) 
-parameter DELAY_ADJUSTMENT_MODE_FEEDBACK = "FIXED"; 
-parameter DELAY_ADJUSTMENT_MODE_RELATIVE = "FIXED"; 
-parameter SHIFTREG_DIV_MODE = 2'b00; 			//0-->Divide by 4, 1-->Divide by 7, 3 -->Divide by 5
-parameter FDA_FEEDBACK = 4'b0000; 			//Integer. 
-parameter FDA_RELATIVE = 4'b0000; 			//Integer. 
-parameter PLLOUT_SELECT = "GENCLK"; 			// 
-
-//Use the Spreadsheet to populate the values below.
-parameter DIVR = 4'b0000; 				//determine a good default value
-parameter DIVF = 7'b0000000; 				//determine a good default value
-parameter DIVQ = 3'b000; 				//determine a good default value
-parameter FILTER_RANGE = 3'b000; 			//determine a good default value
-
-parameter ENABLE_ICEGATE = 1'b0; 			//Additional cbits	
-parameter TEST_MODE = 1'b0;				//TestMode parameter. Used for test/Dynamic PLL configuration.  
-parameter EXTERNAL_DIVIDE_FACTOR = 1; 			//Not used by model. Added for PLL Config GUI.
-
-generate
-
-if(TEST_MODE==1) begin
-
-	Sbt_DS_PLL40 instSbtSPLL (
-		.CORE_REF_CLK (REFERENCECLK),
-        	.PACKAGEPIN (),
-		.EXTFEEDBACK (EXTFEEDBACK),  	
-		.DYNAMICDELAY (DYNAMICDELAY),		
-		.BYPASS (BYPASS),
-		.RESETB (~RESETB),	
-		.PLL_SCK(SCLK),
-	        .PLL_SDI(SDI),
-        	.PLL_SDO(SDO),
-		.PLLOUT1 (SPLLOUT1net),	
-		.PLLOUT2 (SPLLOUT2net),		
-		.LOCK (LOCK)   	
-	);	
-
-	defparam instSbtSPLL.DIVR = DIVR;	
-	defparam instSbtSPLL.DIVF = DIVF;
-	defparam instSbtSPLL.DIVQ = DIVQ;
-	defparam instSbtSPLL.FILTER_RANGE = FILTER_RANGE;
-	defparam instSbtSPLL.FEEDBACK_PATH = FEEDBACK_PATH;
-	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_RELATIVE = DELAY_ADJUSTMENT_MODE_RELATIVE;
-	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_FEEDBACK = DELAY_ADJUSTMENT_MODE_FEEDBACK;
-	defparam instSbtSPLL.SHIFTREG_DIV_MODE = SHIFTREG_DIV_MODE;
-	defparam instSbtSPLL.FDA_RELATIVE = FDA_RELATIVE; 
-	defparam instSbtSPLL.FDA_FEEDBACK = FDA_FEEDBACK; 
-	defparam instSbtSPLL.PLLOUT_SELECT_PORTA = PLLOUT_SELECT;
-	defparam instSbtSPLL.PLLOUT_SELECT_PORTB = "GENCLK";
-	defparam instSbtSPLL.TEST_MODE = TEST_MODE;
-
-end else begin
-
-	SbtSPLL40 instSbtSPLL (
-		.REFERENCECLK (REFERENCECLK),
-		.EXTFEEDBACK (EXTFEEDBACK),  	
-		.DYNAMICDELAY (DYNAMICDELAY),		
-		.BYPASS (BYPASS),
-		.RESETB (~RESETB),			
-		.PLLOUT1 (SPLLOUT1net),	
-		.PLLOUT2 (SPLLOUT2net),		
-		.LOCK (LOCK)   	
-	); 
-
-	defparam instSbtSPLL.DIVR = DIVR;	
-	defparam instSbtSPLL.DIVF = DIVF;
-	defparam instSbtSPLL.DIVQ = DIVQ;
-	defparam instSbtSPLL.FILTER_RANGE = FILTER_RANGE;
-	defparam instSbtSPLL.FEEDBACK_PATH = FEEDBACK_PATH;
-	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_RELATIVE = DELAY_ADJUSTMENT_MODE_RELATIVE;
-	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_FEEDBACK = DELAY_ADJUSTMENT_MODE_FEEDBACK;
-	defparam instSbtSPLL.SHIFTREG_DIV_MODE = SHIFTREG_DIV_MODE;
-	defparam instSbtSPLL.FDA_RELATIVE = FDA_RELATIVE; 
-	defparam instSbtSPLL.FDA_FEEDBACK = FDA_FEEDBACK; 
-	defparam instSbtSPLL.PLLOUT_SELECT_PORTA = PLLOUT_SELECT;
-	defparam instSbtSPLL.PLLOUT_SELECT_PORTB = "GENCLK";
-	//defparam instSbtSPLL.TEST_MODE = TEST_MODE;
-end	 
-endgenerate			
-
-assign PLLOUTCORE = ((ENABLE_ICEGATE != 0) && LATCHINPUTVALUE) ? PLLOUTCORE : SPLLOUT1net;
-assign PLLOUTGLOBAL = ((ENABLE_ICEGATE != 0) && LATCHINPUTVALUE)  ? PLLOUTGLOBAL : SPLLOUT1net;
-
-`ifdef TIMINGCHECK
-specify
-   (REFERENCECLK *> PLLOUTGLOBAL) = (1.0, 1.0);
-   (REFERENCECLK *> PLLOUTCORE) = (1.0, 1.0);
-   (SCLK *> SDO) = (1.0, 1.0);
-   $setup(posedge SDI, posedge SCLK, 1.0);
-   $setup(negedge SDI, posedge SCLK, 1.0);
-   $setup(posedge SDI, negedge SCLK, 1.0);
-   $setup(negedge SDI, negedge SCLK, 1.0);
-   $hold(posedge SCLK, posedge SDI, 1.0);
-   $hold(posedge SCLK, negedge SDI, 1.0);
-   $hold(negedge SCLK, posedge SDI, 1.0);
-   $hold(negedge SCLK, negedge SDI, 1.0);
-endspecify
-`endif
-endmodule // SB_PLL40_CORE
+//////-----------------------------------------------------
+////// ------------ SB_PLL40_CORE  ------------------------
+//////-----------------------------------------------------
+//
+//`timescale 1ps/1ps
+//module SB_PLL40_CORE (
+//		REFERENCECLK,			//Driven by core logic
+//		PLLOUTCORE,			//PLL output to core logic
+//		PLLOUTGLOBAL,	   		//PLL output to global network
+//		EXTFEEDBACK,  			//Driven by core logic
+//		DYNAMICDELAY,			//Driven by core logic
+//		LOCK,				//Output of PLL
+//		BYPASS,				//Driven by core logic
+//		RESETB,				//Driven by core logic
+//		SDI,				//Driven by core logic. Test Pin
+//		SDO,				//Output to RB Logic Tile. Test Pin
+//		SCLK,				//Driven by core logic. Test Pin
+//		LATCHINPUTVALUE 		//iCEGate signal
+//);
+//
+//input 	REFERENCECLK;				//Driven by core logic
+//output 	PLLOUTCORE;				//PLL output to core logic
+//output	PLLOUTGLOBAL;	   			//PLL output to global network
+//input	EXTFEEDBACK;  				//Driven by core logic
+//input	[7:0] DYNAMICDELAY;  			//Driven by core logic
+//output	LOCK;					//Output of PLL
+//input	BYPASS;					//Driven by core logic
+//input	RESETB;					//Driven by core logic
+//input	LATCHINPUTVALUE; 			//iCEGate signal
+//
+////Test/Dynamic PLL configuration Pins
+//output	SDO;					//Output of PLL to core logic. 
+//input	SDI;					//Driven by core logic
+//input	SCLK;					//Driven by core logic
+//
+//wire SPLLOUT1net;
+//wire SPLLOUT2net;
+//
+//// Parameters 
+//parameter FEEDBACK_PATH = "SIMPLE";			//String  (simple, delay, phase_and_delay, external) 
+//parameter DELAY_ADJUSTMENT_MODE_FEEDBACK = "FIXED"; 
+//parameter DELAY_ADJUSTMENT_MODE_RELATIVE = "FIXED"; 
+//parameter SHIFTREG_DIV_MODE = 2'b00; 			//0-->Divide by 4, 1-->Divide by 7, 3 -->Divide by 5
+//parameter FDA_FEEDBACK = 4'b0000; 			//Integer. 
+//parameter FDA_RELATIVE = 4'b0000; 			//Integer. 
+//parameter PLLOUT_SELECT = "GENCLK"; 			// 
+//
+////Use the Spreadsheet to populate the values below.
+//parameter DIVR = 4'b0000; 				//determine a good default value
+//parameter DIVF = 7'b0000000; 				//determine a good default value
+//parameter DIVQ = 3'b000; 				//determine a good default value
+//parameter FILTER_RANGE = 3'b000; 			//determine a good default value
+//
+//parameter ENABLE_ICEGATE = 1'b0; 			//Additional cbits	
+//parameter TEST_MODE = 1'b0;				//TestMode parameter. Used for test/Dynamic PLL configuration.  
+//parameter EXTERNAL_DIVIDE_FACTOR = 1; 			//Not used by model. Added for PLL Config GUI.
+//
+//generate
+//
+//if(TEST_MODE==1) begin
+//
+//	Sbt_DS_PLL40 instSbtSPLL (
+//		.CORE_REF_CLK (REFERENCECLK),
+//        	.PACKAGEPIN (),
+//		.EXTFEEDBACK (EXTFEEDBACK),  	
+//		.DYNAMICDELAY (DYNAMICDELAY),		
+//		.BYPASS (BYPASS),
+//		.RESETB (~RESETB),	
+//		.PLL_SCK(SCLK),
+//	        .PLL_SDI(SDI),
+//        	.PLL_SDO(SDO),
+//		.PLLOUT1 (SPLLOUT1net),	
+//		.PLLOUT2 (SPLLOUT2net),		
+//		.LOCK (LOCK)   	
+//	);	
+//
+//	defparam instSbtSPLL.DIVR = DIVR;	
+//	defparam instSbtSPLL.DIVF = DIVF;
+//	defparam instSbtSPLL.DIVQ = DIVQ;
+//	defparam instSbtSPLL.FILTER_RANGE = FILTER_RANGE;
+//	defparam instSbtSPLL.FEEDBACK_PATH = FEEDBACK_PATH;
+//	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_RELATIVE = DELAY_ADJUSTMENT_MODE_RELATIVE;
+//	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_FEEDBACK = DELAY_ADJUSTMENT_MODE_FEEDBACK;
+//	defparam instSbtSPLL.SHIFTREG_DIV_MODE = SHIFTREG_DIV_MODE;
+//	defparam instSbtSPLL.FDA_RELATIVE = FDA_RELATIVE; 
+//	defparam instSbtSPLL.FDA_FEEDBACK = FDA_FEEDBACK; 
+//	defparam instSbtSPLL.PLLOUT_SELECT_PORTA = PLLOUT_SELECT;
+//	defparam instSbtSPLL.PLLOUT_SELECT_PORTB = "GENCLK";
+//	defparam instSbtSPLL.TEST_MODE = TEST_MODE;
+//
+//end else begin
+//
+//	SbtSPLL40 instSbtSPLL (
+//		.REFERENCECLK (REFERENCECLK),
+//		.EXTFEEDBACK (EXTFEEDBACK),  	
+//		.DYNAMICDELAY (DYNAMICDELAY),		
+//		.BYPASS (BYPASS),
+//		.RESETB (~RESETB),			
+//		.PLLOUT1 (SPLLOUT1net),	
+//		.PLLOUT2 (SPLLOUT2net),		
+//		.LOCK (LOCK)   	
+//	); 
+//
+//	defparam instSbtSPLL.DIVR = DIVR;	
+//	defparam instSbtSPLL.DIVF = DIVF;
+//	defparam instSbtSPLL.DIVQ = DIVQ;
+//	defparam instSbtSPLL.FILTER_RANGE = FILTER_RANGE;
+//	defparam instSbtSPLL.FEEDBACK_PATH = FEEDBACK_PATH;
+//	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_RELATIVE = DELAY_ADJUSTMENT_MODE_RELATIVE;
+//	defparam instSbtSPLL.DELAY_ADJUSTMENT_MODE_FEEDBACK = DELAY_ADJUSTMENT_MODE_FEEDBACK;
+//	defparam instSbtSPLL.SHIFTREG_DIV_MODE = SHIFTREG_DIV_MODE;
+//	defparam instSbtSPLL.FDA_RELATIVE = FDA_RELATIVE; 
+//	defparam instSbtSPLL.FDA_FEEDBACK = FDA_FEEDBACK; 
+//	defparam instSbtSPLL.PLLOUT_SELECT_PORTA = PLLOUT_SELECT;
+//	defparam instSbtSPLL.PLLOUT_SELECT_PORTB = "GENCLK";
+//	//defparam instSbtSPLL.TEST_MODE = TEST_MODE;
+//end	 
+//endgenerate			
+//
+//assign PLLOUTCORE = ((ENABLE_ICEGATE != 0) && LATCHINPUTVALUE) ? PLLOUTCORE : SPLLOUT1net;
+//assign PLLOUTGLOBAL = ((ENABLE_ICEGATE != 0) && LATCHINPUTVALUE)  ? PLLOUTGLOBAL : SPLLOUT1net;
+//
+//`ifdef TIMINGCHECK
+//specify
+//   (REFERENCECLK *> PLLOUTGLOBAL) = (1.0, 1.0);
+//   (REFERENCECLK *> PLLOUTCORE) = (1.0, 1.0);
+//   (SCLK *> SDO) = (1.0, 1.0);
+//   $setup(posedge SDI, posedge SCLK, 1.0);
+//   $setup(negedge SDI, posedge SCLK, 1.0);
+//   $setup(posedge SDI, negedge SCLK, 1.0);
+//   $setup(negedge SDI, negedge SCLK, 1.0);
+//   $hold(posedge SCLK, posedge SDI, 1.0);
+//   $hold(posedge SCLK, negedge SDI, 1.0);
+//   $hold(negedge SCLK, posedge SDI, 1.0);
+//   $hold(negedge SCLK, negedge SDI, 1.0);
+//endspecify
+//`endif
+//endmodule // SB_PLL40_CORE
 
 
 ////-----------------------------------------------------

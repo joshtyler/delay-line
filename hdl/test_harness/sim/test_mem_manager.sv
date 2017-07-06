@@ -2,7 +2,7 @@
 `include "../src/uart_msg_consts.h"
 `include "../src/test_harness_consts.h"
 
-`timescale 1ns/1ps;
+`timescale 1ns/1ps
 
 module test_mem_manager;
 

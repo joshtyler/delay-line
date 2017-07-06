@@ -1,16 +1,18 @@
 # iCEstick constraints
 
-# Red LEDs
-set_io led0 99
-set_io led1 98
-
 # UART
 set_io uart_tx_pin 8
 set_io uart_rx_pin 9
 
 # PMOD
-set_io uart_tx_pmod 78 #Pin1
-set_io uart_rx_pmod 79 #Pin2
+set_io in 78 #Pin1
+set_io out 79 #Pin2
+set_io output_clk 80 #Pin3
+set_io in_demod 81 #Pin4
+set_io sample 87 #Pin7
+set_io next_word 88 #Pin8
+set_io clk_out 90 #Pin9
+
 
 # 12 MHz clock
-set_io clk 21
+set_io clk_in 21
