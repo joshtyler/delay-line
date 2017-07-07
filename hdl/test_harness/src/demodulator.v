@@ -41,7 +41,7 @@ always @(posedge clk)
 always @(*)
 	case(state)
 		SM_WAIT: next_ctr = 0;
-		SM_COUNT: next_ctr = ctr +1;
+		SM_COUNT: next_ctr = ctr + 1'b1;
 	endcase
 
 //Output logic

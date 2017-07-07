@@ -22,7 +22,7 @@ SB_PLL40_CORE #(
 		.DIVF(7'b0111111),	// DIVF = 63
 		.DIVQ(3'b101),		// DIVQ =  5
 		.FILTER_RANGE(3'b001)	// FILTER_RANGE = 1
-	) uut (
+	) test_harness_wrapper_pll_inst (
 		.LOCK(locked),
 		.RESETB(1'b1),
 		.BYPASS(1'b0),

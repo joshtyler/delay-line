@@ -10,7 +10,7 @@ module msg_asm(clk, n_reset,
 parameter integer WORD_SIZE = 8;
 parameter integer WORDS_PER_PACKET = 4;
 
-localparam integer CTR_WIDTH = $clog2(WORDS_PER_PACKET);
+parameter integer CTR_WIDTH = $clog2(WORDS_PER_PACKET);
 localparam integer OUTPUT_WIDTH = WORD_SIZE * WORDS_PER_PACKET;
 
 input clk, n_reset;
@@ -32,7 +32,7 @@ always @(posedge clk)
 		ctr <= 0;
 	else begin
 		case(state)
-			SM_RX: if(data_in_valid) ctr <= ctr + 1;
+			SM_RX: if(data_in_valid) ctr <= ctr + 1'b1;
 			SM_TX: ctr <= 0;
 		endcase
 	end
@@ -45,8 +45,12 @@ always @(posedge clk)
 
 //Combinationally assign output to the entire contents of memory
 genvar i;
-for(i=0; i< WORDS_PER_PACKET; i=i+1)
-	assign data_out[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)] = mem[i];
+generate
+	for(i=0; i< WORDS_PER_PACKET; i=i+1)
+	begin : generate_block
+		assign data_out[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)] = mem[i];
+	end
+endgenerate
 
 //State logic
 always @(posedge clk)

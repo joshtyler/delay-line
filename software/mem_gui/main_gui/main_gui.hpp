@@ -109,6 +109,10 @@ class MainGui : public Gtk::Window
         Gtk::TextView *log;
         Glib::RefPtr<Gtk::TextBuffer> logBuffer;
         std::stringstream logStream;
+        //Log formatting
+        Glib::RefPtr<Gtk::TextBuffer::TagTable> logTagTable;
+        Glib::RefPtr<Gtk::TextBuffer::Tag> logTagSend, logTagReceive, logTagError;
+
 
 
 

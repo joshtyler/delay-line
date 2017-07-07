@@ -9,8 +9,8 @@ parameter integer DATA_BITS = 8;
 parameter integer STOP_BITS = 1;
 parameter integer CLKS_PER_BIT = 1000; //Number of clocks per bit
 
-localparam BIT_CTR_WIDTH = $clog2(DATA_BITS); //Assume that DATA_BITS is bigger than STOP_BITS
-localparam SAMPLE_CTR_WIDTH = $clog2(CLKS_PER_BIT); //Counter to track when to sample and transition between bits
+parameter BIT_CTR_WIDTH = $clog2(DATA_BITS); //Assume that DATA_BITS is bigger than STOP_BITS
+parameter SAMPLE_CTR_WIDTH = $clog2(CLKS_PER_BIT); //Counter to track when to sample and transition between bits
 
 input clk, n_reset, start;
 input [DATA_BITS-1:0] data_in;
@@ -32,12 +32,12 @@ reg [SAMPLE_CTR_WIDTH-1:0] sample_ctr;
 
 always @(posedge clk)
 	if(!n_reset)
-		sample_ctr <= 0;
+		sample_ctr <= {SAMPLE_CTR_WIDTH{1'b0}};
 	else begin
 		if(sample_ctr == CLKS_PER_BIT-1)
-			sample_ctr <= 0;
+			sample_ctr <= {SAMPLE_CTR_WIDTH{1'b0}};
 		else
-			sample_ctr <= sample_ctr + 1;
+			sample_ctr <= sample_ctr + 1'b1;
 	end
 
 
@@ -76,8 +76,8 @@ begin
 	next_bit_ctr = 0;
 	case(state)
 		START : next_bit_ctr = 0;
-		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr+1;
-		STOP: next_bit_ctr = bit_ctr + 1;
+		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr + 1'b1;
+		STOP: next_bit_ctr = bit_ctr + 1'b1;
 	endcase
 
 end

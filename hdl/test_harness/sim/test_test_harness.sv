@@ -6,7 +6,7 @@ module test_test_harness;
 parameter integer DATA_WIDTH = 8;
 parameter integer STOP_BITS = 1;
 parameter integer BAUD = 9600;
-parameter integer CLK_RATE = 54_000_000;
+parameter integer CLK_RATE = 100_000_000;
 
 localparam integer CLKS_PER_BAUD = (CLK_RATE / BAUD);
 localparam realtime CLK_PERIOD = (1.0s / CLK_RATE);
@@ -20,10 +20,10 @@ always #(CLK_PERIOD/2) clk = !clk;
 
 //DUT
 logic uart_tb_tx_fpga_rx, uart_tb_rx_fpga_tx, in =0, out;
-test_harness_wrapper dut(.clk_in(clk), .uart_rx_pin(uart_tb_tx_fpga_rx), .in(in), .uart_tx_pin(uart_tb_rx_fpga_tx), .out(out), .output_clk(), .in_demod(), .sample(), .next_word(), .clk_out());
-//defparam dut.pll0.test_harness_wrapper_pll_inst.CLK_FREQ = CLK_RATE; //Normal
+test_harness_wrapper dut(.clk_in(clk), .uart_rx_pin(uart_tb_tx_fpga_rx), .in_sig(in), .uart_tx_pin(uart_tb_rx_fpga_tx), .out_sig(out), .output_clk(), .in_demod(), .sample(), .next_word(), .clk_out());
+defparam dut.pll0.test_harness_wrapper_pll_inst.CLK_FREQ = CLK_RATE; //Normal
 //defparam dut. \pll0.test_harness_wrapper_pll_inst .CLK_FREQ = CLK_RATE; //Post pnr
-defparam dut. pll0.test_harness_wrapper_pll_inst .CLK_FREQ = CLK_RATE; //Post synth
+//defparam dut. pll0.test_harness_wrapper_pll_inst .CLK_FREQ = CLK_RATE; //Post synth
 
 //Emulate delay line
 //Delay is number of numbers * bits per number * bit period

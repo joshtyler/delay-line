@@ -26,7 +26,7 @@ always @(posedge clk)
 		if(ctr > (cycles_per_half_period -1))
 			ctr <= 0;
 		else
-			ctr <= ctr + 1;
+			ctr <= ctr + 1'b1;
 
 reg mod; //Signal to AND with data and modulate
 always @(posedge clk)

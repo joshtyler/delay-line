@@ -1,11 +1,11 @@
 //Testbench for delay line (top level)
 //Run with 1fs time precision to avoid assert failures
-
+`timescale 1ps/1ps
 //`define DEBUG
 
 module test_delay_line;
 
-parameter integer CLK_FREQ = 100_000_000; //135Mhz System clock frequency
+parameter integer CLK_FREQ = 12_000_000; //12Mhz System clock frequency
 parameter integer MOD_FREQ = 13_500_000; //13.5Mhz Moduluation frequency
 parameter realtime PULSE_WIDTH = 0.9us;
 parameter realtime PULSE_GAP = 1.0us;
@@ -23,6 +23,7 @@ logic clk, clk_in, in, out;
 
 clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
 delay_line_wrapper dut(.clk_in(clk), .in_sig(in), .out_sig(out), .led());
+defparam dut.pll0.uut.CLK_FREQ = 81_000_000;
 
 assign clk_in = clk;
 

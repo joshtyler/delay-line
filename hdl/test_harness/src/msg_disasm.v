@@ -12,7 +12,7 @@ module msg_disasm(clk, n_reset,
 parameter integer WORD_SIZE = 8;
 parameter integer WORDS_PER_PACKET = 4;
 
-localparam integer CTR_WIDTH = $clog2(WORDS_PER_PACKET +1);
+parameter integer CTR_WIDTH = $clog2(WORDS_PER_PACKET +1);
 localparam integer INPUT_WIDTH = WORD_SIZE * WORDS_PER_PACKET;
 
 input clk, n_reset;
@@ -39,7 +39,7 @@ always @(posedge clk)
 	else begin
 		case(state)
 			SM_RX_REQ: ctr <= 0; //Reset counter
-			SM_TX_REQ: ctr <= ctr + 1; //Increment counter
+			SM_TX_REQ: ctr <= ctr + 1'b1; //Increment counter
 		endcase
 	end
 
@@ -50,8 +50,12 @@ always @(posedge clk)
 
 //Combinationally assign input to the entire contents of memory
 genvar i;
-for(i=0; i< WORDS_PER_PACKET; i=i+1)
-	assign mem[i] = data_in[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)];
+generate
+	for(i=0; i< WORDS_PER_PACKET; i=i+1)
+	begin : generate_block
+		assign mem[i] = data_in[((i+1)*WORD_SIZE)-1:(i*WORD_SIZE)];
+	end
+endgenerate
 
 //State logic
 always @(posedge clk)

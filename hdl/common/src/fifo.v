@@ -45,9 +45,9 @@ begin
 	else if(rd_en_checked ^ wr_en_checked) // Don't change if we are both reading and writing
 	begin
 		if(rd_en_checked) //If reading decrement
-			counter <= counter -1;
+			counter <= counter - 1'b1;
 		else if(wr_en_checked) //If writing increment
-			counter <= counter +1;
+			counter <= counter + 1'b1;
 	end
 end
 
@@ -66,7 +66,7 @@ begin
 		if(rd_addr == DEPTH -1) // If we are at the highest address
 			rd_addr <= 0;
 		else
-			rd_addr <= rd_addr + 1;
+			rd_addr <= rd_addr + 1'b1;
 	end
 end
 
@@ -80,7 +80,7 @@ begin
 		if(wr_addr == DEPTH -1) // If we are at the highest address
 			wr_addr <= 0;
 		else
-			wr_addr <= wr_addr + 1;
+			wr_addr <= wr_addr + 1'b1;
 	end
 end
 

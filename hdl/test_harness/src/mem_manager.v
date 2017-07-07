@@ -45,11 +45,11 @@ assign pulse_gap = mem_params `UART_MEM_PARAMS_PULSE_GAP_PAYLOAD_BITS;
 
 
 //Output clock generator
-localparam integer OUTPUT_CLK_WIDTH = $clog2(2**`UART_MEM_PARAMS_PULSE_WIDTH_WIDTH + 2**`UART_MEM_PARAMS_PULSE_GAP_WIDTH);
+parameter integer OUTPUT_CLK_WIDTH = $clog2(2**`UART_MEM_PARAMS_PULSE_WIDTH_WIDTH + 2**`UART_MEM_PARAMS_PULSE_GAP_WIDTH);
 reg [OUTPUT_CLK_WIDTH-1:0] output_clk_ctr;
 wire [OUTPUT_CLK_WIDTH-1:0] output_clk_max_count, output_clk_high_count;
 assign output_clk_high_count = pulse_gap; //Count at which to set the output high
-assign output_clk_max_count = pulse_width + pulse_gap -1; //Count at which to reset the counter
+assign output_clk_max_count = pulse_width + pulse_gap - 1'b1; //Count at which to reset the counter
 
 wire output_clk, output_clk_middle_high, output_clk_rising_edge, output_clk_falling_edge;
 assign output_clk = (output_clk_ctr >= output_clk_high_count) && (output_clk_ctr != 0); //The != 0 stops the output clock idling high when the max count is 0
@@ -64,12 +64,12 @@ always @(posedge clk)
 		if(output_clk_falling_edge)
 			output_clk_ctr <= 0;
 		else
-			output_clk_ctr <= output_clk_ctr + 1;
+			output_clk_ctr <= output_clk_ctr + 1'b1;
 	end
 
 
 //Bit counter
-localparam integer BIT_CTR_WIDTH = $clog2(`UART_REPLACE_NUM_DATA_WIDTH); //Must be able to count up to the word width
+parameter integer BIT_CTR_WIDTH = $clog2(`UART_REPLACE_NUM_DATA_WIDTH); //Must be able to count up to the word width
 reg [BIT_CTR_WIDTH-1:0] bit_ctr;
 wire bit_ctr_reset;
 assign bit_ctr_reset = (bit_ctr == `UART_REPLACE_NUM_DATA_WIDTH -1);
@@ -82,7 +82,7 @@ always @(posedge clk)
 			if(bit_ctr_reset)
 				bit_ctr <= 0;
 			else
-				bit_ctr <= bit_ctr + 1;
+				bit_ctr <= bit_ctr + 1'b1;
 		end
 		
 	end
@@ -102,12 +102,12 @@ always @(posedge clk)
 			if(word_ctr >= (no_nums-1))
 				word_ctr <= 0;
 			else
-				word_ctr <= word_ctr +1;
+				word_ctr <= word_ctr + 1'b1;
 
 			if(next_word_ctr >= (no_nums-1))
 				next_word_ctr <= 0;
 			else
-				next_word_ctr <= next_word_ctr + 1;
+				next_word_ctr <= next_word_ctr + 1'b1;
 		end
 	end
 

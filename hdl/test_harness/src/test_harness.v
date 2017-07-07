@@ -10,7 +10,7 @@ output uart_tx_pin, out;
 parameter integer UART_DATA_WIDTH = 8;
 parameter integer UART_STOP_BITS = 1;
 parameter integer UART_BAUD = 9600;
-parameter integer CLK_RATE = 24_000_000;
+parameter integer CLK_RATE = 108_000_000;
 parameter integer MSG_ASM_FIFO_DEPTH = 8; //8 Packets
 parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
 

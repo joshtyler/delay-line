@@ -6,7 +6,7 @@ module dual_port_ram(clk, wr_addr, wr_en, wr_data, rd_addr, rd_en, rd_data);
 
 parameter WIDTH = 8;
 parameter DEPTH = 8;
-localparam ADDR_WIDTH = $clog2(DEPTH);
+parameter ADDR_WIDTH = $clog2(DEPTH);
 
 input clk, wr_en, rd_en;
 input [ADDR_WIDTH-1:0] wr_addr, rd_addr;

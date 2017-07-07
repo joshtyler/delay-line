@@ -76,6 +76,21 @@ MainGui::MainGui(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refG
     logBuffer = Gtk::TextBuffer::create();
     log->set_buffer(logBuffer);
 
+    //Setup log formatting
+    logTagTable = Gtk::TextBuffer::TagTable::create();
+    //Send tag
+    logTagSend = Gtk::TextBuffer::Tag::create();
+    logTagSend->property_foreground() = "green";
+    logTagTable->add(logTagSend);
+    //Receive tag
+    logTagReceive = Gtk::TextBuffer::Tag::create();
+    logTagReceive->property_foreground() = "blue";
+    logTagTable->add(logTagReceive);
+    //Error tag
+    logTagError = Gtk::TextBuffer::Tag::create();
+    logTagError->property_foreground() = "red";
+    logTagTable->add(logTagError);
+
     //Set Idle function to be main loop
     Glib::signal_idle().connect( sigc::mem_fun(*this, &MainGui::onIdle) );
 }
@@ -162,7 +177,12 @@ bool MainGui::onIdle(void)
     //Replacing the entire contents on every iteration causes jagged scrollbar behaviour
     if(logStream.str() != logBuffer->get_text())
     {
+        //Update buffer
         logBuffer->set_text(logStream.str());
+
+        // Scroll to end of Buffer
+        auto it = logBuffer->get_iter_at_line(logBuffer->get_line_count());
+        log->scroll_to(it);
     }
 
     return true; //Idle task not complete

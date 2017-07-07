@@ -15,6 +15,7 @@ add_file -verilog -lib work "../../src/pulse_gen.v"
 add_file -verilog -lib work "../../src/pll.v" 
 add_file -verilog -lib work "../../../common/src/fifo.v" 
 add_file -verilog -lib work "../../../common/src/power_on_reset.v" 
+add_file -verilog -lib work "../../src/delay_line_wrapper.v" 
 #implementation: "delay_line_Implmnt"
 impl -add delay_line_Implmnt -type fpga
 

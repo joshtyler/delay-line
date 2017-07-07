@@ -1,5 +1,6 @@
 //Clock module
 //Creates a 50/50 duty cycle clock
+`timescale 1ps/1ps
 
 module clock #(parameter realtime PERIOD) (output logic clk);
 

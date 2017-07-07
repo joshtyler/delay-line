@@ -14,7 +14,7 @@ always @(posedge clk)
 	if(en)
 	begin
 		if(ctr != 2'b10) //Halt on 10
-			ctr <= ctr + 1;
+			ctr <= ctr + 1'b1;
 	end
 
 assign n_reset = !(ctr == 2'b01);

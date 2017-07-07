@@ -1,12 +1,12 @@
 # iCEstick constraints
 
 # Red LEDs
-set_io led0 99
-set_io led1 98
+set_io led 99
 
 # Pmod connector
-#set_io in 78 # Pin 1
-#set_io out 79 # Pin 2
+set_io in_sig 78 # Pin 1
+set_io out_sig 79 # Pin 2
 
 # 12 MHz clock
 set_io clk_in 21
+

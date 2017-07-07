@@ -54,7 +54,7 @@ begin
 		wr_en_mem <= 1;
 		wr_addr_mem <= erase_ctr;
 		wr_data_mem <= 0;
-		erase_ctr <= erase_ctr +1;
+		erase_ctr <= erase_ctr + 1'b1;
 	end else begin
 		erase_ctr <= 0;
 		wr_en_mem <= wr_en; //Default to write enable signals

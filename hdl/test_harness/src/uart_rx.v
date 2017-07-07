@@ -10,8 +10,8 @@ parameter integer STOP_BITS = 1;
 parameter integer CLKS_PER_BIT = 1000; //Number of clocks per bit
 
 localparam SAMPLE_COUNT = CLKS_PER_BIT/2; //Count to sample data on.
-localparam BIT_CTR_WIDTH = $clog2(DATA_BITS); //Counter to track which bit we are on
-localparam SAMPLE_CTR_WIDTH = $clog2(CLKS_PER_BIT); //Counter to track when to sample and transition between bits
+parameter BIT_CTR_WIDTH = $clog2(DATA_BITS); //Counter to track which bit we are on
+parameter SAMPLE_CTR_WIDTH = $clog2(CLKS_PER_BIT); //Counter to track when to sample and transition between bits
 
 input clk, n_reset, data_in;
 output reg valid;
@@ -44,7 +44,7 @@ begin
 		if( falling_edge || sample_ctr_end ) //Reset counter on falling input, or overflow
 			sample_ctr <= 0;
 		else
-			sample_ctr <= sample_ctr + 1;
+			sample_ctr <= sample_ctr + 1'b1;
 	end
 end
 
@@ -94,8 +94,8 @@ begin
 	next_bit_ctr = 0;
 	case(state)
 		START : next_bit_ctr = 0;
-		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr +1;
-		STOP: next_bit_ctr = bit_ctr + 1;
+		DATA : if(data_bits_done) next_bit_ctr = 0; else next_bit_ctr = bit_ctr + 1'b1;
+		STOP: next_bit_ctr = bit_ctr + 1'b1;
 	endcase
 end
 

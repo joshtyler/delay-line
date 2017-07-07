@@ -4,9 +4,9 @@ module delay_line(clk, n_reset, in, out);
 
 parameter integer FIFO_DEPTH = 1024; //Depth of main FIFO (How many pulses can be stored)
 parameter integer MODULATION_FREQ = 13_500_000; //13.5MHz
-parameter integer CLK_FREQ = 100_000_000; //Must be an even multiple of modulation freq
+parameter integer CLK_FREQ = 81_000_000; //Must be an even multiple of modulation freq
 parameter real EDGE_DETECT_TIMEOUT = 1.5e-6; //Timeout for edge detector
-parameter integer DELAY_CYCLES = 109511; // =delay time / clk period = 1.09511111e-3 / 10ns
+parameter integer DELAY_CYCLES = 88540; // =delay time / clk period = 1.09333333e-3 / 12.3456ns
 parameter real PULSE_TIME = 0.9e-6; //Time of pulse (will be rounded to full cycles of modulation frequency)
 
 localparam real CLK_PERIOD = 1.0 / CLK_FREQ;
