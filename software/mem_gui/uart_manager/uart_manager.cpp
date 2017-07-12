@@ -2,6 +2,7 @@
 // Handles sending and receiving messages, waiting for ACKs etc.
 
 #include <iostream>
+#include <thread>
 #include "uart_manager.hpp"
 #include "uart_msg.hpp"
 
@@ -57,7 +58,14 @@ void UartManager::update(void)
 	{
 		if(uart.writeDone())
 		{
-			writeLogged = false;
+            static int i = 0;
+            if(i == 1) //Stupid delay
+            {
+                writeLogged = false;
+                i=0;
+            } else {
+                i++;
+            }
 		}
 	}
 
@@ -67,15 +75,25 @@ void UartManager::update(void)
         currentWrite = sendQueue.front();
         sendQueue.pop();
         uart.writeRequest(currentWrite.getDataRef(),UartMsgLen);
-        log << "Raw transmit packet: " << std::hex << currentWrite << std::dec;
+        log << "Sent:" << std::hex << currentWrite << std::dec;
         ackQueue.push({currentWrite, (clock() + timeout)}); //We expect the packet to be ACKed. Log this in the ACK queue
         writeLogged = true;
+    }
+
+    //Check if the FPGA has taken too long to ack
+    if(ackQueue.size()>0)
+    {
+        if (clock() > ackQueue.front().latestTime)
+        {
+            throw UartManagerException("FGPA took too long to ACK");
+        }
     }
 }
 
 void UartManager::processReceivedMessage(UartMessage msg)
 {
-        log << "Raw received packet:" << std::hex << msg << std::dec;
+//        log << "Raw received packet:" << std::hex << msg << std::dec << std::endl;
+        log << "Received: ";
         switch(msg.getHeader())
         {
             case UartMessage::REPLACE_NUM:
@@ -85,6 +103,7 @@ void UartManager::processReceivedMessage(UartMessage msg)
                 throw(UartManagerException("Received unexpected message type from FPGA"));
 
             case UartMessage::RECEIVED_WRONG_NUM:
+                log << "Error: ";
                 log << ReceivedWrongNum(msg);
 //                throw(FpgaMessageError("FPGA received wrong number"));
 
@@ -93,18 +112,22 @@ void UartManager::processReceivedMessage(UartMessage msg)
                 break;
 
             case UartMessage::ERR_FIFO_FULL:
+                log << "Error: ";
                 log << ErrFifoFull(msg);
                 throw(FpgaMessageError("FIFO full"));
                 break;
             case UartMessage::ERR_MEM_OVERRUN:
+                log << "Error: ";
                 log << ErrMemOverrun(msg);
                 throw(FpgaMessageError("Message overrun"));
                 break;
             case UartMessage::ERR_UPDATE_WHILST_RUN:
+                log << "Error: ";
                 log << ErrUpdateWhilstRun(msg);
                 throw(FpgaMessageError("Attempt to update whilst running"));
                 break;
             case UartMessage::ERR_INVALID_MSG:
+                log << "Error: ";
                 log << ErrInvalidMsg(msg);
                 throw(FpgaMessageError("Received invalid message"));
                 break;

@@ -6,7 +6,7 @@ module test_test_harness;
 parameter integer DATA_WIDTH = 8;
 parameter integer STOP_BITS = 1;
 parameter integer BAUD = 9600;
-parameter integer CLK_RATE = 100_000_000;
+parameter integer CLK_RATE = 108_000_000;
 
 localparam integer CLKS_PER_BAUD = (CLK_RATE / BAUD);
 localparam realtime CLK_PERIOD = (1.0s / CLK_RATE);
@@ -44,16 +44,20 @@ always @(posedge clk) //Sample on clock edge
 begin
 	if(0 == uart_tb_rx_fpga_tx) //If we have a start bit
 	begin
+//		$display("Begin start at %t", $realtime);
 		#(0.5*BAUD_PERIOD);//Half way through start bit
+//		$display("Start sample");
 		for(rec_iter=0; rec_iter < DATA_WIDTH; rec_iter++) //Get data bits
 		begin
 			#BAUD_PERIOD;
+//			$display("Data sample at %t", $realtime);
 			received_num[rec_iter] = uart_tb_rx_fpga_tx;
 		end
 	
 		for(rec_iter=0; rec_iter < STOP_BITS; rec_iter++)
 		begin
 			#BAUD_PERIOD;
+//			$display("Stop sample at %t", $realtime);
 			assert(1 == uart_tb_rx_fpga_tx);
 		end
 		//We are now done, and are half way through the last stop bit
@@ -78,28 +82,49 @@ begin
 	total_msg >>= 8;
 end
 
+//Uart transmit noise generator
+logic uart_transmit_noise;
+initial
+begin
+	uart_transmit_noise = 0;
+	forever
+	begin
+		#(1ns * $urandom_range(500,1000));//Random delay
+		uart_transmit_noise = 1;
+		#(1ns * $urandom_range(1,2));//Random delay
+		uart_transmit_noise = 0;
+
+	end
+end
+	
+logic uart_transmit_data;
+
+always_comb
+	uart_tb_tx_fpga_rx = uart_transmit_data^uart_transmit_noise;
+
 task uart_transmit;
 input reg[DATA_WIDTH-1:0] num;
 integer i;
 begin
 	//Transmit
 	//Start bit
-	uart_tb_tx_fpga_rx = 0;
+	uart_transmit_data = 0;
 	#BAUD_PERIOD;
 	//Data bits
 	for(i=0;i<DATA_WIDTH; i++)
 	begin
-		uart_tb_tx_fpga_rx = num[i];
+		uart_transmit_data = num[i];
 		#BAUD_PERIOD;
 	end
 	//Stop bits
 	for(i=0; i<STOP_BITS; i++)
 	begin
-		uart_tb_tx_fpga_rx = 1;
+		uart_transmit_data = 1;
 		#BAUD_PERIOD;
 	end 
 end
 endtask
+
 
 task uart_transmit_packet;
 input logic `UART_HEADER_SIZE header;
@@ -126,7 +151,7 @@ integer i;
 logic `UART_PAYLOAD_SIZE payload;
 initial
 begin
-	uart_tb_tx_fpga_rx = 1;
+	uart_transmit_data = 1;
 	#SPACE_DELAY;
 
 	uart_transmit_packet(`UART_HEADER_SYS_STATUS,0); //Stop

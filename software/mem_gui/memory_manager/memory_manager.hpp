@@ -22,7 +22,7 @@ class MemoryManager : public MessageCreator
         void processMessage(UartMessage msg);
         ParamType getCurVal() const {return curVal; };
         void setVal(ParamType newVal);
-        void clear(void) {curVal = 0; }; //Clear current memory (used when stopped)
+        void clear(void) {curVal = 0; update.expected = false;}; //Clear current memory (used when stopped)
 
     private:
         ParamType addr; //The address that this class manages - this doesn't change

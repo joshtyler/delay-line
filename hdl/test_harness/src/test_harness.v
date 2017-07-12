@@ -13,6 +13,8 @@ parameter integer UART_BAUD = 9600;
 parameter integer CLK_RATE = 108_000_000;
 parameter integer MSG_ASM_FIFO_DEPTH = 8; //8 Packets
 parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
+parameter integer GLITCH_WIDTH = 30; //Filter all glitches shorter this many clock cycles 
+
 
 localparam integer UART_CLKS_PER_BAUD = (CLK_RATE / UART_BAUD);
 
@@ -24,7 +26,7 @@ wire [UART_DATA_WIDTH-1:0] uart_tx_data, uart_rx_data;
 
 uart_tx #(
 		.DATA_BITS(UART_DATA_WIDTH),
-		.STOP_BITS(UART_STOP_BITS),
+		.STOP_BITS(8), //Send 8 stop bits to space out packets
 		.CLKS_PER_BIT(UART_CLKS_PER_BAUD)
 	) uart_tx_0 (
 		.clk(clk),
@@ -35,6 +37,16 @@ uart_tx #(
 		.out(uart_tx_pin)
 	);
 
+wire uart_rx_filtered;
+glitch_filter #(
+		.DELAY(GLITCH_WIDTH)
+	) uart_rx_filter (
+		.clk(clk),
+		.n_reset(n_reset),
+		.signal_in(uart_rx_pin),
+		.signal_out(uart_rx_filtered)
+	);
+
 uart_rx #(
 		.DATA_BITS(UART_DATA_WIDTH),
 		.STOP_BITS(UART_STOP_BITS),
@@ -42,7 +54,7 @@ uart_rx #(
 	) uart_rx_0 (
 		.clk(clk),
 		.n_reset(n_reset),
-		.data_in(uart_rx_pin),
+		.data_in(uart_rx_filtered),
 		.valid(uart_rx_valid),
 		.data_out(uart_rx_data)
 	);

@@ -83,3 +83,5 @@ xilinxsim.ini
 *.cfi
 *.prm
 *.mcs
+output.txt
+test_harness_impact_xdb/

@@ -83,8 +83,7 @@ void FtdiWrapper::open(unsigned int idx, int baud)
 
 
 	//Find device corresponding to index
-	unsigned int i=0;
-	while(i < idx)
+	for(unsigned int i=0; i < idx; i++)
 	{
 		curDev = curDev->next;
 		if(curDev == NULL)

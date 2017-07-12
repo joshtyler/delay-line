@@ -5,14 +5,14 @@ module SB_PLL40_CORE(
 	input BYPASS,
 	input REFERENCECLK,
 	output PLLOUTCORE,
-	output LOCK,
-	output PLLOUTGLOBAL,
-	input EXTFEEDBACK,
-	input [7:0] DYNAMICDELAY,
-	input LATCHINPUTVALUE,
-	input SDI,
-	output SDO,
-	input SCLK
+	output LOCK
+//	output PLLOUTGLOBAL,
+//	input EXTFEEDBACK,
+//	input [7:0] DYNAMICDELAY,
+//	input LATCHINPUTVALUE,
+//	input SDI,
+//	output SDO,
+//	input SCLK
 	);
 
 parameter DIVR = 4'b0000;
