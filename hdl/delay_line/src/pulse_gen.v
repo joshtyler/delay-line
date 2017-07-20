@@ -1,12 +1,12 @@
 // Pulse generator
 
-module pulse_gen(clk, n_reset, en, out);
+module pulse_gen(clk, n_reset, en, active, out);
 
 parameter CLKS_PER_HALF_PERIOD = 2;
 parameter PULSES = 3;
 
 input clk, n_reset, en;
-output out;
+output active, out;
 
 parameter PERIOD_CTR_WIDTH = $clog2(CLKS_PER_HALF_PERIOD);
 parameter PULSE_CTR_WIDTH = $clog2(PULSES);
@@ -87,5 +87,6 @@ begin
 end
 
 assign out = (state == HIGH);
+assign active = (state == HIGH || state == LOW);
 
 endmodule

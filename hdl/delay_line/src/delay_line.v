@@ -1,6 +1,6 @@
 // Top level module
 
-module delay_line(clk, n_reset, in, out);
+module delay_line(clk, n_reset, in, out, out_en);
 
 parameter integer FIFO_DEPTH = 1024; //Depth of main FIFO (How many pulses can be stored)
 parameter integer MODULATION_FREQ = 13_500_000; //13.5MHz
@@ -20,7 +20,7 @@ parameter integer CTR_WIDTH = $clog2(DELAY_CYCLES); //Counter must not overflow 
 localparam integer DELAY = DELAY_CYCLES - 2 - 1 - 1; // We lose two clock cycles due to synchronisation flip flops, one in edge detector, and one in output stage
 
 input clk, n_reset, in;
-output out;
+output out, out_en;
 
 //Synchronisation flip flops
 reg in_sync_intermediate, in_sync;
@@ -42,18 +42,56 @@ assign fifo_data_in = ctr + DELAY; //Data in to FIFO
 
 //Edge detector
 wire fifo_wren; //FIFO write enable
-edge_detect #(EDGE_DETECT_TIMEOUT_CYCLES) edge0(clk, n_reset, in_sync, fifo_wren);
+edge_detect #(
+		.TIMEOUT(EDGE_DETECT_TIMEOUT_CYCLES)
+	) edge0( 
+		.clk(clk),
+		.n_reset(n_reset),
+		.in(in_sync),
+		.out(fifo_wren)
+	);
 
 //FIFO
 wire fifo_empty, fifo_full, fifo_rden;
 wire [CTR_WIDTH-1:0] fifo_data_out;
-fifo #(CTR_WIDTH, FIFO_DEPTH)  fifo0(clk, n_reset, fifo_data_in, fifo_wren, fifo_data_out, fifo_rden, fifo_empty, fifo_full);
+fifo #(
+		.WIDTH(CTR_WIDTH),
+		.DEPTH(FIFO_DEPTH)
+	)fifo0(
+		.clk(clk),
+		.n_reset(n_reset),
+		.data_in(fifo_data_in),
+		.wr_en(fifo_wren),
+		.data_out(fifo_data_out),
+		.rd_en(fifo_rden),
+		.empty(fifo_empty),
+		.full(fifo_full)
+	);
 
 //Comparator
 wire pulse_gen_trigger;
-comparator #(CTR_WIDTH) comp0(clk, n_reset, fifo_empty, fifo_data_out, ctr, fifo_rden, pulse_gen_trigger);
+comparator #(
+		.WIDTH(CTR_WIDTH)
+	) comp0 (
+		.clk(clk),
+		.n_reset(n_reset),
+		.empty(fifo_empty),
+		.data_in(fifo_data_out),
+		.count(ctr),
+		.req_data(fifo_rden),
+		.trigger(pulse_gen_trigger)
+	);
 
 //Pulse generator
-pulse_gen #(PULSE_GEN_CLKS_PER_HALF_PERIOD, PULSE_GEN_PULSES) pulse_gen0(clk, n_reset, pulse_gen_trigger, out);
+pulse_gen #(
+		.CLKS_PER_HALF_PERIOD(PULSE_GEN_CLKS_PER_HALF_PERIOD),
+		.PULSES(PULSE_GEN_PULSES)
+	) pulse_gen0 (
+		.clk(clk),
+		.n_reset(n_reset),
+		.en(pulse_gen_trigger),
+		.active(out_en),
+		.out(out)
+	);
 
 endmodule
