@@ -44,8 +44,8 @@ class MemoryOptions : public GuiSection
                 MemViewerModel()
                 { add(addr); add(val);};
 
-                Gtk::TreeModelColumn<unsigned int> addr;
-                Gtk::TreeModelColumn<unsigned int> val;
+                Gtk::TreeModelColumn<ParamType> addr;
+                Gtk::TreeModelColumn<std::string> val; //Store as a string and convert to a string manually for formatting
         };
         MemViewerModel memViewerModel;
         Gtk::TreeView* memViewer;
@@ -59,6 +59,7 @@ class MemoryOptions : public GuiSection
         };
 
         void fillMem(FillTypes f);
+        std::string formatHexNum(ParamType num);
 };
 
 

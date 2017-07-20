@@ -3,6 +3,7 @@
 //
 
 #include <random>
+#include <iomanip>
 #include "memory_options.hpp"
 
 MemoryOptions::MemoryOptions(Glib::RefPtr<Gtk::Builder> builderIn, const SystemOptions &systemOptionsIn,
@@ -21,7 +22,7 @@ MemoryOptions::MemoryOptions(Glib::RefPtr<Gtk::Builder> builderIn, const SystemO
     memViewerTreeModel = Gtk::ListStore::create(memViewerModel);
     memViewer->set_model(memViewerTreeModel);
     memViewer->append_column_numeric("Address", memViewerModel.addr, "%0d");
-    memViewer->append_column_numeric("Data (hex)", memViewerModel.val, "%09x");
+    memViewer->append_column("Data (hex)", memViewerModel.val);
 
     addWidget("fill_zeros",fillZeros);
     addWidget("fill_ones",fillOnes);
@@ -54,7 +55,7 @@ void MemoryOptions::createMemViewer(void)
         auto addr = std::distance(memArr.begin(),it);
         Gtk::TreeModel::Row row = *(memViewerTreeModel->append());
         row[memViewerModel.addr] = addr;
-        row[memViewerModel.val] = 0;
+        row[memViewerModel.val] = formatHexNum(0);
     }
 
 }
@@ -64,7 +65,7 @@ void MemoryOptions::updateMemViewer(void)
     for(auto it = memViewerTreeModel->children().begin(); it != memViewerTreeModel->children().end(); it++)
     {
         auto addr = std::distance(memViewerTreeModel->children().begin(),it);
-        (*it)[memViewerModel.val] = memArr[addr]->getCurVal();
+        (*it)[memViewerModel.val] = formatHexNum(memArr[addr]->getCurVal());
     }
 
 }
@@ -80,7 +81,7 @@ void MemoryOptions::onMemRequestSend(void)
 //Fill the memory with either 0s, 1s, or random data, as instructed
 void MemoryOptions::fillMem(MemoryOptions::FillTypes f)
 {
-    const ParamType maxNum = 0xEFFFFFFFF; //Don't set MSB as this is a spacer
+    const ParamType maxNum = 0x7FFFFFFFF; //Don't set MSB as this is a spacer
 
     //Random number logic from https://stackoverflow.com/questions/7560114/random-number-c-in-some-range
     std::random_device rd; // obtain a random number from hardware
@@ -111,4 +112,11 @@ void MemoryOptions::fillMem(MemoryOptions::FillTypes f)
 
         memArr[addr]->setVal(newVal);
     }
+}
+
+std::string MemoryOptions::formatHexNum(ParamType num)
+{
+    std::ostringstream ss;
+    ss << std::hex << std::setfill ('0') << std::setw (9) << num;
+    return ss.str();
 }

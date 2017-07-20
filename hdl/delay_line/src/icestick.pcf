@@ -1,7 +1,16 @@
 # iCEstick constraints
 
 # Red LEDs
-set_io led 99
+set_io LED0 99
+set_io LED1 98
+set_io LED2 97
+set_io LED3 96
+
+# Green LED
+set_io LED4 95
+
+# IrDA port
+set_io SD 107
 
 # Pmod connector
 set_io in_sig 78 # Pin 1
