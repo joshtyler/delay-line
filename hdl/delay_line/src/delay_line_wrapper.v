@@ -1,7 +1,7 @@
 // Top level module
 
-module delay_line_wrapper(clk_in, in_sig, out_sig, //Real inputs
-LED0, LED1, LED2, LED3, LED4, SD); //Inputs to hold at either vcc or ground
+module delay_line_wrapper(clk_in, in_sig, out_sig, //Real inputs/outputs
+LED0, LED1, LED2, LED3, LED4, SD); //Outputs to hold at vcc/ground
 
 input clk_in, in_sig;
 output out_sig, LED0, LED1, LED2, LED3, LED4, SD;
@@ -34,12 +34,17 @@ power_on_reset por0
 	.n_reset(n_reset)
 );
 
+//Delay line
+wire delay_line_out, out_en;
 delay_line delay_line_0
 (
 	.clk(clk),
 	.n_reset(n_reset),
 	.in(in_sig),
-	.out(out_sig)
+	.out(delay_line_out),
+	.out_en(out_en)
 );
+
+assign out_sig = out_en? delay_line_out : 1'bz;
 
 endmodule
