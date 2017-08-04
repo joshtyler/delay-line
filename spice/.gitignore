@@ -1,6 +1,7 @@
 *.raw
 *.log
 *.net
+*.plt
 
 #Don't include Peter linnington's stuff. I don't have permission to release it
 peter_simulation*

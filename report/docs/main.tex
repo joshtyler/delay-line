@@ -2,26 +2,92 @@
 %\pagestyle{fancy}
 
 \chapter{\chapterStyle{Introduction}} \label{sec:intro}
-Foobar \cite{aps2000} \gls{fpga}.
+\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer \gls{edsac} \review{cite}. \Gls{edsac} was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac} hard-coded their programs, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
 
+\Gls{edsac} ran its first program in May 1949. This poses a significant design challenge for the memory of the machine. Transistors were not commercially available at all until 1951 \cite{bonne2007}, and valves, whilst available, were physically large, and were fairly expensive. This meant to create a modest amount of storage would not have been feasible. \Gls{eniac} used valves, but it also had very little memory. This was not a problem for its intended application, but would have posed a problem for a general purpose computing platform, such as \gls{edsac}\cite[p.208]{wilkes1948}.
 
+The solution chosen for \gls{edsac}'s storage problem was delay line memory. This was common with other early computers, and works via a fairly simple mechanism. Given a medium able to delay a pulse train by a certain amount, memory can be created by feeding the output of that delay medium back into the input. If the delay time is tuned to be an integer multiple of the system clock frequency, the system is able to store a sequence of bits proportional in length to the delay time. This principle is illustrated in Figure \ref{fig:delay-line-principle}.
 
-\chapter{\chapterStyle{State-of-the-Art}}
+The storage medium used for delay lines exists in various forms, from magnetorestrictive delay lines which function by twisting one end of a coil of wire, then waiting for the stress to propagate to the other end of the wire, to electric delay lines which provide much smaller delays by sending electrical impulses down a length of coaxial wire or \gls{pcb} microstrip trace.
+
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{Demonstration of the principle of delay line memory}
+	\label{fig:delay-line-principle}
+\end{figure}
+
+\Gls{edsac} used acoustic delay lines in the form of steel tubes, approximately \SI{1.5}{\metre} long, and full of mercury. Impulses were inserted into one end of the tube via a quartz transducer, and reach the other end of the tube after a delay of approximately \SI{1}{\milli\second}. Here a quartz transducer receives the acoustic impulse and converts it to an electronic impulse.
+
+Creating a faithful reproduction of this system poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the project is currently intending to use magnetorestrictive delay lines \cite{ward2011}.
+
+These delay lines are anachronistic for the time, and are very dis-similar in appearance to the original delay lines. In addition to the development of such lines poses its own set of technical challenges. For this reason it was decided to use modern technology to create a replacement for the original delay lines. This replacement is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
+
+\chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
+This Chapter presents a review of the relevant literature surrounding the delay lines used in \gls{edsac}, and uses it to derive a specification for the recreated delay line. Much of the literature presented comes from original documentation produced by Maurice Wilkes, the man in charge of the original \gls{edsac} project.
 
 \section{\glsentryshort{edsac} Delay Line Specification}
-\subsection{Electical}
+As briefly discussed in Chapter \ref{sec:intro}, \gls{edsac} uses mercury delay lines as memory. These are primarily used in two ways:
+\begin{enumerate}
+	\item Short tubes used for the results of calculations.
+	\item Batteries of longer tubes used as the main memory store, what would be termed \gls{ram} in a modern computer.
+\end{enumerate}
+
+\Gls{edsac} stores words in units of 36 pulses, which is referred to as a minor cycle. 34 pulses are used to store the magnitude of a number, one stores the sign, and one acts as a space between numbers. This system was chosen to allow storage of ten digit numbers. 
+
+The shorter tubes are sized to store only a single minor cycle, but the longer tubes are long enough to store 576 pulses (16 minor cycles). The batteries of each of these tubes each contained 16 tubes, and \gls{edsac} originally had two batteries, allowing for a total storage capacity of $16 \times 16 \times 2 = 512$ numbers.
 
 \subsection{Timing}
+The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.1}{\micro\second} gap for each bit. The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0.
 
-\section{\glsentryshort{fpga} Performance}
+In the regeneration portion of the circuitry, the pulses are demodulated from the \SI{13.5}{\mega\hertz} carrier and stretched to approximately \SI{1.9}{\micro\second} long, i.e. just long enough that each pulse fails to overlap it's neighbour \cite[p.212]{wilkes1948}.
 
-\section{Microcontroller Performance}
+This is critical because it means that the pulses that have passed through the delay line are effectively resynchronised to the system clock. If the system did not work in this way, then the delay lines in the the original \gls{edsac} would never have worked. The propagation time of acoustic waves through mercury varies slightly with temperature, and the cumulative effect of this through all the delay lines of the store would mean that pulses would be unlikely to align with the system clock at the other end.
 
-\section{Amplification Methodology}
+This does imply that the maximum acceptable skew of the delay line from its nominal delay is $\pm$ \SI{0.5}{\micro\second}. In reality however this doesn't take into account other factors such as the jitter and long term drift of the system clock, and the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period.
 
-\section{Phantom Power Methodology}
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{\Glsentryshort{edsac} pulse timing }
+	\label{fig:edsac-pulse-timing}
+\end{figure}
+
+\subsection{Electrical}
+Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{69}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt}.
+
+Despite this, the recreation project has discovered that the regeneration circuitry actually feed the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{35}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{25}{\volt} peak for the tubes at the end of the store.
+
+In addition to this, problems were experienced with amplifying the low signal level output by the delay lines. Because the current wire delay line solution has flexibility in its output voltage, currently the delayed signal is output at \SI{100}{\milli\volt} peak.
+
+\subsection{Mechanical}
+The mercury delay lines originally consisted of banks of steel tubes, each tube having an outer diameter of \SI{4.44}{\centi\metre}, and an inner diamter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. The tubes are then held in an array using machined end-plates.
+
+
 
 \chapter{\chapterStyle{Specification}}
+
+The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specification for the delay line I will produce. This specification is detailed in Table \ref{tbl:spec}.
+
+\begin{longtable}{r  >{\raggedright}p{0.43\textwidth}  >{\raggedright}p{0.43\textwidth} }
+	\caption{Delay line specification}\label{tbl:spec}\newcounter{specNo}\tabularnewline
+	\toprule
+	\bfseries Item & \bfseries Specification & \bfseries Justification \tabularnewline
+	\midrule
+	\endhead %Everything above this will be repeated on every page
+	\bottomrule
+	\endfoot
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the \gls{edsac} pulse train presented to it's input & This is the primary function of the device \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a skew against the nominal delay of \review{xx}, and a jitter of \review{xx} & \review{foo} \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to accept input voltages in the range of \review{xx} to \review{xx} & This is necessary to mimic the performance of the original delay line \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output delay in the range of \review{xx} to \review{xx} & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort. \tabularnewline
+	
+	
+\end{longtable}
 
 \chapter{\chapterStyle{System Development}}
 
@@ -30,14 +96,6 @@ Foobar \cite{aps2000} \gls{fpga}.
 \section{Testbench}
 
 \section{Amplifier}
-
-%\chapter{\chapterStyle{System Implementation}}
-
-%\section{Delay line}
-
-%\section{Testbench}
-
-%\section{Amplifier}
 
 \chapter{\chapterStyle{Testing and Verification}}
 

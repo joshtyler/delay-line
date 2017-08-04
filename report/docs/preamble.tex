@@ -53,6 +53,15 @@
 \apptocmd{\thebibliography}{\raggedright}{}{}
 
 
+%Tables (and long tables)
+\usepackage[table]{xcolor}
+\usepackage{longtable}
+% alternate rowcolors for all long-tables
+\let\oldlongtable\longtable
+\let\endoldlongtable\endlongtable
+\renewenvironment{longtable}{\rowcolors{2}{white}{gray!30}\oldlongtable} {
+	\endoldlongtable}
+
 %Drawing
 \usepackage{tikz}
 
@@ -68,13 +77,13 @@
 \usetikzlibrary{patterns}
 \usetikzlibrary{automata}
 
-
 %Acronyms!
 \usepackage[nonumberlist, acronyms, toc,]{glossaries}
 \makenoidxglossaries
 \setacronymstyle{long-short}
 \renewcommand{\glsgroupskip}{} %Don't put a small space between groups
 \input{docs/acronyms} %Import list of acronyms
+
 
 %Degree symbol
 \usepackage{textcomp} %Remove \gensymb warning
@@ -145,7 +154,7 @@
 \usepackage{tcolorbox}
 \newcommand{\dummyfigure}
 {
-	\begin{tcolorbox}[width=2.5in,height=1.5in,arc=0mm,auto outer arc, halign=center, valign=center]
+	\begin{tcolorbox}[width=3.5in,height=2.5in,arc=0mm,auto outer arc, halign=center, valign=center]
 		Figure placeholder
 	\end{tcolorbox}
 }
