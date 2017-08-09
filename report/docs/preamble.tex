@@ -55,11 +55,16 @@
 
 %Tables (and long tables)
 \usepackage[table]{xcolor}
-\usepackage{longtable}
-% alternate rowcolors for all long-tables
-\let\oldlongtable\longtable
-\let\endoldlongtable\endlongtable
-\renewenvironment{longtable}{\rowcolors{2}{white}{gray!30}\oldlongtable} {
+\usepackage{longtable}
+
+% alternate rowcolors for all long-tables
+
+\let\oldlongtable\longtable
+
+\let\endoldlongtable\endlongtable
+
+\renewenvironment{longtable}{\rowcolors{2}{white}{gray!30}\oldlongtable} {
+
 	\endoldlongtable}
 
 %Drawing
@@ -73,9 +78,26 @@
 
 \usepackage{tikz-3dplot}
 \usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+\usetikzlibrary{calc}
 \usetikzlibrary{positioning}
 \usetikzlibrary{patterns}
 \usetikzlibrary{automata}
+
+% Setup some tikz defaults
+\newcommand{\nodeDist}{1.5cm}
+\newcommand{\tikzStateNodeDist}{3*\nodeDist}
+
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=\nodeDist, minimum height=\nodeDist, text centered, draw=black, fill=black!40]
+
+%\tikzset{font={\small}} %set small font
+\tikzstyle{every state}=[fill=black!40,draw=none,minimum size=\tikzStateNodeDist/2] %Setup state machine style
+\tikzstyle{stateMachine}=[->,auto,node distance=\tikzStateNodeDist,thick]
+
+\tikzstyle{arrowNml} = [thick,->,>=stealth]
+\tikzstyle{arrowRev} = [thick,<-,>=stealth]
+\tikzstyle{arrowDbl} = [thick,<->,>=stealth]
+\tikzstyle{lineNml} = [thick]
+
 
 %Acronyms!
 \usepackage[nonumberlist, acronyms, toc,]{glossaries}
@@ -105,8 +127,11 @@
 \usepackage{amsmath,amsfonts,amsthm}
 
 % Graphicx
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
+\usepackage[export]{adjustbox} %Also loads graphicsx
+\graphicspath{ {figs/} }
+\newcommand{\figureWidth}{0.7\textwidth}
+\newcommand{\figureHeight}{0.7\textwidth}
+\newcommand{\includegraphicssized}[1]{\includegraphics[max height=\figureHeight, max width=\figureWidth]{#1}}
 
 % Booktabs - better looking tables
 \usepackage{booktabs}
@@ -131,9 +156,6 @@
 
 % headers
 \usepackage{fancyhdr}
-
-% we want fancy headers
-\pagestyle{fancy}
 % we want fancy headers even when LaTeX explicitely uses "plain" pagestyle
 \fancypagestyle{plain}{%
 	% reset headers and footers
@@ -143,6 +165,7 @@
 	\fancyhead[R]{\scriptsize \thesisAuthor, \thesisDate, MSc dissertation}
 	\fancyfoot[C]{\scriptsize - \thepage\ -}
 }
+\pagestyle{plain} % Set all pages to use this style
 
 %Stuff for reviewing, placeholders, etc.
 %Commmand to review

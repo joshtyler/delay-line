@@ -2,49 +2,80 @@
 %\pagestyle{fancy}
 
 \chapter{\chapterStyle{Introduction}} \label{sec:intro}
-\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer \gls{edsac} \review{cite}. \Gls{edsac} was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac} hard-coded their programs, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
+\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}. \Gls{edsac} was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac}, used programs hard-coded using switches, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
 
-\Gls{edsac} ran its first program in May 1949. This poses a significant design challenge for the memory of the machine. Transistors were not commercially available at all until 1951 \cite{bonne2007}, and valves, whilst available, were physically large, and were fairly expensive. This meant to create a modest amount of storage would not have been feasible. \Gls{eniac} used valves, but it also had very little memory. This was not a problem for its intended application, but would have posed a problem for a general purpose computing platform, such as \gls{edsac}\cite[p.208]{wilkes1948}.
-
-The solution chosen for \gls{edsac}'s storage problem was delay line memory. This was common with other early computers, and works via a fairly simple mechanism. Given a medium able to delay a pulse train by a certain amount, memory can be created by feeding the output of that delay medium back into the input. If the delay time is tuned to be an integer multiple of the system clock frequency, the system is able to store a sequence of bits proportional in length to the delay time. This principle is illustrated in Figure \ref{fig:delay-line-principle}.
-
-The storage medium used for delay lines exists in various forms, from magnetorestrictive delay lines which function by twisting one end of a coil of wire, then waiting for the stress to propagate to the other end of the wire, to electric delay lines which provide much smaller delays by sending electrical impulses down a length of coaxial wire or \gls{pcb} microstrip trace.
 
 \begin{figure}[ht]
 	\centering
-	\dummyfigure
-	\caption{Demonstration of the principle of delay line memory}
+	\includegraphicssized{wilkes_renwick_edsac_crop}
+	\caption{W.Renwick and M.Wilkes standing with \glsentryshort{edsac} \cite{cam2011b}}
+	\label{fig:edsac-photo}
+\end{figure} 
+
+\Gls{edsac} ran its first program in May 1949. This posed a significant design challenge for the memory of the machine. Transistors were not commercially available at all until 1951 \cite{bonne2007}, and valves, whilst available, were physically large, and were fairly expensive. This meant that creation of even a modest amount of storage would not have been feasible. \Gls{eniac} used valves, but it also had very little memory. This was not a problem for its intended application, but would have posed a problem for a general purpose computing platform, such as \gls{edsac} \cite[p.208]{wilkes1948}.
+
+The solution chosen for \gls{edsac}'s storage problem was delay line memory. This was common with other early computers, and works via a fairly simple mechanism. Given a medium able to delay a pulse train by a certain amount, memory can be created by feeding the output of that delay medium back into the input. If the delay time is tuned to be an integer multiple of the system clock frequency, the system is able to store a sequence of bits proportional in length to the delay time. This principle is illustrated in Figure \ref{fig:delay-line-principle}.
+
+Delay lines exist in various forms, from magnetorestrictive delay lines which function by twisting one end of a coil of wire, then waiting for the stress to propagate to the other end of the wire, to electric delay lines which provide much smaller delays by sending electrical impulses down a length of coaxial wire or a \gls{pcb} microstrip trace.
+
+\begin{figure}[ht]
+	\centering
+
+	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+	
+	
+	\node (delay) [block, anchor=south west, minimum width=5*\nodeDist] at (0,0) {Delay Unit};
+	
+	\node (gate) [block, below=of delay.south west, anchor=north west] {Gate};
+	
+	\node (amp) [block, below=of delay.south east, anchor=north east] {Amplifier};
+	
+	\draw [arrowNml] (gate.west) -- ++(-0.5*\nodeDist,0) |- (delay.west);
+	
+	\draw [arrowNml] (delay.east) -- ++(0.5*\nodeDist,0) |- (amp.east);
+	
+	\draw [arrowNml] ([yshift=0.25*\nodeDist] amp.west) -- ([yshift=0.25*\nodeDist] gate.east);
+	
+	\draw [arrowRev] ([yshift=-0.25*\nodeDist] gate.east) -- ++(\nodeDist,0) -- ++(0,-\nodeDist) -- ++(-0.5*\nodeDist,0) node[left] {Clock Pulses};
+	
+	
+	\end{tikzpicture}
+	
+	\caption{Demonstration of the principle of delay line memory, adapted from \cite{tyler2017}}
 	\label{fig:delay-line-principle}
 \end{figure}
 
-\Gls{edsac} used acoustic delay lines in the form of steel tubes, approximately \SI{1.5}{\metre} long, and full of mercury. Impulses were inserted into one end of the tube via a quartz transducer, and reach the other end of the tube after a delay of approximately \SI{1}{\milli\second}. Here a quartz transducer receives the acoustic impulse and converts it to an electronic impulse.
 
-Creating a faithful reproduction of this system poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the project is currently intending to use magnetorestrictive delay lines \cite{ward2011}.
+\Gls{edsac} used acoustic delay lines in the form of steel tubes, approximately \SI{1.5}{\metre} long, and full of mercury. Impulses were inserted into one end of the tube via a quartz transducer, and reach the other end of the tube after a delay of approximately \SI{1}{\milli\second}. Here a second quartz transducer converts the incoming acoustic impulse into an electronic impulse.
 
-These delay lines are anachronistic for the time, and are very dis-similar in appearance to the original delay lines. In addition to the development of such lines poses its own set of technical challenges. For this reason it was decided to use modern technology to create a replacement for the original delay lines. This replacement is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
+Creating a faithful reproduction of this system poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the reconstruction project currently intends to use magnetorestrictive delay lines \cite{ward2011}.
+
+As discussed at length in \cite{tyler2017}, this method is non-ideal since it is: anachronistic for the time, dissimilar in appearance to the original delay lines, and dissimilar in terms of electrical interface to the original. For this reason it was decided to investigate the use of modern technology to emulate the original delay lines. This emulation is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
 
 \chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
 This Chapter presents a review of the relevant literature surrounding the delay lines used in \gls{edsac}, and uses it to derive a specification for the recreated delay line. Much of the literature presented comes from original documentation produced by Maurice Wilkes, the man in charge of the original \gls{edsac} project.
 
 \section{\glsentryshort{edsac} Delay Line Specification}
-As briefly discussed in Chapter \ref{sec:intro}, \gls{edsac} uses mercury delay lines as memory. These are primarily used in two ways:
+As briefly discussed in Chapter \ref{sec:intro}, \gls{edsac} uses mercury delay lines as memory. These are used in two ways:
 \begin{enumerate}
 	\item Short tubes used for the results of calculations.
-	\item Batteries of longer tubes used as the main memory store, what would be termed \gls{ram} in a modern computer.
+	\item Batteries of longer tubes used as the main memory store. This is analogous to \gls{ram} in a modern computer.
 \end{enumerate}
 
 \Gls{edsac} stores words in units of 36 pulses, which is referred to as a minor cycle. 34 pulses are used to store the magnitude of a number, one stores the sign, and one acts as a space between numbers. This system was chosen to allow storage of ten digit numbers. 
 
 The shorter tubes are sized to store only a single minor cycle, but the longer tubes are long enough to store 576 pulses (16 minor cycles). The batteries of each of these tubes each contained 16 tubes, and \gls{edsac} originally had two batteries, allowing for a total storage capacity of $16 \times 16 \times 2 = 512$ numbers.
 
-\subsection{Timing}
-The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.1}{\micro\second} gap for each bit. The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0.
+\subsection{Timing} \label{sec:review-delay-timing}
+The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.1}{\micro\second} gap for each bit. The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0. It should be noted that the reconstruction will use a bit rate slightly faster or slower than \SI{500}{\kilo\hertz}, because \SI{500}{\kilo\hertz} is an international distress frequency, and given the large wiring looms in \gls{edsac}, it would be quite easy for \gls{edsac} to become an unintentional transmitter of this frequency.
 
 In the regeneration portion of the circuitry, the pulses are demodulated from the \SI{13.5}{\mega\hertz} carrier and stretched to approximately \SI{1.9}{\micro\second} long, i.e. just long enough that each pulse fails to overlap it's neighbour \cite[p.212]{wilkes1948}.
 
 This is critical because it means that the pulses that have passed through the delay line are effectively resynchronised to the system clock. If the system did not work in this way, then the delay lines in the the original \gls{edsac} would never have worked. The propagation time of acoustic waves through mercury varies slightly with temperature, and the cumulative effect of this through all the delay lines of the store would mean that pulses would be unlikely to align with the system clock at the other end.
 
-This does imply that the maximum acceptable skew of the delay line from its nominal delay is $\pm$ \SI{0.5}{\micro\second}. In reality however this doesn't take into account other factors such as the jitter and long term drift of the system clock, and the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period.
+Despite this resynchronisation after each delay line, the original \gls{edsac} suffered a great deal from the variation of delay with temperature. Originally the system clock was adjusted whenever the temperature of the delay lines drifted out of synchronization, but later on in development the delay lines were put inside a temperature controlled oven.
+
+The regeneration system implies that the maximum acceptable skew of the delay line from its nominal delay is $\pm$ \SI{0.5}{\micro\second}. This does not, however, take into account other factors such as the jitter and longer term drift of the system clock, as well the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period.
 
 \begin{figure}[ht]
 	\centering
@@ -60,50 +91,297 @@ Despite this, the recreation project has discovered that the regeneration circui
 
 In addition to this, problems were experienced with amplifying the low signal level output by the delay lines. Because the current wire delay line solution has flexibility in its output voltage, currently the delayed signal is output at \SI{100}{\milli\volt} peak.
 
-\subsection{Mechanical}
-The mercury delay lines originally consisted of banks of steel tubes, each tube having an outer diameter of \SI{4.44}{\centi\metre}, and an inner diamter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. The tubes are then held in an array using machined end-plates.
+The \SI{75}{\ohm} transmission lines are \gls{ac} coupled to the main \gls{edsac} chassis, and the shield of the coaxial cable is referenced directly to earth. This poses a small problem for the reconstruction, because modern health and safety regulations dictate that the chassis of \gls{edsac} should be earthed, but the electronics themselves are powered from an isolated \SI{0}{\volt} rail with earth leakage protection in place.
 
+This wouldn't be a problem except for the fact that the coaxial shield is earth referenced, meaning the coaxial return current goes to earth, not the isolated \SI{0}{\volt} rail. In order to combat this, several capacitors have been added between ground and the \SI{0}{\volt} rail, in order to allow the \gls{ac} current to pass, but still provide \gls{dc} isolation. This means that care will be necessary when implementing the circuitry to power the delay line, as it cannot draw any \gls{dc} power from the line.
+
+\subsection{Mechanical}
+The store delay lines originally consisted of banks of steel tubes, each tube having an outer diameter of \SI{4.44}{\centi\metre}, and an inner diamter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. The tubes are then held in an array using machined end-plates. An illustration of this is shown in Figure \ref{fig:coffins}.
+
+The main implication of these dimensions for the reconstructed system is that the electronics must be more narrow than the inner diameter of the tube, so that it can fit inside.
+
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{delay_lines}
+	\caption{A battery of mercury delay lines in \glsentryshort{edsac} \cite{cam2011c}}
+	\label{fig:coffins}
+\end{figure}
 
 
 \chapter{\chapterStyle{Specification}}
 
 The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specification for the delay line I will produce. This specification is detailed in Table \ref{tbl:spec}.
 
-\begin{longtable}{r  >{\raggedright}p{0.43\textwidth}  >{\raggedright}p{0.43\textwidth} }
-	\caption{Delay line specification}\label{tbl:spec}\newcounter{specNo}\tabularnewline
-	\toprule
-	\bfseries Item & \bfseries Specification & \bfseries Justification \tabularnewline
-	\midrule
-	\endhead %Everything above this will be repeated on every page
-	\bottomrule
-	\endfoot
+\begin{longtable}{r  >{\raggedright}p{0.43\textwidth}  >{\raggedright}p{0.43\textwidth} }
+
+	\caption{Delay line specification}\label{tbl:spec}\newcounter{specNo}\tabularnewline
+
+	\toprule
+
+	\bfseries Item & \bfseries Specification & \bfseries Justification \tabularnewline
+
+	\midrule
+
+	\endhead %Everything above this will be repeated on every page
+
+	\bottomrule
+
+	\endfoot
+
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the \gls{edsac} pulse train presented to it's input & This is the primary function of the device \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the \gls{edsac} pulse train presented to it's input & This is the primary function of the device. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a skew against the nominal delay of \review{xx}, and a jitter of \review{xx} & \review{foo} \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by \gls{edsac}, with only minimal non-intrusive modificaions made to \gls{edsac}. & This is the primary function of the device. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to accept input voltages in the range of \review{xx} to \review{xx} & This is necessary to mimic the performance of the original delay line \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} be able to have an adjustable nominal delay in the range of  \review{xx} to \review{xx}. & An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output delay in the range of \review{xx} to \review{xx} & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a skew against the nominal delay of no greater than \review{xx}, and a maximum per cycle jitter of. \review{xx} & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with input waveforms \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \review{xx} to \review{xx}. & This is necessary to mimic the performance of the original delay line. \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \review{xx} to \review{xx}, driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort. \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-phys-size} & \textbf{Must} be able to fit inside a tube of \review{xx} internal diameter. & This diameter allows the design to fit inside the steel tubes originally filled with mercury. \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-testing} & \textbf{Must} be accompanied by a testing device capable of emulating the signals produced by \gls{edsac}. & This allows the delay line to be tested separately to the reconstruction project. \tabularnewline
 	
 	
 \end{longtable}
 
-\chapter{\chapterStyle{System Development}}
+\chapter{\chapterStyle{Delay line Development}}
 
-\section{Delay line}
+This Chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
 
-\section{Testbench}
+The delay itself is implemented in the digital domain, with the goal of accurately emulating the analogue domain of the original design. This development is detailed in Section \ref{sec:delay-line-dig-des}. The surrounding analogue circuitry translates between the logic level signal signals of the digital circuit, and the input and output.
 
-\section{Amplifier}
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{The overall architecture of the delay line}
+	\label{fig:delay-line-arch}
+\end{figure}
 
-\chapter{\chapterStyle{Testing and Verification}}
 
-\section{Delay line}
+\section{Digital Design} \label{sec:delay-line-dig-des}
 
-\section{Testbench}
+The goal of the digital design is to delay the signal on it's input by a certain amount. If the input signal were arbitrary, then the optimal solution would be to clock a \SI{1}{\bit} wide \gls{fifo} buffer with a sampling clock. The delay would then be given by Equation \ref{eq:naive-buffer-depth}, where $t_d$ represents the delay time, $f_s$ sampling clock frequency, and $N$ the depth of the buffer.
 
-\section{Amplifier}
+\begin{equation}
+	t_d = \frac{1}{f_s} \times N \label{eq:naive-buffer-depth}
+\end{equation}
+
+This solution can be simplified by consideration of the fact that the input signal is not arbitrary, the characteristics or the signal are known from the research detailed in Section \ref{sec:review-delay-timing}. It is known that:
+\begin{itemize}
+	\item The signal will consist of \SI{0.9}{\micro\second} pulses of \SI{13.5}{\mega\hertz} tone.
+	\item Each tone burst will be separated by \SI{1.1}{\micro\second}.
+	\item Each delay line can store a maximum of 576 pulses.
+\end{itemize}
+
+Using these characteristics it can be seen that a digital delay line only needs to sample store the time at which the rising edge of an incoming pulse is received. Since the packet length and modulation frequency is fixed, this can be asserted on the line a fixed delay later.
+
+\subsection{Architecture selection}
+
+Various architectures could be used to implement the system described in the previous section. The three most obvious methods of implementation being
+\begin{itemize}
+	\item A microcontroller design.
+	\item A discrete logic design
+	\item A \gls{fpga} design
+\end{itemize}
+
+Microcontrollers have the advantage of being comparatively cheap and readily available, in addition they typically have more than enough \gls{ram} available to implement the memory to store the array of times at which pulses arrived.
+
+The principle disadvantage is that microcontrollers inherently to their architecture process a single thread of data at once. This means that even a tight processing loop which samples the input would add a much larger amount of jitter to the input compared to a hardware solution with the same clock rate. Fortunately however modern microcontroller architectures, typically have a large number of peripherals embedded in the silicon, which can remove computation from the core. This combined with interrupts can provide an architecture with very predictable latency.
+
+An example implementation is detailed in Figure \ref{fig:mcu-system-arch}. This details a system, based upon a typical microcontroller in the \gls{arm} Cortex-M0 family. A pin change interrupt interrupts the main execution thread, and branches to an interrupt handler. This interrupt handler reads the value of a free-running timer peripheral that counts up using the microcontroller master clock, adds a fixed delay value to it, and appends it to a queue of timer counts held in \gls{ram}. This queue contains the values of the counter which the output should be asserted at.
+
+The main execution thread of the microcontroller configures the timer peripheral to trigger a second timer peripheral once its count equals the value on the top of the queue. This second counter is connected directly to an output \gls{gpio} pin, and is clocked such that the output toggles at \SI{13.5}{\mega\hertz}.
+
+This system can therefore meet the requirements of the delay line, with a worst case jitter of one system clock period (since the Cortex-M0 family allows for deterministic latency interrupts \review{cite}). Microcontrollers with timers capable of being configured as described above are readily available also \review{cite STM32 reference manual here}.
+
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{Proposed architecture for a microcontroller based system}
+	\label{fig:mcu-system-arch}
+\end{figure}
+
+The other two alternatives, a discrete logic system, and a \gls{fpga} based system would be similar in architecture, but differ in implementation, with the \gls{fpga} based system implementing the function using the programmable fabric of a \gls{fpga}, whereas the discrete implementation would use individual \glspl{ic}. A block diagram of the proposed architecture is shown in Figure \ref{fig:hardware-system-arch}.
+
+The concept of this architecture is similar to that of the microcontroller based system. There is a free running counter inside the \gls{fpga}, when a pulse is detected on the input, the value of the counter, added to a fixed delay is saved into a \gls{fifo}. A second hardware module outputs a pulse train whenever the value of the counter matches the value on the top of the \gls{fifo}.
+
+The difference between the hardware implementation and the microcontroller implementation is that there isn't a processor core to set up the hardware blocks, instead each hardware block is designed to perform the correct function, and interacts with the other modules using logic signals. In addition there is no need for an external modulator, as a harware block can be created to output the modulated \SI{13.5}{\mega\hertz} signal.
+
+The \gls{fifo} is the centre of this system. It is set to be the width of the free-running counter. At its input is the current value of the counter, added to a fixed constant that represents the required delay. This value is saved into the \gls{fifo} when the rising edge detector produces a pulse on its output.
+
+The rising edge detector is a fairly simple hardware block that outputs a pulse for a single clock cycle when it detects a rising edge on its input. It then times out for a fixed interval, to avoid triggering on the remaining pulses in the same packet, and resets.
+
+At the output of the \gls{fifo} feeds into a comparator. This comparator compares the value on the top of the \gls{fifo} with the current value of the counter, and triggers the pulse generator when the two values are equal.
+
+The pulse generator outputs a fixed length burst of \SI{13.5}{\mega\hertz} tone whenever it is triggered. This could be implemented simply by choosing a clock frequency that is $2^n$ times greater than \SI{13.5}{\mega\hertz}. Thus the carrier frequency can be generated by a counter clocked from the input clock.
+
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{Proposed architecture for a \glsentryshort{fpga} or discrete system}
+	\label{fig:hardware-system-arch}
+\end{figure}
+
+\review{Could add power in here}
+
+The advantage of the microcontroller system over a \gls{fpga} or discrete solution is twofold. Firstly the simplicity of the physical circuit necessary. A microcontroller based design would require a \gls{ic} for the microcontroller itself, and an external crystal oscillator (although some microcontrollers do have a reduced precision internal \gls{rc} oscillator, removing the need even for this), and are generally powered from a single \SI{3.3}{\volt} supply. This is in contrast to \glspl{fpga} which typically require more than one supply rail, with extensive decoupling, and a discrete solution which would require many \glspl{ic}.
+
+Secondly a microcontroller design would likely be slightly cheaper than a discrete logic design, as low end microcontrollers are typically only slightly more expensive than individual logic \glspl{ic}, and are much less costly than typical \glspl{fpga}.
+
+Despite these advantages, a hardware solution does have the advantage of elegance. While it has been demonstrated above that a microcontroller solution could achieve single cycle jitter -- the same as a hardware solution. It is a lot more difficult to implement and verify, given the fact that configuration of many hardware peripherals are required.
+
+In addition, the cost advantage of the microcontroller solution may be smaller than anticipated. This is because the simplicity of the hardware solution would only require a very small \gls{fpga}, which may be competitive in price to a microcontroller. Alternatively a \gls{cpld} with an external \gls{ram} \gls{ic} could be used. A \gls{fpga} solution would be preferred to a discrete implementation, due to the ease of testing, and reconfiguring the hardware if the requirements change.
+
+Therefore on balance it has been decided to proceed with a \gls{fpga} based solution.
+
+\subsubsection{\Glsentryshort{fpga} Selection}
+
+The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:fpga-reqs}.
+
+\begin{table}[ht]
+	
+	\centering
+	\newcounter{FpgaSpecNo}
+	
+	\caption{\Glsentryshort{fpga} Requirements}
+	\label{tbl:fpga-reqs}
+	\begin{tabular}{l p{0.4\textwidth} p{0.4\textwidth}}
+		\toprule
+		Number & Requirement & Justification \\
+		
+		\midrule
+		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-cost} &
+		\textbf{Must} have a moderately low cost &
+		Using the \gls{ic} for every delay line in the store must not be cost prohibitive.\\
+		
+		
+		\midrule
+		
+		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-les} &
+		\textbf{Must} have enough logic elements and block \gls{ram} to implement a single long delay line &
+		This is the proposed function of the delay line\\
+		
+		\midrule
+
+		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-speed} &
+		\textbf{Must} have fabric capable of being clocked fast enough to implement the design with a clock rate of \review{xx} &
+		It was decided at \review{xx} that this is the required sampling speed.\\
+		
+		\midrule
+
+		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-dev-board} &
+		\textbf{Should} have a development board available with a width less than \review{xx} &
+		As described in Section \review{xx}, \review{xx} is the internal diameter of the delay line tube, it would be ideal if the development board could fit inside the tube, to save a custom \gls{pcb} being designed.\\
+
+		
+		\midrule
+
+		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-pll} &
+		\textbf{Should} have a \gls{pll} to enable to fabric clock to be generated from a crystal oscillator &
+		An internal \gls{pll} is ideal, but an external \gls{pll} could also be used.\\
+		
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+At the time of writing the least expensive \gls{fpga} available from component suppliers Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
+
+This \gls{fpga} has 1280 \glspl{lc}, which should be plenty to implement the simple design, given that each \gls{lc} in this architecture consists of a four input \gls{lut}, and a flip-flop \cite[p.2-2]{lattice2017a}. The \gls{fpga} also has \SI{64}{\kilo\bit} of block \gls{ram}. This meets specification point \ref{itm:fpga-spec-les}, when one considers that is enough to store a clock sample for each of the 576 possible pulses, even if a \SI{64}{\bit} clock width was used, as demonstrated by Equation \ref{eq:bram-size-estimate}, where $S$ representes the size of memory required. In addition to this, there is one \gls{pll} available on the \gls{fpga} die, meeting specification point \ref{itm:fpga-spec-pll}.
+
+\begin{equation}
+	S = \SI{64}{\bit} \times 576 = \SI{36}{\kilo\bit} \label{eq:bram-size-estimate}
+\end{equation}
+
+It is hard to estimate how fast a design will be able to operate in a \gls{fpga} without synthesising it, and running timing analysis. However, despite this we can estimate that the \gls{fpga} will easily meet timing at \review{xx}, thus meeting specification point \ref{itm:fpga-spec-speed}, given that the register-to-register performance of the fabric is as good as \SI{403}{\mega\hertz} for a dual-port \gls{ram}, \SI{305}{\mega\hertz} for a 16:1 multiplexer, and \SI{105}{\mega\hertz} for a \SI{64}{\bit} counter.
+
+In addition to this, a development board is available which is very narrow \cite{lattice2017b}. The exact dimensions are not provided, but it is barely wider than the \SI{22}{\milli\metre} \gls{tqfp} of the \gls{fpga} itself \cite[p.2]{lattice2017b}, meaning it is highly likely to fit in the \review{xx} diameter tube, thus meeting specification point \ref{itm:fpga-spec-dev-board}.
+
+Based upon the fact that it meets all of the specification points, it has been decided to implement the design using the Lattice iCEstick evaluation board, with the possibility of moving to a custom \gls{pcb} if many instances of the design were required.
+
+\subsection{\Glsentryshort{hdl} Design}
+
+Uniquely, the Lattice iCE40 family of \glspl{fpga} has an open-source toolchain available, named Project IceStorm which can be used as an alternative to the toolchain provided by Lattice \cite{icestorm}. Project IceStorm synthesises Verilog natively, and Lattice's iCEcube2 toolchain synthesises both Verilog and \gls{vhdl} \cite[p.10]{lattice2017c}. Therefore in order to maintain compatibility with both toolchains, the design will be written using Verilog. Both toolchains were trialled, and the codebase is compatible with both, however Project IceStorm was used in the end as it is the more user-friendly toolchain.
+
+The design was implemented using the structure of Figure \ref{fig:hardware-system-arch}, with the rising edge detector, \gls{fifo}, comparator, and pulse generator implemented as individual Verilog modules.
+
+\review{Could talk about how the parameters are determined here}
+
+\subsubsection{Rising Edge Detector}
+
+The rising edge detector is implemented as the state machine of Figure \ref{fig:edge-detect-sm}. In the wait state, the input is sampled on every clock edge, when it is true, the state machine transitions to the assert state, where the output is asserted, until the state machine unconditionally branches to the timeout state. In the timeout state a counter is incremented until it reaches the required limit. At this point the state machine branches back to the wait state.
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}[stateMachine]
+	
+	\node[initial,state] (wait) {\texttt{SM\_WAIT}};
+	\node[state]         (assert) [right of=wait] {\texttt{SM\_ASSERT}};
+	\node[state]         (timeout) [right of=assert] {\texttt{SM\_TIMEOUT}};
+	
+	\path (wait) edge[bend left] node[auto] {\texttt{in}} (assert)
+	(assert) edge[bend left] node[auto] {} (timeout)
+	(timeout) edge[loop above] node[auto] {\texttt{ctr != (TIMEOUT-1)}} (timeout)
+	(timeout) edge[bend left] node[auto] {\texttt{ctr == (TIMEOUT-1)}} (wait)
+	(wait) edge[loop above] node[auto] {\texttt{!in}} (wait);
+	
+	\end{tikzpicture}
+	\caption{Rising Edge Detector State Machine}
+	\label{fig:edge-detect-sm}
+\end{figure}
+
+\subsubsection{\Glsentryshort{fifo}}
+The \gls{fifo} is implemented by building logic constructs around a dual port \gls{ram} to handle addressing of the read and write ports.
+
+The main part of the \gls{fifo} is the read and write addresses. These addresses act as pointers to the current location of the read/write word in \gls{ram}. Each address is incremented on when the fifo it read from/written to, and the address loops around to the start when it reaches the end of the \gls{ram} buffer. This `round robin' approach means that the \gls{fifo} can be read from and written to an unlimited amount of times, so long as the total number of words stored is not greater than the depth of the buffer.
+
+In addition to the read/write address pointers, there is a counter which keeps track of the total number of words stored in the buffer. This counter is decremented if a read is requested, and incremented if a write is requested (its value does not change if both a read and a write is requested at the same time, or neither a read or write is requested). This counter is used to generate empty and full signals so that the surrounding logic knows the state of the counter.
+
+\subsubsection{Comparator}
+The comparator is implemented as a state machine that requests data from the \gls{fifo} and asserts the output when the counter matches the data word, as illustrated by the state transition diagram of Figure \ref{fig:comparator-sm}.
+
+\texttt{empty} is the \texttt{empty} signal from the \gls{fifo}, and the \gls{fifo} read request signal is true when the state machine is in the request state.
+
+\texttt{count} is the value of the system counter, and \texttt{data\_in} is the data read from the \gls{fifo}. The output trigger is true when the state machine is in the \texttt{SM\_ASSERT} state.
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}[stateMachine]
+	
+	\node[initial,state] (waitData) {\texttt{\shortstack{SM\_WAIT\\\_FOR\_DATA}}};
+	\node[state]         (req) [right of=waitData] {\texttt{\shortstack{SM\_\\REQUEST}}};
+	\node[state]         (wait) [right of=req] {\texttt{SM\_WAIT}};
+	\node[state]         (assert) [below of=req] {\texttt{SM\_ASSERT}};
+
+	
+	\path (waitData) edge[bend left] node[auto] {\texttt{!empty}} (req)
+	(req) edge[bend left] node[auto] {} (wait)
+	(wait) edge[loop above] node[auto] {\texttt{count != data\_in}} (wait)
+	(timeout) edge[bend left] node[auto] {\texttt{count == data\_in}} (assert)
+	(assert) edge[bend left] node[auto] {} (waitData)
+	(waitData) edge[loop above] node[auto] {\texttt{empty}} (waitData);
+	
+	\end{tikzpicture}
+	\caption{Comparator State Machine}
+	\label{fig:comparator-sm}
+\end{figure}
+
+
+\subsection{\Glsentryshort{hdl} Verification}
+
+\section{Method of Powering}
+
+\section{Analogue Design}
+
+\chapter{\chapterStyle{Test Harness Development}}
+
+\chapter{\chapterStyle{Integration and Testing}}
+
 
 \chapter{\chapterStyle{Project Planning}}
 
