@@ -10,14 +10,23 @@ output output_clk,in_demod, next_word, clk_out;
 output reg sample;
 
 
-//PLL
-wire clk, pll_locked;
-pll pll0
+//PLLa 
+wire clk, clk_intermediate, pll_locked, plla_locked, pllb_locked;
+plla plla0
 (
 	.clock_in(clk_in),
-	.clock_out(clk),
-	.locked(pll_locked)
+	.clock_out(clk_intermediate),
+	.locked(plla_locked)
 );
+
+pllb pllb0
+(
+	.clock_in(clk_intermediate),
+	.clock_out(clk),
+	.locked(pllb_locked)
+);
+
+assign pll_locked = plla_locked && pllb_locked;
 
 
 //Power on reset
@@ -29,6 +38,7 @@ power_on_reset por0
 	.n_reset(n_reset)
 );
 
+reg out, out_en;
 test_harness test_harness_0
 (
 	.clk(clk),
@@ -36,8 +46,10 @@ test_harness test_harness_0
 	.uart_rx_pin(uart_rx_pin),
 	.in(in_sig),
 	.uart_tx_pin(uart_tx_pin),
-	.out(out_sig)
+	.out(out),
+	.out_en(out_en)
 );
+assign out_sig = out_en? out : 1'bz; //Tristate output
 
 
 assign output_clk = 0; //test_harness_0.mem_manager_0.output_clk;

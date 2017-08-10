@@ -35,7 +35,7 @@ msg_types = [('received wrong num', ('addr',edsac_addr_len), ('data',edsac_data_
              ('mod params',('cycles per half period',6)),  # Request to update modulator parameters
              ('demod params',('pulse width',8)), #Request to update demodulator parameters
              ('sys status', ('run', 1)),  # Request to update system status
-             ('mem params', ('no nums', edsac_addr_len), ('test mode',1),('pulse width',10), ('pulse gap',10)),  # Requst to update memory manager params
+             ('mem params', ('no nums', edsac_addr_len), ('test mode',1),('pulse width',8), ('pulse gap',8)),  # Requst to update memory manager params
              ('err fifo full', ('payload', payload_len*word_len)),  # Error - input FIFO is full
              ('err mem overrun', ('payload', payload_len*word_len)),  # Error - missed a word that came in because dealing with UART request took too long
              ('err update whilst run', ('payload', payload_len*word_len)),  # Error - attempted to update parameters whilst running

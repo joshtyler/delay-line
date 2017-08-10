@@ -1,5 +1,5 @@
 // UART Message Decoder and Encoder Classes 
-// Automatically generated  by uart_msg_const_gen.py at 03:41PM on July 03, 2017
+// Automatically generated  by uart_msg_const_gen.py at 10:20PM on August 10, 2017
 // DO NOT MODIFY MANUALLY
 
 #ifndef UART_MSG_HPP
@@ -160,10 +160,10 @@ class MemParams : public UartMessage
 		void setNoNums(ParamType data) {setBits(8, 15, data);};
 		ParamType getTestMode(void) const {return getBits(16, 16);};
 		void setTestMode(ParamType data) {setBits(16, 16, data);};
-		ParamType getPulseWidth(void) const {return getBits(17, 26);};
-		void setPulseWidth(ParamType data) {setBits(17, 26, data);};
-		ParamType getPulseGap(void) const {return getBits(27, 36);};
-		void setPulseGap(ParamType data) {setBits(27, 36, data);};
+		ParamType getPulseWidth(void) const {return getBits(17, 24);};
+		void setPulseWidth(ParamType data) {setBits(17, 24, data);};
+		ParamType getPulseGap(void) const {return getBits(25, 32);};
+		void setPulseGap(ParamType data) {setBits(25, 32, data);};
 		void print(std::ostream& os) const
 		{
 			os << getHeaderStr() << ": "  << " no nums: " << getNoNums() << " test mode: " << getTestMode() << " pulse width: " << getPulseWidth() << " pulse gap: " << getPulseGap()<< std::endl;

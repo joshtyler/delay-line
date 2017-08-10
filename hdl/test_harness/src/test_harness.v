@@ -2,15 +2,15 @@
 
 `include "uart_msg_consts.h"
 
-module test_harness(clk, n_reset, uart_rx_pin, in, uart_tx_pin, out);
+module test_harness(clk, n_reset, uart_rx_pin, in, uart_tx_pin, out, out_en);
 
 input clk, n_reset, uart_rx_pin, in;
-output uart_tx_pin, out;
+output uart_tx_pin, out, out_en;
 
 parameter integer UART_DATA_WIDTH = 8;
 parameter integer UART_STOP_BITS = 1;
 parameter integer UART_BAUD = 9600;
-parameter integer CLK_RATE = 108_000_000;
+parameter integer CLK_RATE = 54_000_000;
 parameter integer MSG_ASM_FIFO_DEPTH = 8; //8 Packets
 parameter integer MSG_DISASM_FIFO_DEPTH = 8; //8 Packets
 parameter integer GLITCH_WIDTH = 30; //Filter all glitches shorter this many clock cycles 
@@ -207,5 +207,7 @@ modulator modulator_0
 	.mod_params(mod_params),
 	.out(out)
 );
+
+assign out_en = mem_manager_out; // This is when the modulation is active
 
 endmodule
