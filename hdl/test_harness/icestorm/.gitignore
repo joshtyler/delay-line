@@ -1,0 +1,4 @@
+*.log
+*.blif
+*.asc
+*.bin

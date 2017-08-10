@@ -1,0 +1,18 @@
+# HX8k Dev board constraints
+
+# UART
+set_io uart_tx_pin B12
+set_io uart_rx_pin B10
+
+# Populated header
+set_io in_sig R15
+set_io out_sig P15
+set_io output_clk P16
+set_io in_demod N16
+set_io sample M16
+set_io next_word M15
+set_io clk_out L16
+
+
+# 12 MHz clock
+set_io clk_in J3
