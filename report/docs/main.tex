@@ -244,18 +244,24 @@ Therefore on balance it has been decided to proceed with a \gls{fpga} based solu
 
 The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:fpga-reqs}.
 
-\begin{table}[ht]
+\begin{table}[ht]
+
 	
 	\centering
 	\newcounter{FpgaSpecNo}
 	
-	\caption{\Glsentryshort{fpga} Requirements}
+	\caption{\Glsentryshort{fpga} Requirements}
+
 	\label{tbl:fpga-reqs}
-	\begin{tabular}{l p{0.4\textwidth} p{0.4\textwidth}}
-		\toprule
-		Number & Requirement & Justification \\
+	\begin{tabular}{l p{0.4\textwidth} p{0.4\textwidth}}
+
+		\toprule
+
+		Number & Requirement & Justification \\
+
 		
-		\midrule
+		\midrule
+
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-cost} &
 		\textbf{Must} have a moderately low cost &
 		Using the \gls{ic} for every delay line in the store must not be cost prohibitive.\\
@@ -286,8 +292,10 @@ The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:f
 		\textbf{Should} have a \gls{pll} to enable to fabric clock to be generated from a crystal oscillator &
 		An internal \gls{pll} is ideal, but an external \gls{pll} could also be used.\\
 		
-		\bottomrule
-	\end{tabular}
+		\bottomrule
+
+	\end{tabular}
+
 \end{table}
 
 At the time of writing the least expensive \gls{fpga} available from component suppliers Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
@@ -316,29 +324,40 @@ The design was implemented using the structure of Figure \ref{fig:hardware-syste
 
 The rising edge detector is implemented as the state machine of Figure \ref{fig:edge-detect-sm}. In the wait state, the input is sampled on every clock edge, when it is true, the state machine transitions to the assert state, where the output is asserted, until the state machine unconditionally branches to the timeout state. In the timeout state a counter is incremented until it reaches the required limit. At this point the state machine branches back to the wait state.
 
-\begin{figure}[ht]
-	\centering
-	\begin{tikzpicture}[stateMachine]
+\begin{figure}[ht]
+
+	\centering
+
+	\begin{tikzpicture}[stateMachine]
+
 	
-	\node[initial,state] (wait) {\texttt{SM\_WAIT}};
-	\node[state]         (assert) [right of=wait] {\texttt{SM\_ASSERT}};
-	\node[state]         (timeout) [right of=assert] {\texttt{SM\_TIMEOUT}};
+	\node[initial,state] (wait) {\texttt{SM\_WAIT}};
+
+	\node[state]         (assert) [right of=wait] {\texttt{SM\_ASSERT}};
+
+	\node[state]         (timeout) [right of=assert] {\texttt{SM\_TIMEOUT}};
+
 	
-	\path (wait) edge[bend left] node[auto] {\texttt{in}} (assert)
+	\path (wait) edge[bend left] node[auto] {\texttt{in}} (assert)
+
 	(assert) edge[bend left] node[auto] {} (timeout)
 	(timeout) edge[loop above] node[auto] {\texttt{ctr != (TIMEOUT-1)}} (timeout)
-	(timeout) edge[bend left] node[auto] {\texttt{ctr == (TIMEOUT-1)}} (wait)
-	(wait) edge[loop above] node[auto] {\texttt{!in}} (wait);
+	(timeout) edge[bend left] node[auto] {\texttt{ctr == (TIMEOUT-1)}} (wait)
+
+	(wait) edge[loop above] node[auto] {\texttt{!in}} (wait);
+
 	
-	\end{tikzpicture}
-	\caption{Rising Edge Detector State Machine}
+	\end{tikzpicture}
+
+	\caption{Rising Edge Detector State Machine}
+
 	\label{fig:edge-detect-sm}
 \end{figure}
 
 \subsubsection{\Glsentryshort{fifo}}
 The \gls{fifo} is implemented by building logic constructs around a dual port \gls{ram} to handle addressing of the read and write ports.
 
-The main part of the \gls{fifo} is the read and write addresses. These addresses act as pointers to the current location of the read/write word in \gls{ram}. Each address is incremented on when the fifo it read from/written to, and the address loops around to the start when it reaches the end of the \gls{ram} buffer. This `round robin' approach means that the \gls{fifo} can be read from and written to an unlimited amount of times, so long as the total number of words stored is not greater than the depth of the buffer.
+The main part of the \gls{fifo} is the read and write addresses. These addresses act as pointers to the current location of the read/write word in \gls{ram}. Each address is incremented on when the \gls{fifo} it read from/written to, and the address loops around to the start when it reaches the end of the \gls{ram} buffer. This `round robin' approach means that the \gls{fifo} can be read from and written to an unlimited amount of times, so long as the total number of words stored is not greater than the depth of the buffer.
 
 In addition to the read/write address pointers, there is a counter which keeps track of the total number of words stored in the buffer. This counter is decremented if a read is requested, and incremented if a write is requested (its value does not change if both a read and a write is requested at the same time, or neither a read or write is requested). This counter is used to generate empty and full signals so that the surrounding logic knows the state of the counter.
 
@@ -349,25 +368,34 @@ The comparator is implemented as a state machine that requests data from the \gl
 
 \texttt{count} is the value of the system counter, and \texttt{data\_in} is the data read from the \gls{fifo}. The output trigger is true when the state machine is in the \texttt{SM\_ASSERT} state.
 
-\begin{figure}[ht]
-	\centering
-	\begin{tikzpicture}[stateMachine]
+\begin{figure}[ht]
+
+	\centering
+
+	\begin{tikzpicture}[stateMachine]
+
 	
-	\node[initial,state] (waitData) {\texttt{\shortstack{SM\_WAIT\\\_FOR\_DATA}}};
-	\node[state]         (req) [right of=waitData] {\texttt{\shortstack{SM\_\\REQUEST}}};
+	\node[initial,state] (waitData) {\texttt{\shortstack{SM\_WAIT\\\_FOR\_DATA}}};
+
+	\node[state]         (req) [right of=waitData] {\texttt{\shortstack{SM\_\\REQUEST}}};
+
 	\node[state]         (wait) [right of=req] {\texttt{SM\_WAIT}};
 	\node[state]         (assert) [below of=req] {\texttt{SM\_ASSERT}};
 
 	
-	\path (waitData) edge[bend left] node[auto] {\texttt{!empty}} (req)
+	\path (waitData) edge[bend left] node[auto] {\texttt{!empty}} (req)
+
 	(req) edge[bend left] node[auto] {} (wait)
 	(wait) edge[loop above] node[auto] {\texttt{count != data\_in}} (wait)
 	(timeout) edge[bend left] node[auto] {\texttt{count == data\_in}} (assert)
 	(assert) edge[bend left] node[auto] {} (waitData)
-	(waitData) edge[loop above] node[auto] {\texttt{empty}} (waitData);
+	(waitData) edge[loop above] node[auto] {\texttt{empty}} (waitData);
+
 	
-	\end{tikzpicture}
-	\caption{Comparator State Machine}
+	\end{tikzpicture}
+
+	\caption{Comparator State Machine}
+
 	\label{fig:comparator-sm}
 \end{figure}
 

@@ -111,7 +111,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="width_chars">9</property>
-                        <property name="text" translatable="yes">108.0</property>
+                        <property name="text" translatable="yes">54.0</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>

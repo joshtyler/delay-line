@@ -165,7 +165,7 @@ always @(posedge clk)
 		else
 			mux_en <= 0;
 
-assign out = (mux_en? replace_shift_out : in) && output_clk; //AND with output clock to enforce gap
+assign out = (test_mode ? 1'b1 : (mux_en? replace_shift_out : in)) && output_clk; //AND with output clock to enforce gap
 
 //Received number handler
 reg data_out_ready;

@@ -38,7 +38,7 @@ power_on_reset por0
 	.n_reset(n_reset)
 );
 
-reg out, out_en;
+wire out, out_en;
 test_harness test_harness_0
 (
 	.clk(clk),

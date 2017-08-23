@@ -14,7 +14,10 @@ set_io SD 107
 
 # Pmod connector
 set_io in_sig 78 # Pin 1
-set_io out_sig 79 # Pin 2
+
+# Other header
+set_io out_sig 112
+set_io enable 113
 
 # 12 MHz clock
 set_io clk_in 21

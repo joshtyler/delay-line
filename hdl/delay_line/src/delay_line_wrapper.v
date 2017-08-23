@@ -1,10 +1,10 @@
 // Top level module
 
-module delay_line_wrapper(clk_in, in_sig, out_sig, //Real inputs/outputs
+module delay_line_wrapper(clk_in, in_sig, out_sig, enable, //Real inputs/outputs
 LED0, LED1, LED2, LED3, LED4, SD); //Outputs to hold at vcc/ground
 
 input clk_in, in_sig;
-output out_sig, LED0, LED1, LED2, LED3, LED4, SD;
+output out_sig, enable, LED0, LED1, LED2, LED3, LED4, SD;
 
 //Hold LEDs at 0V
 assign LED0 = 0;
@@ -46,5 +46,6 @@ delay_line delay_line_0
 );
 
 assign out_sig = out_en? delay_line_out : 1'bz;
+assign enable = 1; //Always enable op-amps
 
 endmodule
