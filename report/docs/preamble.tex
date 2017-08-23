@@ -52,9 +52,9 @@
 \usepackage{etoolbox} %Let's let bibliography be ragged right to avoid typesetting problems
 \apptocmd{\thebibliography}{\raggedright}{}{}
 
+\usepackage[table]{xcolor}
 
 %Tables (and long tables)
-\usepackage[table]{xcolor}
 \usepackage{longtable}
 
 % alternate rowcolors for all long-tables
@@ -66,6 +66,7 @@
 \renewenvironment{longtable}{\rowcolors{2}{white}{gray!30}\oldlongtable} {
 
 	\endoldlongtable}
+
 
 %Drawing
 \usepackage{tikz}
@@ -89,8 +90,10 @@
 
 \tikzstyle{block} = [rectangle, rounded corners, minimum width=\nodeDist, minimum height=\nodeDist, text centered, draw=black, fill=black!40]
 
-%\tikzset{font={\small}} %set small font
-\tikzstyle{every state}=[fill=black!40,draw=none,minimum size=\tikzStateNodeDist/2] %Setup state machine style
+%\tikzset{font={\small}} %set small font
+
+\tikzstyle{every state}=[fill=black!40,draw=none,minimum size=\tikzStateNodeDist/2] %Setup state machine style
+
 \tikzstyle{stateMachine}=[->,auto,node distance=\tikzStateNodeDist,thick]
 
 \tikzstyle{arrowNml} = [thick,->,>=stealth]
@@ -149,6 +152,10 @@
 % This package makes all references within your document clickable. By default, these references will become boxed and colored. This is turned back to normal with the \hypersetup command below.
 \usepackage[pdfpagelabels]{hyperref} %pdfpagelabels allows page numbers such as i and ii in pdf reader
 	\hypersetup{colorlinks=false,pdfborder=0 0 0}
+
+
+%Timing diagrams
+\usepackage{tikz-timing}[2011/01/09]
 
 	
 %Count pages

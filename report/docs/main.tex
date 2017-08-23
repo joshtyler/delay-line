@@ -2,7 +2,21 @@
 %\pagestyle{fancy}
 
 \chapter{\chapterStyle{Introduction}} \label{sec:intro}
-\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}. \Gls{edsac} was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac}, used programs hard-coded using switches, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
+\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}, the exact nature of the machine will be discussed in Chapter \ref{sec:tech-rev}, however the recreation of its memory is non trivial and is the aim of this project.
+
+
+\review{This segment is out of place}
+Creating a faithful reproduction of this system poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the reconstruction project currently intends to use magnetorestrictive delay lines \cite{ward2011}.
+
+As discussed at length in \cite{tyler2017}, this method is non-ideal since it is: anachronistic for the time, dissimilar in appearance to the original delay lines, and dissimilar in terms of electrical interface to the original. For this reason it was decided to investigate the use of modern technology to emulate the original delay lines. This emulation is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
+
+\chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
+This Chapter presents an overview of \gls{edsac}, and an overview of the relevant literature surrounding its the memory architecture.
+
+The data derived will be used to derive a specification for the recreated memory solution, presented in Chapter \ref{sec:spec}. It should be ntod that much of the literature presented comes from original documentation produced by Maurice Wilkes, the man who led the original \gls{edsac} project.
+
+\section{\glsentryshort{edsac} overview} \label{sec:edsac-overview}
+\Gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}, was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac}, hard-coded programs using switches, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
 
 
 \begin{figure}[ht]
@@ -10,8 +24,9 @@
 	\includegraphicssized{wilkes_renwick_edsac_crop}
 	\caption{W.Renwick and M.Wilkes standing with \glsentryshort{edsac} \cite{cam2011b}}
 	\label{fig:edsac-photo}
-\end{figure} 
+\end{figure}
 
+\section{\glsentryshort{edsac} Memory Architecture} \label{sec:edsac-mem-arch}
 \Gls{edsac} ran its first program in May 1949. This posed a significant design challenge for the memory of the machine. Transistors were not commercially available at all until 1951 \cite{bonne2007}, and valves, whilst available, were physically large, and were fairly expensive. This meant that creation of even a modest amount of storage would not have been feasible. \Gls{eniac} used valves, but it also had very little memory. This was not a problem for its intended application, but would have posed a problem for a general purpose computing platform, such as \gls{edsac} \cite[p.208]{wilkes1948}.
 
 The solution chosen for \gls{edsac}'s storage problem was delay line memory. This was common with other early computers, and works via a fairly simple mechanism. Given a medium able to delay a pulse train by a certain amount, memory can be created by feeding the output of that delay medium back into the input. If the delay time is tuned to be an integer multiple of the system clock frequency, the system is able to store a sequence of bits proportional in length to the delay time. This principle is illustrated in Figure \ref{fig:delay-line-principle}.
@@ -20,7 +35,7 @@ Delay lines exist in various forms, from magnetorestrictive delay lines which fu
 
 \begin{figure}[ht]
 	\centering
-
+	
 	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
 	
 	
@@ -48,15 +63,8 @@ Delay lines exist in various forms, from magnetorestrictive delay lines which fu
 
 \Gls{edsac} used acoustic delay lines in the form of steel tubes, approximately \SI{1.5}{\metre} long, and full of mercury. Impulses were inserted into one end of the tube via a quartz transducer, and reach the other end of the tube after a delay of approximately \SI{1}{\milli\second}. Here a second quartz transducer converts the incoming acoustic impulse into an electronic impulse.
 
-Creating a faithful reproduction of this system poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the reconstruction project currently intends to use magnetorestrictive delay lines \cite{ward2011}.
 
-As discussed at length in \cite{tyler2017}, this method is non-ideal since it is: anachronistic for the time, dissimilar in appearance to the original delay lines, and dissimilar in terms of electrical interface to the original. For this reason it was decided to investigate the use of modern technology to emulate the original delay lines. This emulation is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
-
-\chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
-This Chapter presents a review of the relevant literature surrounding the delay lines used in \gls{edsac}, and uses it to derive a specification for the recreated delay line. Much of the literature presented comes from original documentation produced by Maurice Wilkes, the man in charge of the original \gls{edsac} project.
-
-\section{\glsentryshort{edsac} Delay Line Specification}
-As briefly discussed in Chapter \ref{sec:intro}, \gls{edsac} uses mercury delay lines as memory. These are used in two ways:
+These delay lines are used in two ways:
 \begin{enumerate}
 	\item Short tubes used for the results of calculations.
 	\item Batteries of longer tubes used as the main memory store. This is analogous to \gls{ram} in a modern computer.
@@ -67,7 +75,18 @@ As briefly discussed in Chapter \ref{sec:intro}, \gls{edsac} uses mercury delay 
 The shorter tubes are sized to store only a single minor cycle, but the longer tubes are long enough to store 576 pulses (16 minor cycles). The batteries of each of these tubes each contained 16 tubes, and \gls{edsac} originally had two batteries, allowing for a total storage capacity of $16 \times 16 \times 2 = 512$ numbers.
 
 \subsection{Timing} \label{sec:review-delay-timing}
-The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.1}{\micro\second} gap for each bit. The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0. It should be noted that the reconstruction will use a bit rate slightly faster or slower than \SI{500}{\kilo\hertz}, because \SI{500}{\kilo\hertz} is an international distress frequency, and given the large wiring looms in \gls{edsac}, it would be quite easy for \gls{edsac} to become an unintentional transmitter of this frequency.
+The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.1}{\micro\second} gap for each bit (although some literature specifies a pulse of \SI{0.9}{\micro\second} and a gap of  \SI{1.0}{\micro\second}, implying a \SI{526}{\kilo\hertz} bit rate). The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0.
+
+It should be noted that the reconstruction will use a bit rate slightly faster or slower than \SI{500}{\kilo\hertz}, because \SI{500}{\kilo\hertz} is an international distress frequency, and given the large wiring looms in \gls{edsac}, it would be quite easy for \gls{edsac} to become an unintentional transmitter of this frequency. This would initially appear to oppose a faithful recreation of \gls{edsac}, however one needs to consider the reaction of the mercury originally used to changes in temperature. Mercury was chosen because its acoustic delay does not vary much with temperature. The variation was still large enough however to cause cause the system to break over the normal temperature range of a laboratory environment. To combat this, the original clock frequency was adjusted with temperature such that the delay of each delay line was an integer multiple of the clock period. Later this system was deemed unsatisfactory and the coffins were enclosed in a temperature controlled environment.
+
+To allow consistent operation of the machine, it is desirable that the recreated \gls{edsac} does not emulate this variation of delay dependant upon temperature, but the delay of each line should be tunable around the nominal delay given by Equation \ref{eq:nom-delay}.
+
+\newcommand{\nominalLongTubeDelayMs}{1.15}
+
+\begin{equation}
+	D = \frac{1}{\SI{500}{\kilo\hertz}} \times 576 = \SI{\nominalLongTubeDelayMs}{\milli\second}  \label{eq:nom-delay}
+\end{equation}
+
 
 In the regeneration portion of the circuitry, the pulses are demodulated from the \SI{13.5}{\mega\hertz} carrier and stretched to approximately \SI{1.9}{\micro\second} long, i.e. just long enough that each pulse fails to overlap it's neighbour \cite[p.212]{wilkes1948}.
 
@@ -75,19 +94,62 @@ This is critical because it means that the pulses that have passed through the d
 
 Despite this resynchronisation after each delay line, the original \gls{edsac} suffered a great deal from the variation of delay with temperature. Originally the system clock was adjusted whenever the temperature of the delay lines drifted out of synchronization, but later on in development the delay lines were put inside a temperature controlled oven.
 
-The regeneration system implies that the maximum acceptable skew of the delay line from its nominal delay is $\pm$ \SI{0.5}{\micro\second}. This does not, however, take into account other factors such as the jitter and longer term drift of the system clock, as well the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period.
+\newcommand{\maxJitterPlusSkewNs}{50} %Maximum jitter plus skew in nano seconds
+
+The regeneration system implies that the maximum acceptable skew of the delay line from its nominal delay is $\pm\SI{500}{\nano\second}$. This does not, however, take into account other factors such as the jitter and longer term drift of the system clock, as well the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period. Therefore creating a system which is an order of magnitude better than the above calculation, i.e. a maximum deviation from the nominal value of \SI{\maxJitterPlusSkewNs}{\nano\second}, seems reasonable.
 
 \begin{figure}[ht]
 	\centering
-	\dummyfigure
+	
+	\newcommand{\lowPeriodLessOne}{12.5L}
+	\newcommand{\highPeriodLessOne}{12.5H}
+	\newcommand{\lowPeriod}{L \lowPeriodLessOne}
+	\newcommand{\highPeriod}{H \highPeriodLessOne}
+	
+	%Each period is 27 units long
+	\newcommand{\sysClkPeriod}{\lowPeriodLessOne C \highPeriodLessOne C}
+	
+	\newcommand{\modulatedPulse}{12{C} C 0.5C}
+	\newcommand{\gap}{; [dotted, red] \lowPeriod ;}
+	
+	%N.B One half is exactly 66.5 units long
+	\newcommand{\lowHalf}{\lowPeriodLessOne 4{\lowPeriod}}
+	
+	\begin{tikztimingtable} [xscale=0.2, timing/slope=.5]
+% There are 27 13.5M periods per system clock
+		System clock & 2{\sysClkPeriod} 12.5L \gap 2{\sysClkPeriod} \lowPeriodLessOne  \\
+%
+		Transmitted burst & \lowPeriodLessOne \modulatedPulse 3{\lowPeriod} \gap \lowHalf \\
+%
+		Received burst &  \lowHalf \gap 6.75L \modulatedPulse 6.75L 2{\lowPeriod} \lowPeriodLessOne \\
+%
+%       Period is 27 units long, Therefore 24.3units of high, plus 2.7 units of low
+		Demodulated pulse &  \lowHalf \gap 6.75L 24.3H 2.7L 6.75L \lowPeriod \lowPeriodLessOne \\
+%
+		Re-clocked pulse & \lowHalf \gap \lowPeriodLessOne \highPeriod 3{\lowPeriod}\\
+%
+		Re-transmitted burst & \lowHalf \gap \lowPeriodLessOne \modulatedPulse 3{\lowPeriod} \\
+		\extracode
+		\begin{pgfonlayer}{background}
+			\vertlines[gray!40]{12.5, 26, 92.5,106}%,146.5}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
 	\caption{\Glsentryshort{edsac} pulse timing }
 	\label{fig:edsac-pulse-timing}
 \end{figure}
 
-\subsection{Electrical}
-Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{69}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt}.
+\subsection{Electrical} \label{sec:review-delay-electrical}
 
-Despite this, the recreation project has discovered that the regeneration circuitry actually feed the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{35}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{25}{\volt} peak for the tubes at the end of the store.
+\newcommand{\maxDelayInputV}{35}
+\newcommand{\minDelayInputV}{25}
+
+\newcommand{\maxDelayOutputmV}{100}
+\newcommand{\minDelayOutputmV}{10}
+
+
+Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak to peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{69}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt}.
+
+Despite this, the recreation project has discovered that the regeneration circuitry actually feed the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{\maxDelayInputV}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{\minDelayInputV}{\volt} peak for the tubes at the end of the store.
 
 In addition to this, problems were experienced with amplifying the low signal level output by the delay lines. Because the current wire delay line solution has flexibility in its output voltage, currently the delayed signal is output at \SI{100}{\milli\volt} peak.
 
@@ -95,12 +157,16 @@ The \SI{75}{\ohm} transmission lines are \gls{ac} coupled to the main \gls{edsac
 
 This wouldn't be a problem except for the fact that the coaxial shield is earth referenced, meaning the coaxial return current goes to earth, not the isolated \SI{0}{\volt} rail. In order to combat this, several capacitors have been added between ground and the \SI{0}{\volt} rail, in order to allow the \gls{ac} current to pass, but still provide \gls{dc} isolation. This means that care will be necessary when implementing the circuitry to power the delay line, as it cannot draw any \gls{dc} power from the line.
 
-\subsection{Mechanical}
-The store delay lines originally consisted of banks of steel tubes, each tube having an outer diameter of \SI{4.44}{\centi\metre}, and an inner diamter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. The tubes are then held in an array using machined end-plates. An illustration of this is shown in Figure \ref{fig:coffins}.
+\subsection{Mechanical} \label{sec:review-delay-mech}
+\newcommand{\tubeLenCm}{165.5} %Tube length in cm
+\newcommand{\tubeOdCm}{4.44} %Tube outer diameter in cm
 
-The main implication of these dimensions for the reconstructed system is that the electronics must be more narrow than the inner diameter of the tube, so that it can fit inside.
 
+The store delay lines originally consisted of banks of approximately \SI{\tubeLenCm}{\centi\metre} long steel tubes. The tubes are then held in an array using machined end-plates. An illustration of this is shown in Figure \ref{fig:coffins}.
 
+The exact dimensions, aside from the length, of each store tube are not explicitly stated in the available literature. However the dimensions of the short tubes are stated, with each short tube having an outer diameter of \SI{\tubeOdCm}{\centi\metre}, and an inner diameter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. For the purposes of this project, the long tubes are therefore assumed to have similar dimensions to this.
+
+The main restriction these dimensions place on the project is that the electronics must fit inside a tube of the corrrect length and outer diameter, so that the reconstructed system can be indistinguishable from the original in terms of form.
 
 \begin{figure}[ht]
 	\centering
@@ -110,9 +176,9 @@ The main implication of these dimensions for the reconstructed system is that th
 \end{figure}
 
 
-\chapter{\chapterStyle{Specification}}
+\chapter{\chapterStyle{Specification}} \label{sec:spec}
 
-The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specification for the delay line I will produce. This specification is detailed in Table \ref{tbl:spec}.
+The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specification for the delay line which will be produced. This specification is detailed in Table \ref{tbl:spec}.
 
 \begin{longtable}{r  >{\raggedright}p{0.43\textwidth}  >{\raggedright}p{0.43\textwidth} }
 
@@ -133,17 +199,19 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 	
 	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the \gls{edsac} pulse train presented to it's input & This is the primary function of the device. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by \gls{edsac}, with only minimal non-intrusive modificaions made to \gls{edsac}. & This is the primary function of the device. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by \gls{edsac}, with only minimal non-intrusive modifications made to \gls{edsac}. & The goal of the device is to faithfully recreate the appearance and electrical interface of \gls{edsac}, and thus large modifications such as power supply wires must be avoided. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} be able to have an adjustable nominal delay in the range of  \review{xx} to \review{xx}. & An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} be able to have a nominal delay of \SI{\nominalLongTubeDelayMs}{\milli\second}, adjustable by at least $\pm 10\%$. & \SI{\nominalLongTubeDelayMs}{\milli\second} is the nominal delay of a long tube, as discussed in Section \ref{sec:review-delay-timing}. An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a skew against the nominal delay of no greater than \review{xx}, and a maximum per cycle jitter of. \review{xx} & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \tabularnewline
+%	\refstepcounter{specNo}\thespecNo\label{itm:spec-temp-stab} & \textbf{Must} be able a delay that is stable across the temperature range of \review{[xx]} to \review{[xx]}. & As discussed in Section \review{[xx]} \gls{edsac} originally had delay lines which varied with temperature  \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with input waveforms \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \review{xx} to \review{xx}. & This is necessary to mimic the performance of the original delay line. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a maximum per burst deviation from the nominal delay of \SI{\maxJitterPlusSkewNs}{\nano\second}. & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \SI{\maxJitterPlusSkewNs}{\nano\second} is the maximum deviation derived in Section \ref{sec:review-delay-timing} \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \review{xx} to \review{xx}, driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with input waveforms \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt}. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-phys-size} & \textbf{Must} be able to fit inside a tube of \review{xx} internal diameter. & This diameter allows the design to fit inside the steel tubes originally filled with mercury. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} (peak to peak), driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort, \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-phys-size} & \textbf{Must} be encapsulated in a metal tube of \SI{\tubeOdCm}{\centi\metre} outer diameter, and \SI{\tubeLenCm}{\centi\metre} length. & This diameter allows the design to have the same appearance of the main memory store tubes of the original \gls{edsac} design, the width and diameter are discussed in \ref{sec:review-delay-mech} \tabularnewline
 	
 	\refstepcounter{specNo}\thespecNo\label{itm:spec-testing} & \textbf{Must} be accompanied by a testing device capable of emulating the signals produced by \gls{edsac}. & This allows the delay line to be tested separately to the reconstruction project. \tabularnewline
 	
@@ -401,6 +469,20 @@ The comparator is implemented as a state machine that requests data from the \gl
 
 
 \subsection{\Glsentryshort{hdl} Verification}
+In order to verify the \gls{hdl} design, a SystemVerilog testbench was written for each module, and these modules were then simulated using Mentor Graphics ModelSim. These testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
+
+The focus of the verification is, however, on the system level testing, which tests the delay line as a whole. This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses in the same way as \gls{edsac}, and each pulse burst is added to a queue with the simulation time when the pulse is expected to arrive. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time. Figure \ref{fig:delay-line-tb-output} shows the output of this testbench.
+
+\begin{figure}[ht]
+	
+	\centering
+	\dummyfigure
+	
+	\caption{Delay line testbench output}
+	
+	\label{fig:delay-line-tb-output}
+\end{figure}
+
 
 \section{Method of Powering}
 
