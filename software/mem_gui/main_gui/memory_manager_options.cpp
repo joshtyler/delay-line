@@ -62,7 +62,7 @@ void MemoryManagerOptions::setDefaultValues(void)
 {
     testMode->set_active(false); //Test mode off by default
     pulseWidth->set_value(timeToCycles(0.9e-6));
-    pulseGap->set_value(timeToCycles(1e-6));
+    pulseGap->set_value(timeToCycles(1.1e-6));
     onSend();
 }
 

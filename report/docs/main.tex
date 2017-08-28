@@ -218,7 +218,7 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 	
 \end{longtable}
 
-\chapter{\chapterStyle{Delay line Development}}
+\chapter{\chapterStyle{Delay line Design}}
 
 This Chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
 
@@ -380,7 +380,7 @@ In addition to this, a development board is available which is very narrow \cite
 
 Based upon the fact that it meets all of the specification points, it has been decided to implement the design using the Lattice iCEstick evaluation board, with the possibility of moving to a custom \gls{pcb} if many instances of the design were required.
 
-\subsection{\Glsentryshort{hdl} Design}
+\subsection{\glsentryshort{hdl} Design}
 
 Uniquely, the Lattice iCE40 family of \glspl{fpga} has an open-source toolchain available, named Project IceStorm which can be used as an alternative to the toolchain provided by Lattice \cite{icestorm}. Project IceStorm synthesises Verilog natively, and Lattice's iCEcube2 toolchain synthesises both Verilog and \gls{vhdl} \cite[p.10]{lattice2017c}. Therefore in order to maintain compatibility with both toolchains, the design will be written using Verilog. Both toolchains were trialled, and the codebase is compatible with both, however Project IceStorm was used in the end as it is the more user-friendly toolchain.
 
@@ -468,7 +468,7 @@ The comparator is implemented as a state machine that requests data from the \gl
 \end{figure}
 
 
-\subsection{\Glsentryshort{hdl} Verification}
+\subsection{\glsentryshort{hdl} Verification}
 In order to verify the \gls{hdl} design, a SystemVerilog testbench was written for each module, and these modules were then simulated using Mentor Graphics ModelSim. These testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
 
 The focus of the verification is, however, on the system level testing, which tests the delay line as a whole. This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses in the same way as \gls{edsac}, and each pulse burst is added to a queue with the simulation time when the pulse is expected to arrive. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time. Figure \ref{fig:delay-line-tb-output} shows the output of this testbench.
@@ -483,16 +483,130 @@ The focus of the verification is, however, on the system level testing, which te
 	\label{fig:delay-line-tb-output}
 \end{figure}
 
+\section{Analogue Design}
 
-\section{Method of Powering}
+The \gls{fpga} communicates using \SI{3.3}{\volt} \gls{lvcmos} inputs and outputs. This is a great difference from the \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} input, and \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} output range. In addition to this, the input and outputs are \gls{ac} coupled and so require a voltage symmetrical about \SI{0}{\volt}.
+
+\subsection{Input}
+
+The input voltage needs to be terminated with \SI{68}{\ohm}, the closest E12 preferred resistor value to \SI{70}{\ohm} and the value which is used by the remainder of the reconstruction project to terminate the transmission lines, in addition to this the power system imposes a requirement to remove the \SI{50}{\hertz} power signal discussed in Chapter \ref{sec:power}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{schematic_portions/delay_line_input}
+	\caption{Delay line input schematic \review{replace with better schematic}}
+	\label{fig:delay-line-input-sch}
+\end{figure}
+
+The schematic designed to interface the input signal to the \gls{fpga} is shown in Figure \ref{fig:delay-line-input-sch}.
+
+The \SI{2.2}{\nano\farad} capacitor and \SI{68}{\ohm} resistor act as a low pass filter with a break frequency of \SI{1.1}{\mega\hertz}, as derived in Equation \ref{eq:delay-input-cutoff}. This correctly terminate the incoming \SI{13.5}{\mega\hertz} bursts, as well as presenting a high impedance to the \SI{50}{\hertz} power supply signal.
+
+\begin{equation}
+f_0 = \frac{1}{2\pi RC} = \frac{1}{2\pi \times \SI{68}{\ohm} \times \SI{2.2}{\nano\farad}} = \SI{1.1}{\mega\hertz} \label{eq:delay-input-cutoff}
+\end{equation}
+
+The next stage of the input circuitry is a \SI{4.7}{\kilo\ohm} potentiometer. This attenuates the input signal by an adjustable amount to provide a logic level input signal for the Schmitt trigger buffer.
+
+The value of the potentiometer is designed such that it provides negligible loading on the input signal compared to the \SI{68}{\ohm} termination resistor. Despite this the current through it for a \SI{10}{\volt} input signal is $\frac{\SI{10}{\volt}}{\SI{4.7}{\kilo\ohm}} = \SI{2.1}{\milli\ampere}$, an order of magnitude greater than both the BAT54 diode leakage current (\SI{2}{\micro\ampere} max \cite[p.2]{vishay2013}), and the Schmitt buffer input leakage current (\SI{5}{\micro\ampere} max \cite[p.4]{diodesinc2014}).
+
+The Schmitt trigger removes small glitches which may occur on the input so that they do not reach the \gls{fpga} input. it also helps to provide a defined \gls{lvcmos} output signal from the unclean input signal.
+
+The BAT54 protection diodes clamp the input signal to the Schmitt buffer close to its supply rails. The are suitable for the task due to their fast recovery time, \SI{5}{\nano\second} and low forward voltage, \SI{0.4}{\volt} at \SI{10}{\milli\ampere} \cite[p.2]{vishay2013}. In addition their continuous forward current rating, \SI{200}{\milli\ampere} max is far greater than what can be sourced through the \SI{4.7}{\kilo\ohm} potentiometer.
+
+\subsection{Output}
+
+The output section of the delay line is required to drive the line with \SI{0}{\volt} when no pulse is present, and a \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} peak-to-peak signal, centered about \SI{0}{\volt} when no signal is present.
+
+
+The biasing about \SI{0}{\volt} is achieved by \gls{ac} coupling the output of the amplification circuit. One problem which can occur from this is that the output of the \gls{fpga} will be \SI{0}{\volt} when no signal is being output, but will oscillate between \SI{0}{\volt} and \SI{3.3}{\volt} when a pulse is being transmitted. This is a problem for the circuit because to correctly \gls{ac} couple the signal, the voltage at the capacitor should be half way between the two extreme values, i.e. \SI{1.65}{\volt}. This is illustrated in Figure \ref{fig:delay-line-output-coupling}.
+
+In order to achieve this effect, the internal tri-state buffer capability of the \gls{fpga} is used. This is the purpose of the resistor network shown on the output of the \gls{fpga}. When the \gls{fpga} output is disabled, the two resistors between power rails pull the op-amp non-inverting input to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{2}{\kilo\ohm}} = \SI{1.65}{\volt}$. When the \gls{fpga} drives its output to \SI{3.3}{\volt}, the voltage at the op-amp is equal to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{2.2}{\volt}$, and when the \gls{fpga} drives \SI{0}{\volt}, the voltage at the op-amp will be $\SI{3.3}{\volt} \times\frac{\SI{0.5}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{1.1}{\volt}$. This arrangement is used, rather than having the \gls{fpga} directly drive the non-inverting input of the op-amp in order to avoid driving the op-amp into saturation, as it is powered from the same \SI{0}{\volt} to \SI{3.3}{\volt} rails as the \gls{fpga} \gls{gpio} pins.
+
+The first stage op amp is a unity gain buffer amplifier used to drive the output into a \SI{220}{\ohm} potentiometer. This potentiometer is used to attenuate the signal to the required level from the \SI{1}{\volt} peak to peak amplitude driven by the op-amp to the required level. This also attenuates the bias point away from half way between the voltage rails. For this reason, the \gls{ac} component of the signal is re-biased onto \SI{1.65}{\volt} before buffering by the second amplifier.
+
+The second amplifier is a second unity gain buffer, that critically has an output impedance of \SI{68}{\ohm} and \gls{ac} couples the output signal in order to remove the \gls{dc} bias.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{schematic_portions/delay_line_output}
+	\caption{Delay line output schematic \review{replace with better schematic}}
+	\label{fig:delay-line-output-sch}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{Effect of having the op-amp output idle at \SI{0}{\volt}}
+	\label{fig:delay-line-output-coupling}
+\end{figure}
+
+For both amplifiers in the circuit LMH6639 amplifiers are used \cite{ti2013}. This amplifier is chosen because of several desirable properties. Firstly it has a \gls{gbp} of \SI{190}{\mega\hertz}, more than what is necessary to buffer the \SI{13.5}{\mega\hertz} signal with unity gain. In addition to this, unlike many high \gls{gbp} op-amps, the LMH6639 is a voltage feedback architecture simplifying design. Crucially for this application the amplifier is stable at a gain of +1, and has almost rail-to-rail performance at a single supply voltage of \SI{3}{\volt} (typical output range is \SI{75}{\milli\volt} to \SI{2.93}{\volt} driving \SI{150}{\ohm}.
+
+\chapter{\chapterStyle{Power System Design}} \label{sec:power}
+
+This Chapter discusses how the delay line is powered, which is something which has required some consideration. As discussed in Specification point \ref{itm:spec-power}, the delay line must be powered from the input signal, and this method of providing power via this signal must require minimal modifications to the driving circuitry.
+
+A naive solution would attempt to harvest the power of the input pulses themselves, and store power from each pulse to power the circuitry when the line is inactive. This is plausible because a \SI{20}{\volt} peak-to-peak input signal, delivers \SI{1.5}{\watt} of power into the delay line for the time it is active, as calculated by Equation \ref{eq:power-delivered-to-load}.
+
+\begin{equation}
+P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
+\end{equation}
+
+The problem with this is approach is that one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, non pulses will be delivered to the delay line at all. This means that the delay line would have to power on with a predictable latency such that the first pulse could be delayed by the correct amount. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
+
+Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discussed a slightly more complex solution that overcomes the shortcomings of the former.
+
+
+
+\section{DC Offset Solution} \label{sec:power-dc-offset}
+Since the output of the valve circuitry is \gls{ac} coupled \review{Include schematic portion here?}, a simple solution to interface with \gls{edsac} is to add a \gls{dc} offset to the output. This could be achieved as simply as adding a potential divider to the output of the store regeneration unit, stiff enough to provide a stable voltage for the delay line. This solution is illustrated in Figure \ref{fig:dc-offset}.
+
+\begin{figure}[ht]
+	\centering
+	\dummyfigure
+	\caption{Proposed \glsentryshort{dc} offset solution}
+	\label{fig:dc-offset}
+\end{figure}
+
+This is an ideal solution in theory 
+
+\section{Valve Power Supply Solution} \label{sec:power-valve-supply}
+
+\subsection{\glsentryshort{spice} Simulation}
+
+
+\chapter{\chapterStyle{Test Harness Design}}
+
+\section{Digital Design}
+
+\subsection{\glsentryshort{hdl} Design}
+
+\subsection{\glsentryshort{hdl} Verification}
 
 \section{Analogue Design}
 
-\chapter{\chapterStyle{Test Harness Development}}
+\subsection{Input}
 
-\chapter{\chapterStyle{Integration and Testing}}
+\subsection{Output}
+
+\section{Software Design}
+
+
+\chapter{\chapterStyle{System Integration}}
+
+\section{Mechanical}
+
+\section{Issues}
+
+\subsection{\glsentryshort{fpga} Reset Issue}
+
+\subsection{Signal Breakthrough}
+
+
+\section{Measurements}
 
 
 \chapter{\chapterStyle{Project Planning}}
 
-\chapter{\chapterStyle{Conclusion}}
+\chapter{\chapterStyle{Final Comments}}

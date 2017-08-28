@@ -40,13 +40,29 @@ void GuiSection::addWidget(std::string gladeName, Gtk::Widget *& widget)
 unsigned long GuiSection::entryToUl(Gtk::Entry *widget) const
 {
     std::string str = widget->get_text();
-    return std::stoul(str);
+
+    unsigned long retNum;
+    try
+    {
+        retNum = std::stoul(str);
+    } catch(std::exception& e) {
+        retNum = 0;
+    }
+    return retNum;
 }
 
 double GuiSection::entryToDbl(Gtk::Entry *widget) const
 {
     std::string str = widget->get_text();
-    return std::stod(str);
+
+    double retNum;
+    try
+    {
+        retNum = std::stod(str);
+    } catch(std::exception& e) {
+        retNum = 0;
+    }
+    return retNum;
 }
 
 unsigned int GuiSection::timeToCycles(double time)

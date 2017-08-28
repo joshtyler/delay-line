@@ -54,6 +54,6 @@ void ModulatorOptions::setWidgetVisibility(SystemStatus status)
 
 void ModulatorOptions::setDefaultValues(void)
 {
-    cyclesPerHalfPeriod->set_value(timeToCycles(1/(13.5e6)));
+    cyclesPerHalfPeriod->set_value(timeToCycles(0.5*(1/(13.5e6))));
     onSend();
 }
