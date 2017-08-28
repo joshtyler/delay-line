@@ -1,0 +1,289 @@
+\documentclass[aspectratio=169,11pt, xcolor={table}]{beamer}
+
+%\documentclass[11pt]{beamer}
+
+\usetheme[outer/progressbar=foot]{metropolis}
+
+
+%\usepackage{tabularx}
+\usepackage{booktabs}
+
+\usepackage{gensymb}
+
+\usepackage{siunitx}
+\DeclareSIUnit \pixel{px}
+\DeclareSIUnit \bit{b}
+
+\usepackage{caption}
+
+\usepackage{pgfplots}
+
+%Drawing
+\usepackage{tikz}
+
+%\usepackage{tikz-3dplot}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+\usetikzlibrary{positioning}
+%\usetikzlibrary{patterns}
+%\usetikzlibrary{automata}
+
+\newcommand{\nodeDist}{1cm}
+
+
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=\nodeDist, minimum height=\nodeDist, text centered, draw=black, fill=mLightBrown]
+
+
+%\tikzset{font={\small}} %set small font
+
+
+\tikzstyle{arrowNml} = [thick,->,>=stealth]
+
+\tikzstyle{arrowRev} = [thick,<-,>=stealth]
+
+\tikzstyle{arrowDbl} = [thick,<->,>=stealth]
+
+\tikzstyle{lineNml} = [thick]
+
+
+
+%Tables (and long tables)
+
+\usepackage{longtable}
+
+
+% alternate rowcolors for all long-tables
+
+
+\let\oldlongtable\longtable
+
+
+\let\endoldlongtable\endlongtable
+
+
+\renewenvironment{longtable}{\rowcolors{2}{white}{mLightBrown!50}\oldlongtable} {
+
+	
+	\endoldlongtable}
+
+%Columns example:
+%	\begin{columns}
+%		\begin{column}{.49\textwidth}
+%		\end{column}
+%	\end{columns}
+
+\title{\huge Mercury Delay Line Emulation:\\Reconstructing Memory for EDSAC}
+\date{August 30 2017}
+\author{{\large Joshua Tyler}}
+\begin{document}
+\maketitle
+
+\begin{frame}{What is EDSAC?}
+	\centering
+	\includegraphics[height=0.8\textheight]{figs/wilkes_renwick_edsac_crop}
+
+\end{frame}
+
+
+\begin{frame}{How did memory work in EDSAC?}
+	\begin{columns}
+	\begin{column}{.49\textwidth}
+		\centering
+		\includegraphics[height=0.8\textheight]{figs/delay_lines}
+	\end{column}
+	\begin{column}{.49\textwidth}
+		\centering
+		
+		\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+
+		
+		
+		\node (delay) [block, anchor=south west, minimum width=5*\nodeDist] at (0,0) {Delay Unit};
+
+		
+		\node (gate) [block, below=of delay.south west, anchor=north west] {Gate};
+
+		
+		\node (amp) [block, below=of delay.south east, anchor=north east] {Amplifier};
+
+		
+		\draw [arrowNml] (gate.west) -- ++(-0.5*\nodeDist,0) |- (delay.west);
+
+		
+		\draw [arrowNml] (delay.east) -- ++(0.5*\nodeDist,0) |- (amp.east);
+
+		
+		\draw [arrowNml] ([yshift=0.25*\nodeDist] amp.west) -- ([yshift=0.25*\nodeDist] gate.east);
+
+		
+		\draw [arrowRev] ([yshift=-0.25*\nodeDist] gate.east) -- ++(\nodeDist,0) -- ++(0,-\nodeDist) -- ++(-0.5*\nodeDist,0) node[left] {Clock Pulses};
+
+		
+		
+		\end{tikzpicture}
+	\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Reconstruction Effort}
+	\centering
+	\includegraphics[height=0.8\textheight]{figs/edsac_reconstructed}
+\end{frame}
+
+\begin{frame}{Reconstruction Effort}
+	\centering
+	\includegraphics[height=0.8\textheight]{figs/nickel-delay}
+\end{frame}
+
+\begin{frame}{Where I come in}
+
+\begin{itemize}
+	\item \alert{If you're going to cheat -- cheat big!}
+	
+	\item Using modern technology to create delay lines for EDSAC as close to the original as possible in terms of:
+	\begin{itemize}
+		\item Form
+		\item Function
+		\item Electrical interface
+		\begin{itemize}
+			\item N.B. This includes being `phantom powered'
+		\end{itemize}
+	\end{itemize}
+	\item Creation of a test harness which can emulate the memory interface of EDSAC
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Literature}
+
+	\centering
+	%Trim = {left lower right upper}
+	\includegraphics[trim={0 9cm 0 0.5cm},clip, height=0.8\textheight]{figs/literature}
+
+\end{frame}
+
+\begin{frame}{Specification}
+\newcommand{\nominalLongTubeDelayMs}{1.15}
+\newcommand{\maxJitterPlusSkewNs}{50} %Maximum jitter plus skew in nano seconds
+
+\newcommand{\maxDelayInputV}{35}
+
+\newcommand{\minDelayInputV}{25}
+
+\newcommand{\maxDelayOutputmV}{100}
+
+\newcommand{\minDelayOutputmV}{10}
+\newcommand{\tubeLenCm}{165.5} %Tube length in cm
+
+\newcommand{\tubeOdCm}{4.44} %Tube outer diameter in cm
+
+\newcounter{specNo}
+\tiny
+\begin{longtable}{r  >{\raggedright}p{0.45\textwidth}  >{\raggedright}p{0.45\textwidth} }
+	\tabularnewline
+	\toprule
+
+	
+	\bfseries Item & \bfseries Specification & \bfseries Justification \tabularnewline
+
+	
+	\midrule
+
+	
+	\endhead %Everything above this will be repeated on every page
+
+	
+	\bottomrule
+
+	
+	\endfoot
+
+	
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the EDSAC pulse train presented to it's input & This is the primary function of the device. \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by EDSAC, with only minimal non-intrusive modifications made to EDSAC. & The goal of the device is to faithfully recreate the appearance and electrical interface of EDSAC, and thus large modifications such as power supply wires must be avoided. \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} be able to have a nominal delay of \SI{\nominalLongTubeDelayMs}{\milli\second}, adjustable by at least $\pm 10\%$. & \SI{\nominalLongTubeDelayMs}{\milli\second} is the nominal delay of a long tube, as discussed in the report. An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
+
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a maximum per burst deviation from the nominal delay of \SI{\maxJitterPlusSkewNs}{\nano\second}. & This ensures that the delay line output will be able to synchronise with the clock of EDSAC. \SI{\maxJitterPlusSkewNs}{\nano\second} is the maximum deviation derived in the report \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with input waveforms AC coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt}. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in the report. \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} (peak to peak), driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort, \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} is the range derived in the report. \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-phys-size} & \textbf{Must} be encapsulated in a metal tube of \SI{\tubeOdCm}{\centi\metre} outer diameter, and \SI{\tubeLenCm}{\centi\metre} length. & This diameter allows the design to have the same appearance of the main memory store tubes of the original EDSAC design, the width and diameter are discussed in the report \tabularnewline
+
+	
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-testing} & \textbf{Must} be accompanied by a testing device capable of emulating the signals produced by EDSAC. & This allows the delay line to be tested separately to the reconstruction project. \tabularnewline
+
+	
+	
+\end{longtable}
+
+\end{frame}
+
+\begin{frame}{What I've done -- FPGA delay line}
+
+\end{frame}
+
+\begin{frame}{What I've done -- Analogue interface}
+
+\end{frame}
+
+\begin{frame}{What I've done -- Phantom power}
+
+\end{frame}
+
+\begin{frame}{What I've done -- Digital test harness}
+
+\end{frame}
+
+\begin{frame}{What I've done -- Test harness interface}
+
+\end{frame}
+
+\begin{frame}{What I've done -- System integration}
+
+\end{frame}
+
+\begin{frame}{What I've done -- Problems}
+	\begin{itemize}
+		\item \alert{Many!}
+		\item Phantom powering not as simple as first thought
+		\item Crosstalk between input and output stages
+		\item High speed, high voltage, high power amplifier design
+		\item Finding harmony between:
+		\begin{itemize}
+			\item The literature
+			\item What the reconstruction project has made
+			\item Very old circuits
+			\item Very new circuits
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+	\begin{itemize}
+		\item \alert{Success!}
+		\item What was achieved:
+		\begin{itemize}
+		\item Analysis of EDSAC's `memory problem'
+		\item A working recreation of EDSAC's delay lines that looks and performs as the original (except for phantom power)
+		\item A working test harness capable of generating the correct output signals, and analysis of the input signals
+		\item A memory system which able to recreate all of the delay line memory in EDSAC, pending careful PCB design and implementation 
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[standout]
+	Demo
+\end{frame}
+
+\end{document}
