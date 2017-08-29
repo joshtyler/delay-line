@@ -26,14 +26,16 @@
 \usetikzlibrary{positioning}
 %\usetikzlibrary{patterns}
 %\usetikzlibrary{automata}
+\usepackage[europeanresistors]{circuitikz}
 
 \newcommand{\nodeDist}{1cm}
+\newcommand{\blockWidth}{1.5*\nodeDist}
+\newcommand{\blockHeight}{1.5*\nodeDist}
+\newcommand{\tikzStateNodeDist}{3*\nodeDist}
 
+\tikzset{font={\small}} %set small font
 
-\tikzstyle{block} = [rectangle, rounded corners, minimum width=\nodeDist, minimum height=\nodeDist, text centered, draw=black, fill=mLightBrown]
-
-
-%\tikzset{font={\small}} %set small font
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=\blockWidth, minimum height=\blockHeight, text centered, draw=black, fill=mLightBrown]
 
 
 \tikzstyle{arrowNml} = [thick,->,>=stealth]
@@ -229,27 +231,204 @@
 \end{frame}
 
 \begin{frame}{What I've done -- FPGA delay line}
-
+	\centering
+	\begin{tikzpicture}[node distance=\nodeDist, scale=0.8, every node/.style={transform shape}]
+	
+	\node (sync) [block, anchor=west] at (0,0) {\shortstack{Synchroniser}};
+	
+	\node (edge) [block, right=of sync.east, anchor=west] {\shortstack{Edge\\Detector}};
+	
+	\node (adder) [block, below=of edge.south, anchor=north] {\shortstack{Adder}};
+	
+	\node (fifo) [block, right=of adder.south east, anchor=south west, minimum height=(2*\blockHeight+\nodeDist)] {\shortstack{FIFO}};
+	
+	\node (comparator) [block, right=of fifo.east, anchor=west, minimum height=(2*\blockHeight+\nodeDist)] {\shortstack{Comparator}};
+	
+	\node (pulse) [block, right=of comparator.east, anchor=west] {\shortstack{Pulse\\Generator}};
+	
+	\node (ctr) [block, below=of fifo.south, anchor=north] {\shortstack{Counter}};
+	
+	\draw [arrowRev] (sync.west) -- node[above] {Input} ++(-1.5*\nodeDist,0);
+	
+	\draw [arrowNml] (sync) -- (edge);
+	
+	\draw [arrowNml] (edge.east) -- node[above] {\shortstack{Write\\EN}} ++(\nodeDist,0);
+	
+	\draw [arrowNml] (adder.east) -- node[above] {\shortstack{Write\\Data}} ++(\nodeDist,0);
+	
+	\draw [arrowNml] (ctr.north) -- ++(0, 0.5*\nodeDist) coordinate (ctrTop) -| (adder.south);
+	
+	\node[above] at (ctrTop) {Count};
+	
+	\draw [arrowRev] (adder.west) -- ++(-\nodeDist,0) node[left] {Delay constant};
+	
+	\draw [arrowNml] (ctrTop) -- ++(\nodeDist,0) |- ([yshift=0.5*\blockHeight] comparator.south west);
+	
+	\draw [arrowDbl] ([yshift=-0.5*\blockHeight] fifo.north east) -- node[above] {\shortstack{Read\\Port}} ([yshift=-0.5*\blockHeight] comparator.north west);
+	
+	\draw [arrowNml] (comparator) -- node[above] {\shortstack{EN}} (pulse);
+	
+	\draw [arrowNml] (pulse.east) -- node[above] {Output} ++(1.5*\nodeDist,0);
+	
+	\end{tikzpicture}
 \end{frame}
 
 \begin{frame}{What I've done -- Analogue interface}
-
+	\centering
+	\includegraphics[height=0.8\textheight]{figs/analogue}
 \end{frame}
 
 \begin{frame}{What I've done -- Phantom power}
+	\centering
+	\begin{tikzpicture}
+	
+	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
+	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	\draw (pulse_gen.east)
+	to[C] ++(2,0) coordinate (heater_top);
+	
+	\draw (heater_top)
+	to[L] ++(0,-2)
+	to[sV, l_=\shortstack{Heater\\PSU}] ++(0,-2)
+	coordinate(heater_btm)
+	to[short] ++(-1,0)
+	node[ground] {}
+	to[short] ++(-1,0);
+	
+	\draw (heater_top)
+	to[TL, l^=Coaxial cable]  ++(4,0)
+	coordinate (load_top);
+	
+	\draw (load_top)
+	to[L] ++(0,-2)
+	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
+	coordinate(load_btm);
+	
+	\draw (load_top)
+	to[short] ++(3,0)
+	coordinate (pulse_term_top);
+	
+	\draw (pulse_term_top)
+	to[C] ++(0,-2)
+	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
+	coordinate(pulse_term_btm);
+	
+	\draw (load_btm)
+	to[short] ++(1.5,0)
+	coordinate[ground]
+	to[short] ++(1.5,0);
+	
+	\end{tikzpicture}
 
 \end{frame}
 
 \begin{frame}{What I've done -- Digital test harness}
+	\begin{columns}
+	\begin{column}{.49\textwidth}
+		\centering
+		\begin{tikzpicture}[node distance=\nodeDist,scale=0.45, every node/.style={transform shape}]
+		
+		\newcommand{\controllerWidth}{4*\blockWidth}
+		
+		% Controller
+		\node (cont) [block, minimum width=\controllerWidth] at (0,0) {\shortstack{Controller}};
+		
+		% UART RX Stuff
+		\node (rx_fifo) [block, above=of cont.north west, anchor=south west] {FIFO};
+		\node (msg_asm) [block, above=of rx_fifo.north, anchor=south] {\shortstack{Message\\Assembler}};
+		\node (uart_rx) [block, above=of msg_asm.north, anchor=south] {\shortstack{UART\\Receiver}};
+		
+		\draw [arrowNml] (uart_rx) -- (msg_asm);
+		\draw [arrowNml] (msg_asm) -- (rx_fifo);
+		\draw [arrowNml] (rx_fifo.south) -- ++(0,-\nodeDist);
+		
+		% UART TX Stuff
+		\node (tx_fifo) [block, above=of cont.north east, anchor=south east] {FIFO};
+		\node (msg_disasm) [block, above=of tx_fifo.north, anchor=south] {\shortstack{Message\\Disasembler}};
+		\node (uart_tx) [block, above=of msg_disasm.north, anchor=south] {\shortstack{UART\\Transmitter}};
+		
+		\draw [arrowNml] (msg_disasm) -- (uart_tx);
+		\draw [arrowNml] (tx_fifo) -- (msg_disasm);
+		\draw [arrowRev] (tx_fifo.south) -- ++(0,-\nodeDist);
+		
+		%Memory manager
+		\node (mem) [block, minimum width=\controllerWidth, below = of cont] {Memory Manager};
+		\draw [arrowNml] ([xshift=\blockWidth] cont.south west) -- node[left] {Parameters} ++(0,-\nodeDist);
+		\draw [arrowNml] ([xshift=2*\blockWidth] cont.south west) -- node[left] {\shortstack{Replace\\Request}} ++(0,-\nodeDist);
+		\draw [arrowRev] ([xshift=3*\blockWidth] cont.south west) -- node[left] {\shortstack{Update}} ++(0,-\nodeDist);
+		
+		%Demodulatator
+		\node (demod) [block, left = of mem] {Demodulator};
+		\draw [arrowNml] (cont.west) -| node[above] {Parameters} (demod);
+		\draw [arrowNml] (demod) -- (mem);
+		\draw [arrowRev] (demod.west) -- node[above] {Input} ++(-1.5*\nodeDist,0);
+		
+		%Modulatator
+		\node (mod) [block, right = of mem] {Modulator};
+		\draw [arrowNml] (cont.east) -| node[above] {Parameters} (mod);
+		\draw [arrowNml] (mem) -- (mod);
+		\draw [arrowNml] (mod.east) -- node[above] {Output} ++(1.5*\nodeDist,0);
+		
+		
+		\end{tikzpicture}
+	\end{column}
+		
+	\begin{column}{.49\textwidth}
+		\centering
+		\begin{tikzpicture}[node distance=\nodeDist,scale=0.45, every node/.style={transform shape}]
+		
+		% Clocking
+		\node (out_clk) [block] at (0,0) {\shortstack{Output\\Clock\\Generator}};
+		\node (bit_ctr) [block, right=of out_clk] {\shortstack{Bit\\Counter}};
+		\node (word_ctr) [block, right=of bit_ctr] {\shortstack{Word\\Counter}};
+		
+		\draw[arrowRev] (out_clk.north) -- ++(0, \nodeDist) node[above] {Parameters};
+		\draw[arrowRev] (word_ctr.north) -- ++(0, \nodeDist) node[above] {Parameters};
+		
+		% Number memory
+		\node (num_mem) [block, below = of bit_ctr, minimum width=4*\blockWidth] {Number Memory};
+		\draw [arrowRev] (num_mem.west) -- ++(-1.5*\nodeDist,0) coordinate (replace_req) node[left] {\shortstack{Replacement\\request}};
+		
+		
+		%Replacement number shift register
+		\node (replace_sr) [block, right = of num_mem.north east, anchor = north west, minimum height= (2*\blockHeight + \nodeDist)] {\shortstack{Replacement\\Number\\Shift\\Register}};
+		\draw [arrowNml] (num_mem.east) -- node[above] {\shortstack{Load\\Num.}} ++(\nodeDist, 0);
+		
+		
+		%Received number shift register, and checker
+		\node (rec_sr) [block, below = of num_mem.south west, anchor = north west] {\shortstack{Received Number\\Shift Register}};
+		\node (checker) [block, below=of num_mem.south east, anchor=north east] {Checker};
+		\draw [arrowNml] (checker.south) -- ++(0,-0.5*\nodeDist) node[below] {\shortstack{Incorrect\\Number Received}};
+		\draw [arrowNml] (rec_sr) -- node[below] {\shortstack{Parallel\\Out}} (checker);
+		\draw [arrowRev] (checker.north) -- node[left] {\shortstack{Expected\\Number}} ++(0,\nodeDist);
+		
+		%Output Mux
+		\node (mux) [block, below=of replace_sr] {Multiplexer};
+		\draw[arrowNml] (replace_sr.south) -- node[right] {\shortstack{Shift\\Out}} (mux.north);
+		
+		\coordinate (in) at ([yshift=-(2*\blockHeight + 2*\nodeDist)]replace_req);
+		
+		\node[left] at (in) {Input};
+		
+		\draw [arrowNml] (in) -- ++(0.75*\nodeDist,0) coordinate(input_break) -- (mux);
+		
+		\draw [arrowNml] (input_break) |- node[left] {Shift in} (rec_sr.west);
+		
+		\draw [arrowNml] (mux.east) -- ++(1.5*\nodeDist,0) node[right] {Output};
+		
+		
+		\end{tikzpicture}
+	\end{column}
+
+
+
+	\end{columns}
 
 \end{frame}
 
 
 \begin{frame}{What I've done -- Test harness software}
-
-\end{frame}
-
-\begin{frame}{What I've done -- Test harness analogue}
 
 \end{frame}
 
