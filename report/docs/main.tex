@@ -620,6 +620,105 @@ This is an ideal solution in theory
 
 \section{Digital Design}
 
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+	
+	\newcommand{\controllerWidth}{4*\blockWidth}
+	
+	% Controller
+	\node (cont) [block, minimum width=\controllerWidth] at (0,0) {\shortstack{Controller}};
+	
+	% UART RX Stuff
+	\node (rx_fifo) [block, above=of cont.north west, anchor=south west] {FIFO};
+	\node (msg_asm) [block, above=of rx_fifo.north, anchor=south] {\shortstack{Message\\Assembler}};
+	\node (uart_rx) [block, above=of msg_asm.north, anchor=south] {\shortstack{UART\\Receiver}};
+	
+	\draw [arrowNml] (uart_rx) -- (msg_asm);
+	\draw [arrowNml] (msg_asm) -- (rx_fifo);
+	\draw [arrowNml] (rx_fifo.south) -- ++(0,-\nodeDist);
+	
+	% UART TX Stuff
+	\node (tx_fifo) [block, above=of cont.north east, anchor=south east] {FIFO};
+	\node (msg_disasm) [block, above=of tx_fifo.north, anchor=south] {\shortstack{Message\\Disasembler}};
+	\node (uart_tx) [block, above=of msg_disasm.north, anchor=south] {\shortstack{UART\\Transmitter}};
+	
+	\draw [arrowNml] (msg_disasm) -- (uart_tx);
+	\draw [arrowNml] (tx_fifo) -- (msg_disasm);
+	\draw [arrowRev] (tx_fifo.south) -- ++(0,-\nodeDist);
+	
+	%Memory manager
+	\node (mem) [block, minimum width=\controllerWidth, below = of cont] {Memory Manager};
+	\draw [arrowNml] ([xshift=\blockWidth] cont.south west) -- node[left] {Parameters} ++(0,-\nodeDist);
+	\draw [arrowNml] ([xshift=2*\blockWidth] cont.south west) -- node[left] {\shortstack{Replace\\Request}} ++(0,-\nodeDist);
+	\draw [arrowRev] ([xshift=3*\blockWidth] cont.south west) -- node[left] {\shortstack{Update}} ++(0,-\nodeDist);
+	
+	%Demodulatator
+	\node (demod) [block, left = of mem] {Demodulator};
+	\draw [arrowNml] (cont.west) -| node[above] {Parameters} (demod);
+	\draw [arrowNml] (demod) -- (mem);
+	\draw [arrowRev] (demod.west) -- node[above] {Input} ++(-1.5*\nodeDist,0);
+	
+	%Modulatator
+	\node (mod) [block, right = of mem] {Modulator};
+	\draw [arrowNml] (cont.east) -| node[above] {Parameters} (mod);
+	\draw [arrowNml] (mem) -- (mod);
+	\draw [arrowNml] (mod.east) -- node[above] {Output} ++(1.5*\nodeDist,0);
+	
+	
+	\end{tikzpicture}
+	\caption{Proposed Architecture for Test Harness}
+	\label{fig:test-harnesss-system-arch}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+	
+	% Clocking
+	\node (out_clk) [block] at (0,0) {\shortstack{Output\\Clock\\Generator}};
+	\node (bit_ctr) [block, right=of out_clk] {\shortstack{Bit\\Counter}};
+	\node (word_ctr) [block, right=of bit_ctr] {\shortstack{Word\\Counter}};
+	
+	\draw[arrowRev] (out_clk.north) -- ++(0, \nodeDist) node[above] {Parameters};
+	\draw[arrowRev] (word_ctr.north) -- ++(0, \nodeDist) node[above] {Parameters};
+	
+	% Number memory
+	\node (num_mem) [block, below = of bit_ctr, minimum width=4*\blockWidth] {Number Memory};
+	\draw [arrowRev] (num_mem.west) -- ++(-1.5*\nodeDist,0) coordinate (replace_req) node[left] {\shortstack{Replacement\\request}};
+	
+	
+	%Replacement number shift register
+	\node (replace_sr) [block, right = of num_mem.north east, anchor = north west, minimum height= (2*\blockHeight + \nodeDist)] {\shortstack{Replacement\\Number\\Shift\\Register}};
+	\draw [arrowNml] (num_mem.east) -- node[above] {\shortstack{Load\\Num.}} ++(\nodeDist, 0);
+	
+	
+	%Received number shift register, and checker
+	\node (rec_sr) [block, below = of num_mem.south west, anchor = north west] {\shortstack{Received Number\\Shift Register}};
+	\node (checker) [block, below=of num_mem.south east, anchor=north east] {Checker};
+	\draw [arrowNml] (rec_sr) -- node[below] {\shortstack{Parallel\\Out}} (checker);
+	\draw [arrowRev] (checker.north) -- node[left] {\shortstack{Expected\\Number}} ++(0,\nodeDist);
+	
+	%Output Mux
+	\node (mux) [block, below=of replace_sr] {Multiplexer};
+	\draw[arrowNml] (replace_sr.south) -- node[right] {\shortstack{Shift\\Out}} (mux.north);
+	
+	\coordinate (in) at ([yshift=-(2*\blockHeight + 2*\nodeDist)]replace_req);
+	
+	\node[left] at (in) {Input};
+	
+	\draw [arrowNml] (in) -- ++(0.75*\nodeDist,0) coordinate(input_break) -- (mux);
+	
+	\draw [arrowNml] (input_break) |- node[left] {Shift in} (rec_sr.west);
+	
+	\draw [arrowNml] (mux.east) -- ++(1.5*\nodeDist,0) node[right] {Output};
+
+	
+	\end{tikzpicture}
+	\caption{Proposed Architecture for Memory Manager}
+	\label{fig:mem-manager-arch}
+\end{figure}
+
 \subsection{\glsentryshort{hdl} Design}
 
 \subsection{\glsentryshort{hdl} Verification}
