@@ -85,12 +85,14 @@
 \usetikzlibrary{automata}
 
 % Setup some tikz defaults
-\newcommand{\nodeDist}{1.5cm}
+\newcommand{\nodeDist}{1cm}
+\newcommand{\blockWidth}{1.5*\nodeDist}
+\newcommand{\blockHeight}{1.5*\nodeDist}
 \newcommand{\tikzStateNodeDist}{3*\nodeDist}
 
-\tikzstyle{block} = [rectangle, rounded corners, minimum width=\nodeDist, minimum height=\nodeDist, text centered, draw=black, fill=black!40]
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=\blockWidth, minimum height=\blockHeight, text centered, draw=black, fill=black!40]
 
-%\tikzset{font={\small}} %set small font
+\tikzset{font={\small}} %set small font
 
 \tikzstyle{every state}=[fill=black!40,draw=none,minimum size=\tikzStateNodeDist/2] %Setup state machine style
 
@@ -154,7 +156,8 @@
 	\hypersetup{colorlinks=false,pdfborder=0 0 0}
 
 
-%Timing diagrams
+%Timing diagrams
+
 \usepackage{tikz-timing}[2011/01/09]
 
 	

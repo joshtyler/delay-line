@@ -226,7 +226,9 @@ The delay itself is implemented in the digital domain, with the goal of accurate
 
 \begin{figure}[ht]
 	\centering
+
 	\dummyfigure
+
 	\caption{The overall architecture of the delay line}
 	\label{fig:delay-line-arch}
 \end{figure}
@@ -291,7 +293,45 @@ The pulse generator outputs a fixed length burst of \SI{13.5}{\mega\hertz} tone 
 
 \begin{figure}[ht]
 	\centering
-	\dummyfigure
+	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+	
+	\node (sync) [block, anchor=west] at (0,0) {\shortstack{Synchroniser}};
+	
+	\node (edge) [block, right=of sync.east, anchor=west] {\shortstack{Edge\\Detector}};
+	
+	\node (adder) [block, below=of edge.south, anchor=north] {\shortstack{Adder}};
+	
+	\node (fifo) [block, right=of adder.south east, anchor=south west, minimum height=(2*\blockHeight+\nodeDist)] {\shortstack{FIFO}};
+	
+	\node (comparator) [block, right=of fifo.east, anchor=west, minimum height=(2*\blockHeight+\nodeDist)] {\shortstack{Comparator}};
+	
+	\node (pulse) [block, right=of comparator.east, anchor=west] {\shortstack{Pulse\\Generator}};
+	
+	\node (ctr) [block, below=of fifo.south, anchor=north] {\shortstack{Counter}};
+	
+	\draw [arrowRev] (sync.west) -- node[above] {Input} ++(-1.5*\nodeDist,0);
+	
+	\draw [arrowNml] (sync) -- (edge);
+	
+	\draw [arrowNml] (edge.east) -- node[above] {\shortstack{Write\\EN}} ++(\nodeDist,0);
+	
+	\draw [arrowNml] (adder.east) -- node[above] {\shortstack{Write\\Data}} ++(\nodeDist,0);
+	
+	\draw [arrowNml] (ctr.north) -- ++(0, 0.5*\nodeDist) coordinate (ctrTop) -| (adder.south);
+	
+	\node[above] at (ctrTop) {Count};
+	
+	\draw [arrowRev] (adder.west) -- ++(-\nodeDist,0) node[left] {Delay constant};
+	
+	\draw [arrowNml] (ctrTop) -- ++(\nodeDist,0) |- ([yshift=0.5*\blockHeight] comparator.south west);
+	
+	\draw [arrowDbl] ([yshift=-0.5*\blockHeight] fifo.north east) -- node[above] {\shortstack{Read\\Port}} ([yshift=-0.5*\blockHeight] comparator.north west);
+	
+	\draw [arrowNml] (comparator) -- node[above] {\shortstack{EN}} (pulse);
+	
+	\draw [arrowNml] (pulse.east) -- node[above] {Output} ++(1.5*\nodeDist,0);
+	
+	\end{tikzpicture}
 	\caption{Proposed architecture for a \glsentryshort{fpga} or discrete system}
 	\label{fig:hardware-system-arch}
 \end{figure}
