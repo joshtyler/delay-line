@@ -218,6 +218,272 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 	
 \end{longtable}
 
+\chapter{\chapterStyle{Power System Design}} \label{sec:power}
+
+This Chapter discusses how the delay line is powered, which is something which has required some consideration. As discussed in Specification point \ref{itm:spec-power}, the delay line must be powered from the input signal, and this method of providing power via this signal must require minimal modifications to the driving circuitry.
+
+The \gls{fpga} development board is powered using an LT3030 dual-output lienar regulator \cite{lattice2017b}. This regulator produces a both a \SI{3.3}{\volt}, and a \SI{1.2}{\volt} rail which powers the \gls{fpga} core voltage, and \gls{gpio} banks respectively. Initial testing of the \gls{fpga} showed that the development board, without any support circuitry drew \SI{50}{\milli\ampere} from a \SI{5}{\volt} power supply. The exact voltage of the power supply does not matter however, since the use of a linear power regulator means that approximately the same amount of power will be drawn at all voltages. This current larger than expected, as the Lattice power estimation tool estimated that the \gls{fpga} would draw approximately \SI{15}{\milli\ampere} for my design, and the remainder of the circuitry on the \gls{pcb} only accounted for an extra \SI{10}{\milli\ampere} -- \SI{15}{\milli\ampere}. Careful investigation of the evaluation board schematic revealed that both of the power supply rails were loaded with \SI{100}{\ohm} resistors, accounting for \SI{45}{\milli\ampere} of current draw, as calculated by Equation \ref{eq:current-draw}. Inspection of the LT3030 datasheet shows that the load regulation is specified for a minimum current draw of \SI{1}{\milli\ampere}. The current draw of the resistors is therefore excessive, and the current draw of the remaining components on the \gls{pcb} are sufficient to achieve satisfactory load regulation. The resistors were therefore removed and both the \SI{3.3}{\volt} and \SI{1.2}{\volt} rails were stable and at the correct voltage during normal operation.
+
+
+\newcommand{\delayLineCurrentMa}{28}
+
+The total current draw of the final design, including all of the analogue interface circuitry was measured at \SI{\delayLineCurrentMa}{\milli\ampere}.
+
+\begin{align}
+I &= \frac{V_1}{R_1} + \frac{V_2}{R_2} \nonumber \\
+&= \frac{3.3}{100} + \frac{1.2}{100} \nonumber \\
+&= \SI{45}{\milli\ampere} \label{eq:current-draw}
+\end{align}
+
+
+A naive solution to power the delay line would be to attempt to harvest the power of the input pulses themselves, and store power from each pulse to power the circuitry when the line is inactive. This is plausible because a \SI{20}{\volt} peak-to-peak input signal, delivers \SI{1.5}{\watt} of power into the delay line for the time it is active, as calculated by Equation \ref{eq:power-delivered-to-load}.
+
+\begin{equation}
+P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
+\end{equation}
+
+The problem with this is approach is that one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, non pulses will be delivered to the delay line at all. This means that the delay line would have to power on with a predictable latency such that the first pulse could be delayed by the correct amount. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
+
+Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discussed a slightly more complex solution that overcomes the shortcomings of the former.
+
+
+\section{DC Offset Solution} \label{sec:power-dc-offset}
+Figure \ref{fig:store-regen-output} shows the output portion of the store regeneration schematic. Inspection of the output port that drives the delay line, S2 in the schematic, it can be seen that it is \gls{ac} coupled, by nature of capacitor C32. A simple solution to interface with \gls{edsac} is to add a \gls{dc} offset to the output. This could be achieved as simply as adding a potential divider to the output of the store regeneration unit, stiff enough to provide a stable voltage for the delay line. This solution is illustrated in Figure \ref{fig:dc-offset}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{store_regen_sch}[trim={15cm 0 0 9cm},clip] %Trim = {left lower right upper}
+	\caption{Store Regeneration Unit Output \cite{burton2014b}}
+	\label{fig:store-regen-output}
+\end{figure}
+
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+	
+	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
+	
+	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	
+	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	
+	\draw (pulse_gen.east)
+	
+	to[C, l=2.2nF] ++(2,0) coordinate (heater_top);
+	
+	
+	\draw (heater_top)
+	
+	to[R] ++(0,-2)
+	
+	node[ground] {};
+	
+	\draw (heater_top)
+
+	to[R] ++(0,2)
+	
+	node[vcc] {+250V DC};
+	
+	
+	\draw (heater_top)
+	
+	to[TL, l^=Coaxial cable]  ++(4,0)
+	
+	coordinate (load_top);
+	
+	
+	\draw (load_top)
+	
+	to[L, l_=1mH] ++(0,-2)
+	
+	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
+	
+	coordinate(load_btm);
+	
+	
+	\draw (load_top)
+	
+	to[short] ++(3,0)
+	
+	coordinate (pulse_term_top);
+	
+	
+	\draw (pulse_term_top)
+	
+	to[C, l_=2.2nF] ++(0,-2)
+	
+	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
+	
+	coordinate(pulse_term_btm);
+	
+	
+	\draw (load_btm)
+	
+	to[short] ++(1.5,0)
+	
+	coordinate[ground]
+	
+	to[short] ++(1.5,0);
+	
+	
+	\end{tikzpicture}
+	\caption{Proposed \glsentryshort{dc} offset solution}
+	\label{fig:dc-offset}
+\end{figure}
+
+This is an ideal solution in theory, since the \gls{dc} bias is trivial to add to the \gls{ac} coupled output, and can easily be separated from the signal delay line. In addition, since all of the circuitry is powered using \gls{dc}, the biased input could be used directly to power the \gls{ldo} regulator on the \gls{fpga} development board.
+
+Unfortunately there is a problem with this solution. In order to meet modern health and safety requirements the \gls{dc} supply the store regeneration unit, which drives the delay line, has a \SI{0}{\volt} rail which is isolated from ground, and is protected by a \gls{rcbo} \cite{passmore2015}. This means that any current returned to earth, as opposed to the neutral of the supply will cause a fault, and the power supply will be turned off.
+
+Despite this, the shields of the coaxial cables used for the delay lines are referenced directly to earth. In order to prevent earth leakage in this situation, since the termination of the pulse driving the return line would return a significant current to ground, substantial decoupling capacitors are added between earth and the isolated \SI{0}{\volt} rail on each regeneration chassis. This allows the \gls{ac} termination current to be returned correctly, but prevents any \gls{dc} current from being drawn. This means that the \gls{dc} offset solution isn't viable in reality.
+
+\section{Valve Power Supply Solution} \label{sec:power-valve-supply}
+
+Given that the \gls{dc} offset solution proposed in the previous section wasn't feasible, an alternative solution was devised.
+
+Inspection of the assembly instructions for the store regeneration chassis shows that the heater power supply is referenced directly to ground \cite{burton2014a}.
+
+The heater power supply is a \SI{6.3}{\volt} \gls{rms} \SI{50}{\hertz} \gls{ac} supply. In the regeneration chassis it is used to power the heaters for each valve. A typical valve used in the design draws \SI{1}{\ampere}, so the \SI{\delayLineCurrentMa}{\milli\ampere} load from the delay line will add a negligible load onto this supply.
+
+The supply is generated by mains transformer mounted on each chassis.
+
+Since the supply is a \SI{50}{\hertz} supply, this is a frequency sufficiently far from the \SI{13.5}{\mega\hertz} pulse carrier frequency, that it is be easy to filter out.
+
+In order to couple the heater supply onto the store regeneration output, a single inductor is sufficient. The addition of this inductor is the only modification necessary to the \gls{edsac} chassis circuitry. A diagram showing the equivalent circuit of the modified circuitry is shown in Figure \ref{fig:valve-supply-equiv-cct}.
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+	
+	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
+	
+	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	
+	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+	
+	\draw (pulse_gen.east)
+	
+	to[C, l=2.2nF] ++(2,0) coordinate (heater_top);
+	
+	
+	\draw (heater_top)
+	
+	to[L, l_=1mH] ++(0,-2)
+	
+	to[sV, l_=\shortstack{Heater\\PSU}] ++(0,-2)
+	
+	coordinate(heater_btm)
+	
+	to[short] ++(-1,0)
+	
+	node[ground] {}
+	
+	to[short] ++(-1,0);
+	
+	
+	\draw (heater_top)
+	
+	to[TL, l^=Coaxial cable]  ++(4,0)
+	
+	coordinate (load_top);
+	
+	
+	\draw (load_top)
+	
+	to[L, l_=1mH] ++(0,-2)
+	
+	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
+	
+	coordinate(load_btm);
+	
+	
+	\draw (load_top)
+	
+	to[short] ++(3,0)
+	
+	coordinate (pulse_term_top);
+	
+	
+	\draw (pulse_term_top)
+	
+	to[C, l_=2.2nF] ++(0,-2)
+	
+	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
+	
+	coordinate(pulse_term_btm);
+	
+	
+	\draw (load_btm)
+	
+	to[short] ++(1.5,0)
+	
+	coordinate[ground]
+	
+	to[short] ++(1.5,0);
+	
+	
+	\end{tikzpicture}
+	\caption{Proposed valve heater supply solution, equivalent circuit}
+	\label{fig:valve-supply-equiv-cct}
+\end{figure}
+
+
+The reason that this circuitry works is that \SI{1}{\milli\henry} inductor in series with the heater power supply is a very low impedance to the \SI{50}{\hertz} heater supply. This allows the heater supply to be passed to the delay line with minimal series impedance, whilst providing a very high impedance path to the memory pulses, preventing unnecessary loading of them, as calculated by Equations \ref{eq:heater-supply-l-impedance} and \ref{eq:pulse-l-impedance}.
+
+\begin{equation}
+| Z_{L\SI{50}{\hertz}} | = 2 \pi f L = 2 \times \pi \times \SI{1}{\milli\henry} \times \SI{50}{\hertz} = \SI{0.31}{\ohm} \label{eq:heater-supply-l-impedance} 
+\end{equation}
+
+\begin{equation}
+| Z_{L\SI{13.5}{\mega\hertz}} | = 2 \pi f L = 2 \times \pi \times \SI{1}{\milli\henry} \times \SI{13.5}{\mega\hertz} = \SI{85}{\kilo\ohm} \label{eq:pulse-l-impedance}
+\end{equation}
+
+In a similar manner the \SI{2.2}{\nano\farad} capacitor that is used to couple the output of the pulse generation circuitry presents a low impedance to the pulses from the pulse generation circuitry, but is sufficiently small to prevent a high impedance to the \SI{50}{\hertz} heater supply signal, which prevents it from interfering with the pulse generation circuitry, as demonstrated by Equations \ref{eq:heater-supply-c-impedance} and \ref{eq:pulse-c-impedance}.
+
+\begin{equation}
+| Z_{C\SI{50}{\hertz}} | = \frac{1}{2 \pi f C} = \frac{1}{2 \times \pi \times \SI{2.2}{\nano\farad} \times \SI{50}{\hertz}} = \SI{1.4}{\mega\ohm} \label{eq:heater-supply-c-impedance} 
+\end{equation}
+
+
+\begin{equation}
+| Z_{C\SI{13.5}{\mega\hertz}} | = \frac{1}{2 \pi f C} = \frac{1}{2 \times \pi \times \SI{2.2}{\nano\farad} \times \SI{13.5}{\mega\hertz}} = \SI{5.4}{\ohm} \label{eq:pulse-c-impedance} 
+\end{equation}
+
+The same principle works for the termination and power supply circuitry inside the delay line, which will be discussed in more detail in Section \review{xx}.
+
+\subsection{Circuit Design}
+
+Whilst Figure \ref{fig:valve-supply-equiv-cct} models the delay line power supply as a resistor, the reality is slightly more complex since the \gls{ac} supply needs to be rectified in order to power the \gls{dc} circuitry. The circuit to achieve this is shown in Figure \ref{fig:delay-line-psu-sch}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{schematic_portions/delay_line_psu}
+	\caption{Delay line power supply schematic \review{replace picture}}
+	\label{fig:delay-line-psu-sch}
+\end{figure}
+
+This circuit is a half wave rectifier. This design was chosen in preference to a full-wave rectifier because it removes the need for an isolating transformer inside of the delay line tube.
+
+The combination of the diode, \SI{10}{\ohm} resistor, and \SI{10}{\milli\farad} capacitor act as a traditional half wave rectifier, with the diode only allowing a low impedance path for the positive half of the sine wave, the capacitor storing the voltage to provide continuous power to the load, and the resistor limiting the peak current drawn by the circuit. The addition of the inductor presents a high impedance to the \SI{13.5}{\mega\hertz} memory pulse, preventing unnecessary loading on the input signal, as discussed in Section \ref{sec:power-valve-supply}.
+
+The value of the capacitor was designed to keep the ripple of the supply to approximately \SI{0.1}{\ohm}, as illustrated by the linear approximation of Equation \ref{eq:delay-line-ripple}. \SI{10}{\milli\farad}, is the closest readily available value to the calculated \SI{12}{\milli\farad}. In reality the ripple will be much smaller than the calculated value, for two reasons:
+
+\begin{enumerate}
+	\item The current is approximately half of the originally anticipated \SI{60}{\milli\ampere} as discussed at the start of this chapter.
+	\item Energy will also be stored in the magnetic field of the inductor, which is ignored in this approximation.
+\end{enumerate}
+
+\begin{align}
+I &= C \frac{dV}{dt} \nonumber \\
+&\approx C \frac{\Delta V}{ \Delta t} \nonumber \\
+\therefore C &\approx \frac{I \Delta t}{\Delta V} \nonumber \\
+&\approx \frac{\SI{60}{\milli\ampere} \times \frac{1}{\SI{50}{\hertz}} }{\SI{0.1}{\volt}} \nonumber \\
+&\approx \SI{12}{\milli\farad} \label{eq:delay-line-ripple}
+\end{align}
+
+The only additional component is the resistor. This is included in order to drain the voltage across the capacitor when the circuit is powered off, whilst only providing a small current drain of $I \approx \frac{6.3}{\SI{1}{\kilo\ohm}} \approx \SI{6.3}{\milli\ampere}$ in normal operation.
+
 \chapter{\chapterStyle{Delay line Design}}
 
 This Chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
@@ -227,7 +493,31 @@ The delay itself is implemented in the digital domain, with the goal of accurate
 \begin{figure}[ht]
 	\centering
 
-	\dummyfigure
+	\begin{tikzpicture}[node distance=\nodeDist, every node/.style={transform shape}]
+
+	\node (psu) [block] at (0,0) {PSU};
+	
+	\node (frontend) [block, below= of psu] {\shortstack{Analogue\\Frontend}};
+	
+	\draw [arrowRev] (psu.west) -- ++(-\nodeDist,0) -- ++(0, -0.5*\nodeDist - 0.5*\blockHeight) coordinate (input_branch) -- ++(-\nodeDist,0) node[left] {Input};
+
+	\draw [arrowNml] (input_branch) |- (frontend.west);
+	
+	\node (fpga) [block, right= of frontend.south east, anchor= south west, minimum height = 2*\blockHeight + \nodeDist] {\shortstack{FGPA\\Development\\Board}};
+	
+	\draw [arrowNml] (psu.east) -- node[above] {\shortstack{\texttildelow \SI{6}{\volt}\\\glsentryshort{dc}}} ([yshift=-0.5*\blockHeight] fpga.north west);
+		
+	\draw [arrowNml] (frontend.east) -- node[above] {\shortstack{\texttildelow $\SI{3}{\volt}_\text{pk}$\\Pulses}} ([yshift=0.5*\blockHeight] fpga.south west);
+	
+	\node (out_amp) [block, right= of fpga, minimum height = 2*\blockHeight + \nodeDist] {\shortstack{Output\\Amplifier}};
+	
+	\draw [arrowNml] ([yshift=-0.5*\blockHeight] fpga.north east) -- node[above] {\shortstack{\SI{3.3}{\volt}\\\glsentryshort{dc}}} ([yshift=-0.5*\blockHeight] out_amp.north west);
+	
+	\draw [arrowNml] ([yshift=0.5*\blockHeight] fpga.south east) -- node[above] {\shortstack{\SI{3.3}{\volt}\\Signal}} ([yshift=0.5*\blockHeight] out_amp.south west);
+	
+	\draw [arrowNml] (out_amp.east) -- ++(\nodeDist,0) node[right] {Output};
+		
+	\end{tikzpicture}
 
 	\caption{The overall architecture of the delay line}
 	\label{fig:delay-line-arch}
@@ -507,22 +797,6 @@ The comparator is implemented as a state machine that requests data from the \gl
 	\label{fig:comparator-sm}
 \end{figure}
 
-
-\subsection{\glsentryshort{hdl} Verification}
-In order to verify the \gls{hdl} design, a SystemVerilog testbench was written for each module, and these modules were then simulated using Mentor Graphics ModelSim. These testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
-
-The focus of the verification is, however, on the system level testing, which tests the delay line as a whole. This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses in the same way as \gls{edsac}, and each pulse burst is added to a queue with the simulation time when the pulse is expected to arrive. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time. Figure \ref{fig:delay-line-tb-output} shows the output of this testbench.
-
-\begin{figure}[ht]
-	
-	\centering
-	\dummyfigure
-	
-	\caption{Delay line testbench output}
-	
-	\label{fig:delay-line-tb-output}
-\end{figure}
-
 \section{Analogue Design}
 
 The \gls{fpga} communicates using \SI{3.3}{\volt} \gls{lvcmos} inputs and outputs. This is a great difference from the \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} input, and \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} output range. In addition to this, the input and outputs are \gls{ac} coupled and so require a voltage symmetrical about \SI{0}{\volt}.
@@ -583,205 +857,6 @@ The second amplifier is a second unity gain buffer, that critically has an outpu
 
 For both amplifiers in the circuit LMH6639 amplifiers are used \cite{ti2013}. This amplifier is chosen because of several desirable properties. Firstly it has a \gls{gbp} of \SI{190}{\mega\hertz}, more than what is necessary to buffer the \SI{13.5}{\mega\hertz} signal with unity gain. In addition to this, unlike many high \gls{gbp} op-amps, the LMH6639 is a voltage feedback architecture simplifying design. Crucially for this application the amplifier is stable at a gain of +1, and has almost rail-to-rail performance at a single supply voltage of \SI{3}{\volt} (typical output range is \SI{75}{\milli\volt} to \SI{2.93}{\volt} driving \SI{150}{\ohm}.
 
-\chapter{\chapterStyle{Power System Design}} \label{sec:power}
-
-This Chapter discusses how the delay line is powered, which is something which has required some consideration. As discussed in Specification point \ref{itm:spec-power}, the delay line must be powered from the input signal, and this method of providing power via this signal must require minimal modifications to the driving circuitry.
-
-A naive solution would attempt to harvest the power of the input pulses themselves, and store power from each pulse to power the circuitry when the line is inactive. This is plausible because a \SI{20}{\volt} peak-to-peak input signal, delivers \SI{1.5}{\watt} of power into the delay line for the time it is active, as calculated by Equation \ref{eq:power-delivered-to-load}.
-
-\begin{equation}
-P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
-\end{equation}
-
-The problem with this is approach is that one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, non pulses will be delivered to the delay line at all. This means that the delay line would have to power on with a predictable latency such that the first pulse could be delayed by the correct amount. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
-
-Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discussed a slightly more complex solution that overcomes the shortcomings of the former.
-
-\review{talk about what power is required by the FPGA here. E.g. mention how LDO powers circuitry etc.}
-
-\review{Also MUST mention removal of \SI{100}{\ohm} resistors, because it is referenced later}
-
-
-\section{DC Offset Solution} \label{sec:power-dc-offset}
-Since the output of the valve circuitry is \gls{ac} coupled \review{Include schematic portion here?}, a simple solution to interface with \gls{edsac} is to add a \gls{dc} offset to the output. This could be achieved as simply as adding a potential divider to the output of the store regeneration unit, stiff enough to provide a stable voltage for the delay line. This solution is illustrated in Figure \ref{fig:dc-offset}.
-
-\begin{figure}[ht]
-	\centering
-	\dummyfigure
-	\caption{Proposed \glsentryshort{dc} offset solution}
-	\label{fig:dc-offset}
-\end{figure}
-
-This is an ideal solution in theory, since the \gls{dc} bias is trivial to add to the \gls{ac} coupled output, and can easily be separated from the signal delay line. In addition, since all of the circuitry is powered using \gls{dc}, the biased input could be used directly to power the \gls{ldo} regulator on the \gls{fpga} development board.
-
-Unfortunately there is a problem with this solution. In order to meet modern health and safety requirements the \gls{dc} supply the store regeneration unit, which drives the delay line, has a \SI{0}{\volt} rail which is isolated from ground, and is protected by a \gls{rcbo} \cite{passmore2015}. This means that any current returned to earth, as opposed to the neutral of the supply will cause a fault, and the power supply will be turned off.
-
-Despite this, the shields of the coaxial cables used for the delay lines are referenced directly to earth. In order to prevent earth leakage in this situation, since the termination of the pulse driving the return line would return a significant current to ground, substantial decoupling capacitors are added between earth and the isolated \SI{0}{\volt} rail on each regeneration chassis. This allows the \gls{ac} termination current to be returned correctly, but prevents any \gls{dc} current from being drawn. This means that the \gls{dc} offset solution isn't viable in reality.
-
-\section{Valve Power Supply Solution} \label{sec:power-valve-supply}
-
-Given that the \gls{dc} offset solution proposed in the previous section wasn't feasible, an alternative solution was devised.
-
-Inspection of the assembly instructions for the store regeneration chassis shows that the heater power supply is referenced directly to ground \cite{burton2014}.
-
-The heater power supply is a \SI{6.3}{\volt} \gls{rms} \SI{50}{\hertz} \gls{ac} supply. In the regeneration chassis it is used to power the heaters for each valve. A typical valve used in the design draws \SI{1}{\ampere}, so the \review{xx mA} load from the delay line will add a negligible load onto this supply.
-
-The supply is generated by mains transformer mounted on each chassis.
-
-Since the supply is a \SI{50}{\hertz} supply, this is a frequency sufficiently far from the \SI{13.5}{\mega\hertz} pulse carrier frequency, that it is be easy to filter out.
-
-In order to couple the heater supply onto the store regeneration output, a single inductor is sufficient. The addition of this inductor is the only modification necessary to the \gls{edsac} chassis circuitry. A diagram showing the equivalent circuit of the modified circuitry is shown in Figure \ref{fig:valve-supply-equiv-cct}.
-
-\begin{figure}[ht]
-	\centering
-	\begin{tikzpicture}
-	
-	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
-
-	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
-
-	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
-
-	\draw (pulse_gen.east)
-
-	to[C, l=2.2nF] ++(2,0) coordinate (heater_top);
-
-	
-	\draw (heater_top)
-
-	to[L, l_=1mH] ++(0,-2)
-
-	to[sV, l_=\shortstack{Heater\\PSU}] ++(0,-2)
-
-	coordinate(heater_btm)
-
-	to[short] ++(-1,0)
-
-	node[ground] {}
-
-	to[short] ++(-1,0);
-
-	
-	\draw (heater_top)
-
-	to[TL, l^=Coaxial cable]  ++(4,0)
-
-	coordinate (load_top);
-
-	
-	\draw (load_top)
-
-	to[L, l_=1mH] ++(0,-2)
-
-	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
-
-	coordinate(load_btm);
-
-	
-	\draw (load_top)
-
-	to[short] ++(3,0)
-
-	coordinate (pulse_term_top);
-
-	
-	\draw (pulse_term_top)
-
-	to[C, l_=2.2nF] ++(0,-2)
-
-	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
-
-	coordinate(pulse_term_btm);
-
-	
-	\draw (load_btm)
-
-	to[short] ++(1.5,0)
-
-	coordinate[ground]
-
-	to[short] ++(1.5,0);
-
-	
-	\end{tikzpicture}
-	\caption{Proposed valve heater supply solution, equivalent circuit}
-	\label{fig:valve-supply-equiv-cct}
-\end{figure}
-
-
-The reason that this circuitry works is that \SI{1}{\milli\henry} inductor in series with the heater power supply is a very low impedance to the \SI{50}{\hertz} heater supply. This allows the heater supply to be passed to the delay line with minimal series impedance, whilst providing a very high impedance path to the memory pulses, preventing unnecessary loading of them, as calculated by Equations \ref{eq:heater-supply-l-impedance} and \ref{eq:pulse-l-impedance}.
-
-\begin{equation}
-	| Z_{L\SI{50}{\hertz}} | = 2 \pi f L = 2 \times \pi \times \SI{1}{\milli\henry} \times \SI{50}{\hertz} = \SI{0.31}{\ohm} \label{eq:heater-supply-l-impedance} 
-\end{equation}
-
-\begin{equation}
-| Z_{L\SI{13.5}{\mega\hertz}} | = 2 \pi f L = 2 \times \pi \times \SI{1}{\milli\henry} \times \SI{13.5}{\mega\hertz} = \SI{85}{\kilo\ohm} \label{eq:pulse-l-impedance}
-\end{equation}
-
-In a similar manner the \SI{2.2}{\nano\farad} capacitor that is used to couple the output of the pulse generation circuitry presents a low impedance to the pulses from the pulse generation circuitry, but is sufficiently small to prevent a high impedance to the \SI{50}{\hertz} heater supply signal, which prevents it from interfering with the pulse generation circuitry.
-
-\begin{equation}
-| Z_{C\SI{50}{\hertz}} | = \frac{1}{2 \pi f C} = \frac{1}{2 \times \pi \times \SI{2.2}{\nano\farad} \times \SI{50}{\hertz}} = \SI{1.4}{\mega\ohm} \label{eq:heater-supply-c-impedance} 
-\end{equation}
-
-
-\begin{equation}
-| Z_{C\SI{13.5}{\mega\hertz}} | = \frac{1}{2 \pi f C} = \frac{1}{2 \times \pi \times \SI{2.2}{\nano\farad} \times \SI{13.5}{\mega\hertz}} = \SI{5.4}{\ohm} \label{eq:heater-supply-c-impedance} 
-\end{equation}
-
-The same principle works for the termination and power supply circuitry inside the delay line, which will be discussed in more detail in Section \review{xx}.
-
-\subsection{Circuit Design}
-
-Whilst Figure \ref{fig:valve-supply-equiv-cct} models the delay line power supply as a resistor, the reality is slightly more complex since the \gls{ac} supply needs to be rectified in order to power the \gls{dc} circuitry. The circuit to achieve this is shown in Figure \ref{fig:delay-line-psu-sch}.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphicssized{schematic_portions/delay_line_psu}
-	\caption{Delay line power supply schematic \review{replace picture}}
-	\label{fig:delay-line-psu-sch}
-\end{figure}
-
-This circuit is a half wave rectifier. This design was chosen in preference to a full-wave rectifier because it removes the need for an isolating transformer inside of the delay line tube.
-
-The combination of the diode, \SI{10}{\ohm} resistor, and \SI{10}{\milli\farad} capacitor act as a traditional half wave rectifier, with the diode only allowing a low impedance path for the positive half of the sine wave, the capacitor storing the voltage to provide continuous power to the load, and the resistor limiting the peak current drawn by the circuit. The addition of the inductor presents a high impedance to the \SI{13.5}{\mega\hertz} memory pulse, preventing unnecessary loading on the input signal, as discussed in Section \ref{sec:power-valve-supply}.
-
-The value of the capacitor was designed to keep the ripple of the supply to approximately \SI{0.1}{\ohm}, as illustrated by the linear approximation of Equation \ref{eq:delay-line-ripple}. \SI{10}{\milli\farad}, is the closest readily available value to the calculated \SI{12}{\milli\farad}. In reality the ripple will be much smaller than the calculated value, for two reasons:
-
-\begin{enumerate}
-	\item The current is approximately half of the originally anticipated \SI{60}{\milli\ampere} as discussed at the start of this chapter.
-	\item Energy will also be stored in the magnetic field of the inductor, which is ignored in this approximation.
-\end{enumerate}
-
-\begin{align}
-	I &= C \frac{dV}{dt} \nonumber \\
-	&\approx C \frac{\Delta V}{ \Delta t} \nonumber \\
-	\therefore C &\approx \frac{I \Delta t}{\Delta V} \nonumber \\
-	&\approx \frac{\SI{60}{\milli\ampere} \times \frac{1}{\SI{50}{\hertz}} }{\SI{0.1}{\volt}} \nonumber \\
-	&\approx \SI{12}{\milli\farad} \label{eq:delay-line-ripple}
-\end{align}
-
-The only additional component is the resistor. This is included in order to drain the voltage across the capacitor when the circuit is powered off, whilst only providing a small current drain of $I \approx \frac{6.3}{\SI{1}{\kilo\ohm}} \approx \SI{6.3}{\milli\ampere}$ in normal operation.
-
-\chapter{\glsentryshort{spice} Simulation}
-As well as building practically building and testing the circuits, it was desirable to simulate the performance of the circuits using LTspice \cite{linear2017}. There were two main reasons for this. Firstly, building the circuits and testing the circuits practically takes a large amount of time, and involves expense of purchasing components. Therefore it was desirable to limit the number of iterations of this process by first testing performance in simulation.
-
-In addition to this, interfacing with the \gls{edsac} circuitry is difficult since it requires travel to Bletchley, and consideration of the practicalities of interfacing with high voltage valve circuitry.
-
-This chapter presents the results of the various simulations which were run. Section \ref{sec:spice-valve-models} discusses the modelling of the valve circuitry used in \gls{edsac} and the remaining sections in the chapter discuss various simulations which took place.
-
-\section{Valve Models} \label{sec:spice-valve-models}
-
-In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This previous work has created models for the valves based both on the datasheet characteristics, as well as practical testing with the valves used in \gls{edsac}. The models produced had been tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
-
-An existing workflow was provided to produce \gls{spice} netlists which use the models from the DesignSpark \cite{rs2017} schematics which the reconstruction project uses. Instead of using this workflow however it was decided to create an LTspice symbol for each valve model and reconstruct the relevant parts of each schematic using LTspice. This decision was made in order to allow better integration with the other simulation models, and to allow for faster iteration of the design.
-
-\section{Delay Line Input Simulation}
-
-\section{Delay Line Output Simulation}
-
-\section{Store Regeneration Input Simulation}
 
 \chapter{\chapterStyle{Test Harness Design}}
 
@@ -880,16 +955,12 @@ An existing workflow was provided to produce \gls{spice} netlists which use the 
 	\draw [arrowNml] (input_break) |- node[left] {Shift in} (rec_sr.west);
 	
 	\draw [arrowNml] (mux.east) -- ++(1.5*\nodeDist,0) node[right] {Output};
-
+	
 	
 	\end{tikzpicture}
 	\caption{Proposed Architecture for Memory Manager}
 	\label{fig:mem-manager-arch}
 \end{figure}
-
-\subsection{\glsentryshort{hdl} Design}
-
-\subsection{\glsentryshort{hdl} Verification}
 
 \section{Analogue Design}
 
@@ -899,17 +970,59 @@ An existing workflow was provided to produce \gls{spice} netlists which use the 
 
 \section{Software Design}
 
+\chapter{\chapterStyle{Simulation and Verification}}
+
+\section{\glsentryshort{spice} Simulation}
+As well as building practically building and testing the circuits, it was desirable to simulate the performance of the circuits using LTspice \cite{linear2017}. There were two main reasons for this. Firstly, building the circuits and testing the circuits practically takes a large amount of time, and involves expense of purchasing components. Therefore it was desirable to limit the number of iterations of this process by first testing performance in simulation.
+
+In addition to this, interfacing with the \gls{edsac} circuitry is difficult since it requires travel to Bletchley, and consideration of the practicalities of interfacing with high voltage valve circuitry.
+
+This chapter presents the results of the various simulations which were run. Section \ref{sec:spice-valve-models} discusses the modelling of the valve circuitry used in \gls{edsac} and the remaining sections in the chapter discuss various simulations which took place.
+
+\subsection{Valve Models} \label{sec:spice-valve-models}
+
+In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This previous work has created models for the valves based both on the datasheet characteristics, as well as practical testing with the valves used in \gls{edsac}. The models produced had been tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
+
+An existing workflow was provided to produce \gls{spice} netlists which use the models from the DesignSpark \cite{rs2017} schematics which the reconstruction project uses. Instead of using this workflow however it was decided to create an LTspice symbol for each valve model and reconstruct the relevant parts of each schematic using LTspice. This decision was made in order to allow better integration with the other simulation models, and to allow for faster iteration of the design.
+
+\subsection{Delay Line Input Simulation}
+
+\subsection{Delay Line Output Simulation}
+
+\subsection{Store Regeneration Input Simulation}
+
+\section{\glsentryshort{hdl} Verification}
+
+
+\subsection{Delay Line Verification}
+In order to verify the \gls{hdl} design, a SystemVerilog testbench was written for each module, and these modules were then simulated using Mentor Graphics ModelSim. These testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
+
+The focus of the verification is, however, on the system level testing, which tests the delay line as a whole. This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses in the same way as \gls{edsac}, and each pulse burst is added to a queue with the simulation time when the pulse is expected to arrive. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time. Figure \ref{fig:delay-line-tb-output} shows the output of this testbench.
+
+
+\begin{figure}[ht]
+	
+	\centering
+	\dummyfigure
+	
+	\caption{Delay line testbench output}
+	
+	\label{fig:delay-line-tb-output}
+\end{figure}
+
+\subsection{Test Harness Verification}
 
 \chapter{\chapterStyle{System Integration}}
 
 \section{Mechanical}
 
-\section{Issues}
+\section{System Level Testing}
 
-\subsection{\glsentryshort{fpga} Reset Issue}
+\subsection{Issues}
 
-\subsection{Signal Breakthrough}
+\subsubsection{\glsentryshort{fpga} Reset Issue}
 
+\subsubsection{Signal Breakthrough}
 
 \section{Measurements}
 

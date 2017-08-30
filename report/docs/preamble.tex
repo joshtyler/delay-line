@@ -138,7 +138,9 @@
 \graphicspath{ {figs/} }
 \newcommand{\figureWidth}{0.7\textwidth}
 \newcommand{\figureHeight}{0.7\textwidth}
-\newcommand{\includegraphicssized}[1]{\includegraphics[max height=\figureHeight, max width=\figureWidth]{#1}}
+
+\usepackage{xargs}
+\newcommandx{\includegraphicssized}[2][2]{\includegraphics[max height=\figureHeight, max width=\figureWidth, #2]{#1}}
 
 % Booktabs - better looking tables
 \usepackage{booktabs}
@@ -178,6 +180,11 @@
 	\fancyfoot[C]{\scriptsize - \thepage\ -}
 }
 \pagestyle{plain} % Set all pages to use this style
+
+\usepackage{dirtree} %View directory structures
+
+
+
 
 %Stuff for reviewing, placeholders, etc.
 %Commmand to review
