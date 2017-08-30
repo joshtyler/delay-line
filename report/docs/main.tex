@@ -634,43 +634,74 @@ In order to couple the heater supply onto the store regeneration output, a singl
 
 \begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}	
-	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
-	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
-	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
-	\draw (pulse_gen.east)
-	to[C, l=2.2nF] ++(2,0) coordinate (heater_top);
+	\begin{tikzpicture}
 	
-	\draw (heater_top)
-	to[L, l_=1mH] ++(0,-2)
-	to[sV, l_=\shortstack{Heater\\PSU}] ++(0,-2)
-	coordinate(heater_btm)
-	to[short] ++(-1,0)
-	node[ground] {}
-	to[short] ++(-1,0);
+	\node (pulse_gen) [rectangle, draw, minimum size=1cm] {\shortstack{Pulse\\Generation}};
+
+	%			to[node, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+
+	%			to[twoport, t=\shortstack{Pulse\\Gen.}] ++(1,0)
+
+	\draw (pulse_gen.east)
+
+	to[C, l=2.2nF] ++(2,0) coordinate (heater_top);
+
 	
-	\draw (heater_top)
-	to[TL, l^=Coaxial cable]  ++(4,0)
-	coordinate (load_top);
+	\draw (heater_top)
+
+	to[L, l_=1mH] ++(0,-2)
+
+	to[sV, l_=\shortstack{Heater\\PSU}] ++(0,-2)
+
+	coordinate(heater_btm)
+
+	to[short] ++(-1,0)
+
+	node[ground] {}
+
+	to[short] ++(-1,0);
+
 	
-	\draw (load_top)
-	to[L, l_=1mH] ++(0,-2)
-	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
-	coordinate(load_btm);
+	\draw (heater_top)
+
+	to[TL, l^=Coaxial cable]  ++(4,0)
+
+	coordinate (load_top);
+
 	
-	\draw (load_top)
-	to[short] ++(3,0)
-	coordinate (pulse_term_top);
+	\draw (load_top)
+
+	to[L, l_=1mH] ++(0,-2)
+
+	to[R, l_=\shortstack{PSU\\load}] ++(0,-2)
+
+	coordinate(load_btm);
+
 	
-	\draw (pulse_term_top)
-	to[C, l_=2.2nF] ++(0,-2)
-	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
-	coordinate(pulse_term_btm);
+	\draw (load_top)
+
+	to[short] ++(3,0)
+
+	coordinate (pulse_term_top);
+
 	
-	\draw (load_btm)
-	to[short] ++(1.5,0)
-	coordinate[ground]
-	to[short] ++(1.5,0);
+	\draw (pulse_term_top)
+
+	to[C, l_=2.2nF] ++(0,-2)
+
+	to[R, l_=\shortstack{Pulse\\termination}] ++(0,-2)
+
+	coordinate(pulse_term_btm);
+
+	
+	\draw (load_btm)
+
+	to[short] ++(1.5,0)
+
+	coordinate[ground]
+
+	to[short] ++(1.5,0);
+
 	
 	\end{tikzpicture}
 	\caption{Proposed valve heater supply solution, equivalent circuit}
@@ -745,6 +776,12 @@ This chapter presents the results of the various simulations which were run. Sec
 In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This previous work has created models for the valves based both on the datasheet characteristics, as well as practical testing with the valves used in \gls{edsac}. The models produced had been tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
 
 An existing workflow was provided to produce \gls{spice} netlists which use the models from the DesignSpark \cite{rs2017} schematics which the reconstruction project uses. Instead of using this workflow however it was decided to create an LTspice symbol for each valve model and reconstruct the relevant parts of each schematic using LTspice. This decision was made in order to allow better integration with the other simulation models, and to allow for faster iteration of the design.
+
+\section{Delay Line Input Simulation}
+
+\section{Delay Line Output Simulation}
+
+\section{Store Regeneration Input Simulation}
 
 \chapter{\chapterStyle{Test Harness Design}}
 
@@ -876,7 +913,13 @@ An existing workflow was provided to produce \gls{spice} netlists which use the 
 
 \section{Measurements}
 
-
 \chapter{\chapterStyle{Project Planning}}
+
+\section{Time Management}
+
+\section{Risk Management}
+
+\section{Financial Management}
+\review{I'm not sure that I actually need this section -- it's not mentioned in the mark scheme}
 
 \chapter{\chapterStyle{Final Comments}}
