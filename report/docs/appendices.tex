@@ -20,52 +20,58 @@ but should contain:
 This philosophy is enforced inside the repository using \texttt{.gitignore} files.
 
 
-The structure of each sub-folder in the project repository is shown in the diagram below (in alphabetical order).
+The structure of each sub-folder in the project repository is shown Figure \ref{fig:repo-dir-struct} (in alphabetical order).
 
-\dirtree{%
-	.1 admin \DTcomment{Administration files. E.g. purchase orders}.
-	.1 demo \DTcomment{\LaTeX files used to generate the project demonstration slides}.
-		.2 figs \DTcomment{Figures used in the demonstration slides}.
-	.1 hdl \DTcomment{\Glsentryshort{hdl} design files/project files, and simulation testbenches}.
-		.2 common \DTcomment{Common Verilog constructs used across multiple designs}.
-			.3 sim \DTcomment{SystemVerilog Simulation testbenches}.
-			.3 sim\_modelsim \DTcomment{ModelSim project file for simulation}.
-			.3 src \DTcomment{Synthesisable Verilog code}.
-		.2 delay\_line \DTcomment{Files related to the delay line design}.
-			.3 icestorm \DTcomment{Makefile for the Project IceStorm toolchain}.
-			.3 sim.
-			.3 sim\_modelsim.
-			.3 src.
-		.2 delay\_line \DTcomment{Files related to the delay line design}.
-			.3 icestorm.
-			.3 sim.
-			.3 sim\_modelsim.
-			.3 src.
-	.1 report \DTcomment{\LaTeX files used to generate the project report (this document)}.
-		.2 docs \DTcomment{\LaTeX source files that are not the master project file}.
-		.2 figs.
-		.2 refs \DTcomment{Files for \textsc{Bib}\TeX referencing}. 
-	.1 software \DTcomment{Supporting software intended to run on a \glsentryshort{pc}}.
-		.2 mem\_gui \DTcomment{Source related to the \glsentryshort{gui} software that talks to the test harness}.
-			.3 {.idea} \DTcomment{Project files for CLion}.
-			.3 ftdi\_wrapper \DTcomment{Source for wrapping the FTDI driver}.
-			.3 generic\_classes \DTcomment{Source for classes used in various parts of the project}.
-			.3 main\_gui \DTcomment{Source to implement \glsentryshort{gui} itself}.
-			.3 memory\_manager \DTcomment{Source to monitor each unit of \glsentryshort{edsac} memory}.
-			.3 status\_manager \DTcomment{Source to control the state of the system}.
-			.3 uart\_manager \DTcomment{Source to control the transmission and receipt of messages}.
-			.3 uart\_msg \DTcomment{Source relating to \glsentryshort{uart} message formats}.
-		.2 uart\_msg\_const\_gen \DTcomment{A script to generate header files containing \glsentryshort{uart} message constants}.
-			.3 cpp\_out \DTcomment{Output folder for C++ header(s)}.
-			.3 verilog\_out \DTcomment{Output folder for Verilog header(s)}.
-	.1 spice \DTcomment{LTspice simulation schematics}.
-		.2 component\_models \DTcomment{Models for various components used in the design}.
-}
+Note that unlabelled folders contain identical types of files to the same name of folder elsewhere in the hierarchy.
+
+\begin{figure}[ht]
+	\dirtree{%
+		.1 admin \DTcomment{Administration files. E.g. purchase orders}.
+		.1 demo \DTcomment{\LaTeX files used to generate the project demonstration slides}.
+			.2 figs \DTcomment{Figures used in the slides}.
+		.1 hdl \DTcomment{\Glsentryshort{hdl} design files/project files, and simulation testbenches}.
+			.2 common \DTcomment{Common Verilog constructs used across multiple designs}.
+				.3 sim \DTcomment{SystemVerilog Simulation testbenches}.
+				.3 sim\_modelsim \DTcomment{ModelSim project file for simulation}.
+				.3 src \DTcomment{Synthesizable Verilog code}.
+			.2 delay\_line \DTcomment{Files related to the delay line design}.
+				.3 icestorm \DTcomment{Makefile for the Project IceStorm toolchain}.
+				.3 sim.
+				.3 sim\_modelsim.
+				.3 src.
+			.2 test\_harness \DTcomment{Files related to the delay line design}.
+				.3 icestorm.
+				.3 sim.
+				.3 sim\_modelsim.
+				.3 src.
+		.1 report \DTcomment{\LaTeX files used to generate the project report (this document)}.
+			.2 docs \DTcomment{\LaTeX source files that are not the master project file}.
+			.2 figs.
+			.2 refs \DTcomment{Files for \textsc{Bib}\TeX referencing}. 
+		.1 software \DTcomment{Supporting software intended to run on a \glsentryshort{pc}}.
+			.2 mem\_gui \DTcomment{Source related to the \glsentryshort{gui} software that talks to the test harness}.
+				.3 {.idea} \DTcomment{Project files for CLion}.
+				.3 ftdi\_wrapper \DTcomment{Source for wrapping the FTDI driver}.
+				.3 generic\_classes \DTcomment{Source for classes used in various parts of the project}.
+				.3 main\_gui \DTcomment{Source to implement \glsentryshort{gui} itself}.
+				.3 memory\_manager \DTcomment{Source to monitor each unit of \glsentryshort{edsac} memory}.
+				.3 status\_manager \DTcomment{Source to control the state of the system}.
+				.3 uart\_manager \DTcomment{Source to control the transmission and receipt of messages}.
+				.3 uart\_msg \DTcomment{Source relating to \glsentryshort{uart} message formats}.
+			.2 uart\_msg\_const\_gen \DTcomment{A script to generate \glsentryshort{uart} message constant header files}.
+				.3 cpp\_out \DTcomment{Output folder for C++ header(s)}.
+				.3 verilog\_out \DTcomment{Output folder for Verilog header(s)}.
+		.1 spice \DTcomment{LTspice simulation schematics}.
+			.2 component\_models \DTcomment{Models for various components used in the design}.
+	}
+	\caption{Repository Directory Structure}
+	\label{fig:repo-dir-struct}
+\end{figure}
 
 
 \chapter{\glsentryshort{hdl} Code Overview}
 
-\review{Is this section really necessary}
+\review{Is this section really necessary?}
 	
 	
 \chapter{Schematics}

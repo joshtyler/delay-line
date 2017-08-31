@@ -182,8 +182,14 @@
 \pagestyle{plain} % Set all pages to use this style
 
 \usepackage{dirtree} %View directory structures
+\renewcommand*\DTstylecomment{\rmfamily\color{red}}
 
+%\DTsetlength{offset}{width}{sep}{rule-width}{dot-size}
+%Default is {0.2em}{1em}{0.2em}{0.4pt}{1.6pt} 
+\DTsetlength{0.2em}{1em}{0.2em}{0.4pt}{3pt} %Increase dot weight
 
+\usepackage{pdflscape} %Allow one page to be landscape
+\usepackage{pgfgantt} %Gantt charts
 
 
 %Stuff for reviewing, placeholders, etc.

@@ -1,0 +1,75 @@
+\documentclass{standalone}
+\usepackage{pgfgantt} %Gantt charts
+
+
+
+
+\begin{document}
+
+	\begin{ganttchart}[hgrid, vgrid, x unit=2mm, title label font = \footnotesize, time slot format =isodate]{2017-06-05}{2017-09-07}
+	\gantttitlecalendar{year, month=name, week=1}\\
+	
+	//MISC tasks that happened but are a bit all on their own
+	\ganttbar{Delay line Testbench Improvement}{2017-06-13}{2017-06-13} \\
+	
+	\ganttbar{Visit to TNMoC}{2017-06-27}{2017-06-27} \\
+	
+	\ganttbar{Report demonstration}{2017-08-30}{2017-08-30} \\
+	
+	\ganttbar{Visit to TNMoC}{2017-09-04}{2017-09-04} \\
+	
+	\ganttgroup{Documentation}{2017-06-12}{2017-09-06} \\
+	\ganttbar{Creation of report template and ToC draft}{2017-06-12}{2017-06-12} \\
+	\ganttbar{Intial draft of technology review and first part of implementation}{2017-08-07}{2017-08-09} \\
+	\ganttbar{Review of what has been written to date}{2017-08-23}{2017-08-23} \\
+	\ganttbar{Writing implementation}{2017-08-24}{2017-08-24} \\
+	\ganttbar{Design report diagrams}{2017-08-29}{2017-08-24} \\
+	\ganttbar{Report writing}{2017-08-30}{2017-09-01} \\
+	\ganttbar{Report writing}{2017-09-02}{2017-09-03} \\
+	\ganttbar{Report writing}{2017-09-05}{2017-09-05} \\
+	\ganttbar{Report checking}{2017-09-06}{2017-09-06} \\
+	
+	
+	\ganttgroup{Initial delay line HDL implementation}{2017-06-06}{2017-06-13} \\
+	\ganttbar{Architecture Research}{2017-06-06}{2017-06-06} \\
+	\ganttlinkedbar{Verilog Implementation}{2017-06-07}{2017-06-07} \\
+	\ganttlinkedbar{Testbench Design}{2017-06-07}{2017-06-07}
+	\ganttlinkedbar{Testbench Design}{2017-06-13}{2017-06-13} \\
+	
+	\ganttgroup{Initial test harness HDL implementation}{2017-06-13}{2017-06-21} \\
+	\ganttbar{Requirements capture and system design}{2017-06-13}{2017-06-13} \\
+	\ganttlinkedbar{Verilog Implementation}{2017-06-13}{2017-06-21} \\
+	\ganttlinkedbar{Testbench Design}{2017-06-13}{2017-06-21} \\
+	
+	\ganttgroup{Initial Test Harness GUI Design}{2017-06-21}{2017-06-29} \\
+	\ganttbar{Creation of proof-of-concept UART driver program}{2017-06-21}{2017-06-22} \\
+	\ganttbar{C++ program architecture design}{2017-06-22}{2017-06-22} \\
+	\ganttlinkedbar{C++ implementation}{2017-06-23}{2017-06-29} \\
+	
+	
+	\ganttbar{Integration of test harness GUI, test harness, and delay line}{2017-07-03}{2017-07-07} \\
+	
+	\ganttbar{Make improvements to GUI}{2017-07-07}{2017-07-11} \\
+	
+	\ganttgroup{Initial Analogue Design}{2017-07-12}{2017-07-17} \\
+	\ganttbar{FGPA power investigation}{2017-07-12}{2017-07-12} \\
+	\ganttbar{Test harness input/output amplifier design}{2017-07-13}{2017-07-17} \\
+	\ganttbar{Phantom power circuitry design}{2017-07-17}{2017-07-17} \\
+	
+	\ganttgroup{Phantom power investigation}{2017-07-19}{2017-08-02} \\
+	\ganttbar{Research into how valve design works}{2017-07-19}{2017-07-20} \\
+	\ganttbar{SPICE simulation of EDSAC output stage, and phantom power draw}{2017-07-24}{2017-07-27} \\
+	\ganttbar{Redesign of phantom power circuitry}{2017-07-28}{2017-07-31} \\
+	\ganttbar{Investigation into regeneration input circuitry}{2017-08-01}{2017-08-02} \\
+	
+	\ganttgroup{Building final delay line circuitry}{2017-08-03}{2017-08-03} \\
+	\ganttbar{Selection of parts to order, and ordering}{2017-08-03}{2017-08-04} \\
+	\ganttbar{Assembling and testing sub-systems}{2017-08-10}{2017-08-15} \\
+	\ganttbar{Assembling and testing sub-systems}{2017-08-10}{2017-08-15} \\
+	\ganttbar{Integration testing and modification}{2017-08-16}{2017-08-22} \\
+	\ganttbar{Re-implement part of circuit to improve noise crosstalk}{2017-08-25}{2017-08-28} \\
+	
+		
+\end{ganttchart}
+
+\end{document}
