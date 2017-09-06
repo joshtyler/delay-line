@@ -31,7 +31,7 @@ void ModulatorOptions::onSend(void)
 //This runs in a callback whenever any of the modulator parameters change
 void ModulatorOptions::updateExplanatoryText(void)
 {
-    double valUs = cyclesToTime((unsigned int)cyclesPerHalfPeriod->get_value_as_int())*1e6; //Value in microseconds
+    double valUs = cyclesToTime((unsigned int)cyclesPerHalfPeriod->get_value_as_int()+1)*1e6; //Value in microseconds
     cyclesPerHalfPeriodConversion->set_text("= "+std::to_string(valUs)+"us");
     freqConversion->set_text("The signal will be modulated with "+std::to_string(1.0/(2.0*valUs))+"MHz");
 }
@@ -54,6 +54,7 @@ void ModulatorOptions::setWidgetVisibility(SystemStatus status)
 
 void ModulatorOptions::setDefaultValues(void)
 {
-    cyclesPerHalfPeriod->set_value(timeToCycles(0.5*(1/(13.5e6))));
+    //cyclesPerHalfPeriod->set_value(timeToCycles(0.5*(1/(13.5e6))));
+    cyclesPerHalfPeriod->set_value(1);
     onSend();
 }

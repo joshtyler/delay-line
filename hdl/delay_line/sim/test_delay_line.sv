@@ -1,7 +1,7 @@
 //Testbench for delay line (top level)
 //Run with 1fs time precision to avoid assert failures
-`timescale 1ps/1ps
-//`define DEBUG
+`timescale 1fs/1fs
+`define DEBUG
 
 module test_delay_line;
 
@@ -9,7 +9,7 @@ parameter integer CLK_FREQ = 12_000_000; //12Mhz System clock frequency
 parameter integer MOD_FREQ = 13_500_000; //13.5Mhz Moduluation frequency
 parameter realtime PULSE_WIDTH = 0.9us;
 parameter realtime PULSE_GAP = 1.0us;
-parameter realtime DELAY = 1.0944e-3;
+parameter realtime DELAY = 1.14108642ms;
 parameter integer EDSAC_NUM_WIDTH = 35; //Number with (excluding blanking pulse)
 
 localparam realtime CLK_PERIOD = (1.0s / CLK_FREQ);
@@ -22,12 +22,12 @@ localparam realtime DELAY_TOLERANCE = CLK_PERIOD;
 logic clk, clk_in, in, out;
 
 clock #(.PERIOD(CLK_PERIOD)) clk0(.*);
-delay_line_wrapper dut(.clk_in(clk), .in_sig(in), .out_sig(out), .LED0(), .LED1(), .LED2(), .LED3(), .LED4(), .SD());
+delay_line_wrapper dut(.clk_in(clk), .in_sig(in), .out_sig(out), .enable(), .LED0(), .LED1(), .LED2(), .LED3(), .LED4(), .SD());
 defparam dut.pll0.uut.CLK_FREQ = 81_000_000;
 
 //assert property (@(posedge clk) dut.pll0.uut.CLK_FREQ == dut.CLK_FREQ); //We cannot set the PLL freq to a non-constant value, but we can check that it is the same as the DUT!
 
-assign (highz1,weak0) out_sig = 1'b0; //Drive weak 0 due to tristate output (simulate pulldown)
+assign (pull1,pull0) out_sig = 1'b0; //Drive weak 0 due to tristate output (simulate pulldown)
 
 assign clk_in = clk;
 
@@ -75,6 +75,8 @@ endtask
 realtime target, diff;
 always @(posedge out)
 begin
+	if(out != 1'bz)
+	begin
 	target = pulse_queue.pop_front();
 	`ifdef DEBUG
 	$display("Target: %t, Realtime: %t", target, $realtime);
@@ -83,7 +85,8 @@ begin
 		diff = target - $realtime;
 	else
 		diff = $realtime - target;
-//	assert(diff < DELAY_TOLERANCE) else begin $display("diff: %t, tol: %t",diff, DELAY_TOLERANCE); $finish; end;	
+	assert(diff < DELAY_TOLERANCE) else begin $display("diff: %t, tol: %t",diff, DELAY_TOLERANCE); $finish; end;
+	end;
 end
 
 

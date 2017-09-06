@@ -69,9 +69,102 @@ Note that unlabelled folders contain identical types of files to the same name o
 \end{figure}
 
 
-\chapter{\glsentryshort{hdl} Code Overview}
+\chapter{Project Planning Charts} \label{app:proj-plan-charts}
 
-\review{Is this section really necessary?}
+This Gantt Chart shown in Figure \ref{fig:gantt-chart} shows how time on the project was actually spent, and this is in comparison to the \gls{pert} chart of Figure \ref{fig:pert-chart} which shows how time was initially planned to be spent at the start of the project.
+
+These charts are discussed more fully in Chapter \ref{sec:project-planning} which discusses the charts.
+
+%Redefine drawing constants to what they were in the lit review.
+%Hacky but it works
+%Just be sure to not use any of the "normal" tikz setup after this point
+\renewcommand{\tikzStateNodeDist}{0.75cm}
+\newcommand{\tikzBoxWidth}{3.25cm}
+
+\tikzset{font={\footnotesize}} %set small font
+\tikzstyle{every state}=[rectangle, rounded corners, fill=black!40,draw=none,minimum width=\tikzBoxWidth,minimum height=2cm] %Setup state machine style
+\tikzstyle{pert}=[->, ,>=stealth', auto,node distance=\tikzStateNodeDist,thick, initial text=Reset]
+
+\tikzstyle{critical} = [fill=red!40]
+\tikzstyle{criticalPath} = [draw=red]
+
+\newcommand{\pertNode}[4]
+{
+	\node[state] (#1) [#2]
+	{
+		\begin{tabular}{c}
+			\textbf{\shortstack{#3}}\\
+			\hline
+			\shortstack{#4}
+		\end{tabular}	
+	};	
+}
+
+\begin{landscape}
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[pert]
+	
+	\pertNode{lit}{critical}{Literature\\Review}{2 Weeks}
+	
+	\pertNode{tb-des}{right=of lit}{Test Harness\\Design}{1 Week}
+	\pertNode{delay-des}{critical,above =of tb-des}{Delay Line\\Design}{2 Weeks}
+	\pertNode{amp-des}{below =of tb-des}{Amplifier\\Design}{1 Week}
+	
+	\pertNode{tb-const}{right=of tb-des}{Test Harness\\Implementation\\and Testing}{1 Week}
+	\pertNode{delay-const}{critical, right=of delay-des}{Delay Line\\Implementation\\and Testing}{2 Weeks}
+	\pertNode{amp-const}{right=of amp-des}{Amplifier\\Implementation\\and Testing}{2 Weeks}
+	
+	\coordinate (meet) at ([xshift=\tikzStateNodeDist] tb-const.east);
+	
+	\pertNode{pcb-des}{critical, right= 2*\tikzStateNodeDist of tb-const}{PCB\\Design}{1 Week}
+	
+	\pertNode{pcb-test}{critical, right=of pcb-des}{PCB\\Construction\\and Testing}{1 Week}
+	
+	\pertNode{pcb-doc}{critical, right=of pcb-test}{Formal PCB\\Documentation}{1 Week}
+	
+	\pertNode{des-doc}{below=of pcb-test}{Formal Design\\Documentation}{2 Weeks}
+	
+	\coordinate (finish) at ([xshift=\tikzStateNodeDist] pcb-doc.east);
+	
+	\node[above] at (finish) {Finish};
+	
+	
+	\path	(lit)			edge							(tb-des)
+	(tb-des)		edge							(tb-const)
+	(tb-const)		edge							(meet)
+	%
+	(lit)			edge[bend left, criticalPath]	(delay-des)
+	(delay-des)		edge[criticalPath]				(delay-const)
+	(delay-const)	edge[bend left, criticalPath]	(meet)
+	%
+	(lit)			edge[bend right]				(amp-des)
+	(amp-des)		edge							(amp-const)
+	(amp-const)		edge[bend right]				(meet)
+	%
+	(meet)			edge[criticalPath]				(pcb-des)
+	(pcb-des)		edge[criticalPath]				(pcb-test)
+	%
+	(meet)			edge[bend right]				(des-doc)
+	(des-doc)		edge[bend right]				(finish)
+	%
+	(pcb-test)		edge[criticalPath]				(pcb-doc)
+	(pcb-doc)		edge[criticalPath]				(finish);
+	
+	\end{tikzpicture}
+	\caption{\glsentryshort{pert} Chart used to plan the project}
+	\label{fig:pert-chart}
+\end{figure}
+\end{landscape}
+
+\begin{figure}
+	\centering
+	\resizebox{\textwidth}{!}{
+		\input{figs/gantt/gantt}	
+	}
+	\caption{Gantt Chart showing how time was allocated in the project}
+	\label{fig:gantt-chart}
+\end{figure}
 	
 	
 \chapter{Schematics}

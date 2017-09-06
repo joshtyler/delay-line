@@ -268,8 +268,7 @@
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Half period time
-(in clock cycles)</property>
+                        <property name="label" translatable="yes">Clock half period divider</property>
                         <property name="justify">center</property>
                       </object>
                       <packing>
