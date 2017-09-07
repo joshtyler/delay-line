@@ -4,23 +4,23 @@
 \chapter{\chapterStyle{Introduction}} \label{sec:intro}
 \gls{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}. The exact nature of the machine will be discussed in Chapter \ref{sec:tech-rev}, however it should be noted that the recreation of its memory is non trivial, and the design of this subsystem is the focus of this project.
 
-The reconstruction effort has made good progress towards recreating the machine, and is already developing a separate solution to the memory problem. The history of \gls{edsac}, along with the technical details of how its memory functions is summarised in Chapter \ref{sec:tech-rev}. The final section in this chapter uses the technical background to describe the exact aims of this project, describing why it is important and compare the goal of this project to the memory currently being developed by the reconstruction effort. Utilising the technical details of the review, Chapter \ref{sec:spec} then derives a specification to establish the required performance of the memory solution in explicit detail.
+The reconstruction effort has made good progress towards recreating the machine, and is already developing a separate solution to the memory problem. The history of \gls{edsac}, along with the technical details of how its memory functions is summarised in Chapter \ref{sec:tech-rev}. The final section in this chapter uses the technical background derived to describe the exact aims of this project, explaining why it is important and comparing the goal of this project to the solution currently being developed by the reconstruction project. Utilising the technical details of the review, Chapter \ref{sec:spec} then derives a specification to establish the required performance of the memory solution in explicit detail.
 
 Working from the specification derived in Chapter \ref{sec:spec}, Chapter \ref{sec:power} contains the design details of how the solution is powered, whilst Chapter \ref{sec:delay-line-des} details the design decisions taken in the creation of the memory mechanism itself.
 
 Given that \gls{tnmoc} is located in Bletchley, and the project is created in Southampton, it has been necessary to produce a method of testing the memory solution which does not rely upon any of the hardware produced by the reconstruction project. For this reason, Chapter \ref{sec:test-harness-design} details the design of a test harness which is capable of testing the memory by emulating the signals produced by \gls{edsac}.
 
-The memory solution interfaces with valve circuitry that comprises the remainder of \gls{edsac}. Parts of this circuitry are very sensitive, and so to ensure that this project would not have any unintended parasitic effects on \gls{edsac} \gls{spice} simulations are used to model the impact this project would have on the circuitry of \gls{edsac}. This is detailed in Chapter \ref{sec:verification}, alongside details of how the digital circuitry of the memory solution created is verified.
+The memory solution interfaces with valve circuitry that comprises the remainder of \gls{edsac}. Parts of this circuitry are very sensitive, and so to ensure that this project would not have any unintended parasitic effects on \gls{edsac} \gls{spice} simulations are used to model the impact this project would have on the circuitry of \gls{edsac}. This is detailed in Chapter \ref{sec:verification}, alongside details of how the digital circuitry of the memory solution is verified.
 
 Following the design and implementation stages, all of the components of the memory module and test harness have been integrated and tested. This, along with details of problems encountered and how they were rectified are described in Chapter \ref{sec:sys-integration}.
 
 The scope encompassed by this project has demanded careful time planning, and analysis of any risks that could derail the goals of the project. This is detailed in Chapter \ref{sec:project-planning}. Final comments comparing the aims of the project to the outcomes, and an outline of scope for future work, are then presented in Chapter \ref{sec:conclusion}.
 
 \chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
-This chapter presents an overview of \gls{edsac}, and an overview of the relevant literature surrounding its the memory architecture. It should be noted that much of the literature presented comes from original documentation produced by Maurice Wilkes, the man who led the original \gls{edsac} project. This is because, despite the notability of \gls{edsac}, its architecture was quickly adapted to develop other machines. Therefore, aside from the papers written by Wilkes himself, there is little technical documentation from other sources of the machine in its original state.
+This chapter presents an overview of \gls{edsac}, and an overview of the relevant literature surrounding its memory architecture. It should be noted that much of the literature presented comes from original documentation produced by Maurice Wilkes, the man who led the original \gls{edsac} project. This is because, despite the notability of \gls{edsac}, its architecture was quickly adapted to develop other machines. Therefore, aside from the papers written by Wilkes himself, there is little technical documentation from other sources of the machine in its original state.
 
 \section{\glsentryshort{edsac} overview} \label{sec:edsac-overview}
-\Gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}, was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this, earlier computers such as \gls{eniac}, hard-coded programs using switches. In the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} was the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
+\Gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}, was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this, earlier computers such as \gls{eniac}, hard-coded programs using switches. In the case of \gls{eniac} using 3,600 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} was the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
 
 The goal of the reconstruction project at \gls{tnmoc} is to reconstruct the computer as faithfully as possible to its state when it ran its first ever program in May 1949 \cite{nmoc2017}.
 
@@ -86,7 +86,7 @@ These delay lines are used in two ways \cite[p.213]{wilkes1948}:
 
 \Gls{edsac} stores words in units of 36 pulses, which is referred to as a minor cycle. 34 pulses are used to store the magnitude of a number, one stores the sign, and one acts as a space between numbers. This system was chosen to allow storage of ten digit numbers \cite[p.209]{wilkes1948}. 
 
-The shorter tubes are sized to store only a single minor cycle, but the longer tubes are long enough to store 576 pulses (16 minor cycles). The batteries of each of these tubes each contained 16 tubes, and \gls{edsac} originally had two batteries, allowing for a total storage capacity of $16 \times 16 \times 2 = 512$ numbers \cite[p.210]{wilkes1948}.
+The shorter tubes are sized to store only a single minor cycle, but the longer tubes are long enough to store 576 pulses (16 minor cycles). The batteries of these tubes each contained 16 tubes, and \gls{edsac} originally had two batteries, allowing for a total storage capacity of $16 \times 16 \times 2 = 512$ numbers \cite[p.210]{wilkes1948}.
 
 \subsection{Timing} \label{sec:review-delay-timing}
 The memory in \gls{edsac} uses a circulating bit rate of \SI{500}{\kilo\hertz}. This is made up of a \SI{0.9}{\micro\second} pulse, and a \SI{1.0}{\micro\second} gap for each bit, although some literature specifies a pulse of \SI{0.9}{\micro\second} and a gap of  \SI{1.0}{\micro\second}, implying a \SI{526}{\kilo\hertz} bit rate \cite[p.209]{wilkes1948} \cite[p.2]{cambridge1948}. The pulse is a burst of \SI{13.5}{\mega\hertz} carrier frequency if the bit is a logical 1, or it is 0V if the bit is a logical 0 \cite[p.2]{cambridge1948}.
@@ -161,7 +161,7 @@ The regeneration system implies that the maximum acceptable skew of the delay li
 
 Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak to peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{68}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt} \cite[p.212]{wilkes1948}.
 
-Despite this, the recreation project has discovered that the regeneration circuitry actually feeds the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{\maxDelayInputV}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{\minDelayInputV}{\volt} peak for the tubes at the end of the store.
+Despite this, the recreation project has discovered that the regeneration circuitry actually feeds the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{\maxDelayInputV}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{\minDelayInputV}{\volt} for the tubes at the end of the store.
 
 In addition to this, problems were experienced by the reconstruction project with amplifying the low signal level output by the delay lines at the \SI{10}{\milli\volt} level. Due to this, the current delay line solution outputs the delayed pulse at approximately \SI{100}{\milli\volt} peak.
 
@@ -170,13 +170,13 @@ In addition to this, problems were experienced by the reconstruction project wit
 \newcommand{\tubeOdCm}{4.44} %Tube outer diameter in cm
 
 
-The store delay lines originally consisted of banks of \SI{\tubeLenCm}{\centi\metre} long steel tubes. The tubes are then held in an array using machined end-plates \cite[p.210]{wilkes1948}. An illustration of this is shown in Figure \ref{fig:coffins}.
+The store delay lines originally consisted of banks of \SI{\tubeLenCm}{\centi\metre} long steel tubes. The tubes were then held in an array using machined end-plates \cite[p.210]{wilkes1948}. An illustration of this is shown in Figure \ref{fig:coffins}.
 
 The exact dimensions, aside from the length, of each store tube are not explicitly stated in the available literature. However the dimensions of the short tubes are stated, with each short tube having an outer diameter of \SI{\tubeOdCm}{\centi\metre}, and an inner diameter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. For the purposes of this project, the long tubes are therefore assumed to have similar dimensions to this.
 
 The main restriction these dimensions place on the project is that the electronics must fit inside a tube of the correct length and outer diameter, so that the reconstructed system can be indistinguishable from the original in terms of form.
 
-\section{Comparison with the current reconstruction effort} \label{sec:review-comparison}
+\section{Comparison with the Current Memory Solution} \label{sec:review-comparison}
 
 Creating a faithful reproduction of the mercury delay line system used by \gls{edsac} poses many challenges. These challenges are discussed at length in \cite{tyler2017}, however a few of the most prevalent are: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes.
 
@@ -227,9 +227,9 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 	
 	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a maximum per burst deviation from the chosen delay of \SI{\maxJitterPlusSkewNs}{\nano\second}. & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \SI{\maxJitterPlusSkewNs}{\nano\second} is the maximum deviation derived in Section \ref{sec:review-delay-timing} \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} at the input. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak-to-peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} at the input. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} (peak to peak), driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort, \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} peak-to-peak, driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort, \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
 	
 	\refstepcounter{specNo}\thespecNo\label{itm:spec-phys-size} & \textbf{Must} be encapsulated in a metal tube of \SI{\tubeOdCm}{\centi\metre} outer diameter, and \SI{\tubeLenCm}{\centi\metre} length. & This diameter allows the design to have the same appearance of the main memory store tubes of the original \gls{edsac} design, the width and diameter are discussed in \ref{sec:review-delay-mech} \tabularnewline
 	
@@ -248,7 +248,7 @@ A naive solution to power the delay line would be to attempt to harvest the powe
 P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
 \end{equation}
 
-The problem with this is approach is that, in the worst case, one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, no pulses will be delivered to the delay line at all. Attempting to use this pulse to power the delay line would require the turn-on time to be very predictably, so that the delay of the first pulse could be compensated for. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
+The problem with this is approach is that, in the worst case, one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, no pulses will be delivered to the delay line at all. Attempting to use this pulse to power the delay line would require the turn-on time to be very predictable, so that the delay of the first pulse could be compensated for. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
 
 Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discusses a slightly more complex solution that overcomes the shortcomings of the former.
 
@@ -505,7 +505,7 @@ The only additional component is the \SI{1}{\kilo\ohm} resistor. This is include
 
 This chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
 
-The delay itself is implemented in the digital domain, with the goal of accurately emulating the analogue domain of the original design. This development is detailed in Section \ref{sec:delay-line-dig-des} with the surrounding analogue circuitry translates between the logic level signal signals of the digital circuit, and the input and output being discussed in Section \ref{sec:delay-line-ana}
+The delay itself is implemented in the digital domain, with the goal of accurately emulating the original analogue domain design. This development is detailed in Section \ref{sec:delay-line-dig-des} with the surrounding analogue circuitry translates between the logic level signal signals of the digital circuit, and the input and output being discussed in Section \ref{sec:delay-line-ana}
 
 \begin{figure}[ht]
 	\centering
@@ -702,7 +702,7 @@ The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:f
 
 \end{table}
 
-At the time of writing the least expensive \gls{fpga} available from component suppliers Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, and significantly lower in higher quantities, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
+At the time of writing the least expensive \gls{fpga} available from component supplier Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, and significantly lower in higher quantities, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
 
 This \gls{fpga} has 1280 \glspl{lc}, which should be plenty to implement the simple design, given that each \gls{lc} in this architecture consists of a four input \gls{lut}, and a flip-flop \cite[p.2-2]{lattice2017a}. The \gls{fpga} also has \SI{64}{\kilo\bit} of block \gls{ram}. This meets specification point \ref{itm:fpga-spec-les}, when one considers that is enough to store a clock sample for each of the 576 possible pulses, even if a \SI{64}{\bit} clock width was used, as demonstrated by Equation \ref{eq:bram-size-estimate}, where $S$ represents the size of memory required. In addition to this, there is one \gls{pll} available on the \gls{fpga} die, meeting specification point \ref{itm:fpga-spec-pll}.
 
@@ -766,7 +766,7 @@ In addition to the read/write address pointers, there is a counter which keeps t
 \subsubsection{Comparator}
 The comparator is implemented as a state machine that requests data from the \gls{fifo} and asserts the output when the counter matches the data word, as illustrated by the state transition diagram of Figure \ref{fig:comparator-sm}.
 
-The state machine works be waiting in the \texttt{SM\_WAIT\_FOR\_DATA} until the \gls{fifo} is not empty, at this point is requests the data from the \gls{fifo} and waits in \texttt{SM\_WAIT} until the correct time to trigger the output, at which point the system transitions to \texttt{SM\_ASSERT} to trigger the output modulator before resetting.
+The state machine works by waiting in the \texttt{SM\_WAIT\_FOR\_DATA} until the \gls{fifo} is not empty, at this point is requests the data from the \gls{fifo} and waits in \texttt{SM\_WAIT} until the correct time to trigger the output, at which point the system transitions to \texttt{SM\_ASSERT} to trigger the output modulator before resetting.
 
 \begin{figure}[ht]
 
@@ -1114,7 +1114,7 @@ The input is clocked into the received number shift register. When an entire wor
 
 \section{Software Design}  \label{sec:test-harness-sw}
 
-The \gls{pc} software to interact with the test harness must be capable of keeping track of the system state, sending messages to the delay line, and interpreting the results, and presenting that information to the user. Initially, a command line tool was considered for this but, in order to provide a simpler user interface, it was decided to create a \gls{gui} application, shown in Figure \ref{fig:mem-gui-screenshot}. Despite this, it would be fairly simple to replace the \gls{gui} with a command line frontend, due to the object orientated nature of the design.
+The \gls{pc} software to interact with the test harness must be capable of keeping track of the system state, sending messages to the delay line, interpreting the results, and presenting that information to the user. Initially, a command line tool was considered for this but, in order to provide a simpler user interface, it was decided to create a \gls{gui} application, shown in Figure \ref{fig:mem-gui-screenshot}. Despite this, it would be fairly simple to replace the \gls{gui} with a command line frontend, due to the object orientated nature of the design.
 
 \begin{figure}[ht]
 	\centering
@@ -1217,7 +1217,7 @@ This chapter presents the results of some of the various simulations which were 
 
 \subsection{Valve Models} \label{sec:spice-valve-models}
 
-In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This work created models for the valves based both on datasheet characteristics, and practical measurement. The models produced had been previously tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
+In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This work created models for the valves based both on datasheet characteristics, and practical measurement. The models produced had been previously tested with simulations of some parts of the store regeneration circuitry and were found to match practical measurements well.
 
 \subsection{Delay Line Input Simulation}
 The main \gls{spice} simulation is the simulation of \gls{edsac} output, and delay line input. This simulation is important because it models several of the concerns for integration with the rest of \gls{edsac}, namely:
@@ -1369,9 +1369,9 @@ The remainder of this section presents the verification strategies used for the 
 
 \subsection{Delay Line Verification}
 
-In addition to the delay line \gls{hdl} design testbenches were written for several of the subsystems including: the edge detector, pulse generator and \gls{fifo}. For brevity, however, these will not be discussed in this report, and the focus will be on the behaviour of the top level module.
+In addition to the top level delay line testbench, testbenches were written for several of the other subsystems including: the edge detector, pulse generator and \gls{fifo}. For brevity, however, these will not be discussed in this report, and the focus will be on the behaviour of the top level module.
 
-This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses, and each transmitted pulse burst is added to a queue with the simulation time when the pulse is expected to arrive on the delay line output. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time.
+This top-level testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses, and each transmitted pulse burst is added to a queue with the simulation time when the pulse is expected to arrive on the delay line output. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time.
  
 Figure \ref{fig:delay-sim} shows the output of this testbench. Figure \ref{fig:delay-sim-full} shows the full simulated output. The top signal is the generated by the testbench and input to the delay line, and the second signal is the output of the delay line. The output is in a high impedance state (blue) when no pulse is output, and is black when the signal is being driven. The pulses in the output signal relate exactly to a delayed version of the input pulses. This may not immediately be obvious from the simulation output image due to the image aliasing effects of having so many pulses displayed. The correct performance of the testbench is verified by the textual simulation output which displays \texttt{\# Simulation completed successfully} after the simulation run, indicating that none of the assertions failed, and each output pulse was asserted at the correct time. The lower two signals are the internal \gls{fifo} full and empty signals. It can be seen that the \gls{fifo} never entirely fills up which is the expected behaviour, and the empty signal is asserted once there are no more delayed pulses being stored in the \gls{fifo}.
  
@@ -1445,7 +1445,7 @@ During the integration stages, several issues were encountered that had not been
 \subsection{\glsentryshort{fpga} Reset Issue}
 The first issue which was encountered was that when the input cable was connected the \gls{fpga} would not always configure correctly, and the output would remain in a high impedance state, irrespective of the input waveform.
 
-The reason for this was determined to be the fact that the input power rail is brought up slowly, as the smoothing capacitor on the input was charged. Reading the programming and configuration guide for the \gls{fpga} used, it can be seen that the \gls{fpga} checks all of it's supply voltages are within the correct range before it configures from the \gls{spi} flash \cite[p.4]{lattice2016}.
+The reason for this was determined to be the fact that the input power rail is brought up slowly, as the smoothing capacitor on the input was charged. Reading the programming and configuration guide for the \gls{fpga} used, it can be seen that the \gls{fpga} checks all of its supply voltages are within the correct range before it configures from the \gls{spi} flash \cite[p.4]{lattice2016}.
 
 Despite this check, the \gls{fpga} considers its \gls{gpio} power rail to be stable once it is somewhere between \SI{0.7}{\volt} and \SI{1.59}{\volt} \cite[p.3-2]{lattice2017a}. This means that as the supply voltage slowly ramps up, the \SI{1.2}{\volt} core voltage will be stable, and the \SI{3.3}{\volt} \gls{gpio} supply voltage will be within the range the \gls{fpga} considers stable long before it is close to \SI{3.3}{\volt}. Therefore the \gls{fpga} will start configuration long before the \SI{3.3}{\volt} is high enough to power the \gls{spi} flash \gls{ic} correctly.
 
@@ -1657,7 +1657,7 @@ In addition to the delay line itself, a comprehensive test harness has been crea
 
 Due to difficulties with testing the design with the physical \gls{edsac} reconstruction machine, notably the physical machine being located far from Southampton and the incomplete nature of the machine, extensive \gls{spice} simulations were performed to ensure that the delay line would integrate well with the relevant components of \gls{edsac}. These simulations were successful and showed that the delay line was able to integrate well with the store regeneration chassis in all respects.
 
-Following the successful construction and testing of the delay line, it was taken to \gls{tnmoc} to integrate with the rest of the machine. The integration effort was successful and the delay line was powered from the valve chassis, accepted the pulses sent to it, and transmitted pulses back to the chassis after a small delay. These pulses were correctly amplified and demodulated. The only problem encountered was an issue with the valve chassis not correctly regenerating the pulses. It was ambiguous as to whether this is a problem with the delay line or the chassis itself however, as there had not previously been any method to test this particular chassis with a delay medium.
+Following the successful construction and testing of the delay line, it was taken to \gls{tnmoc} to integrate with the rest of the machine. The integration effort was successful and the delay line was powered from the valve chassis, accepted the pulses sent to it, and transmitted pulses back to the chassis after the required delay. These pulses were correctly amplified and demodulated. The only problem encountered was an issue with the valve chassis not correctly regenerating the pulses. It was ambiguous as to whether this is a problem with the delay line or the chassis itself however, as there had not previously been any method to test this particular chassis with a delay medium.
 
 There is some scope for further development on this project, notably to continue integration with the rest of the system, and there is also scope to produce the design more formally using a \gls{pcb} now that the concept is proven. This is work which is intended to take place, with the intention that the delay line will be able to form some part of the final \gls{edsac} exhibit and help to educate the general public about the history of computing.
 
