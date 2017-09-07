@@ -47,7 +47,10 @@ Note that unlabelled folders contain identical types of files to the same name o
 		.1 report \DTcomment{\LaTeX files used to generate the project report (this document)}.
 			.2 docs \DTcomment{\LaTeX source files that are not the master project file}.
 			.2 figs.
-			.2 refs \DTcomment{Files for \textsc{Bib}\TeX{} referencing}. 
+			.2 refs \DTcomment{Files for \textsc{Bib}\TeX{} referencing}.
+		.1 sch \DTcomment{Contains KiCAD files used to draw the schematics for the project}.
+			.2 delay\_line \DTcomment{Contains the schematic files of the delay line}.
+			.2 delay\_line \DTcomment{Contains the schematic files of the test harness}.
 		.1 software \DTcomment{Supporting software intended to run on a \glsentryshort{pc}}.
 			.2 mem\_gui \DTcomment{Source related to the \glsentryshort{gui} software that talks to the test harness}.
 				.3 {.idea} \DTcomment{Project files for CLion}.
@@ -64,7 +67,7 @@ Note that unlabelled folders contain identical types of files to the same name o
 		.1 spice \DTcomment{LTspice simulation schematics}.
 			.2 component\_models \DTcomment{Models for various components used in the design}.
 	}
-	\caption{Repository Directory Structure}
+	\caption{Repository directory structure}
 	\label{fig:repo-dir-struct}
 \end{figure}
 
@@ -152,7 +155,7 @@ These charts are discussed more fully in Chapter \ref{sec:project-planning}.
 	(pcb-doc)		edge[criticalPath]				(finish);
 	
 	\end{tikzpicture}
-	\caption{\glsentryshort{pert} Chart used to plan the project}
+	\caption{\glsentryshort{pert} chart used to plan the project}
 	\label{fig:pert-chart}
 \end{figure}
 \end{landscape}
@@ -162,7 +165,7 @@ These charts are discussed more fully in Chapter \ref{sec:project-planning}.
 	\resizebox{\textwidth}{!}{
 		\input{figs/gantt/gantt}	
 	}
-	\caption{Gantt Chart showing how time was allocated in the project}
+	\caption{Gantt chart showing how time was allocated in the project}
 	\label{fig:gantt-chart}
 \end{figure}
 	
@@ -190,7 +193,7 @@ The waveforms are included here since they are more clearly presented in landsca
 	\begin{subfigure}[b]{\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{sim_results/delay_line/full_sim}
-		\caption{Full Simulation}
+		\caption{Full simulation}
 		\label{fig:delay-sim-full}
 	\end{subfigure}
 	
@@ -201,11 +204,11 @@ The waveforms are included here since they are more clearly presented in landsca
 		\label{fig:delay-sim-single}
 	\end{subfigure}
 	
-	\caption{Delay Line Simulation Results}
+	\caption{Delay line simulation results}
 	\label{fig:delay-sim}
 \end{figure}
 
- \begin{figure}[ht]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=\linewidth]{sim_results/test_harness/full_sim}
 	\caption{Full Simulation}
