@@ -5,4 +5,18 @@
 %Must not exceed 600 words
 \begin{abstract}
 	
+	\glsentryshort{edsac} was the first practical digital stored program computer, and ran its first program in May 1949. It contributed much to the field of computing, and due to its notability is currently being reconstructed at \glsentrylong{tnmoc}.
+	
+	\glsentryshort{edsac} used delay line memory that was able to store numbers by inserting pulses into a delay medium and feeding the output into the input. In the case of \glsentryshort{edsac} the delay medium consisted of very precisely machined steel tubes full of mercury. This is very difficult to reproduce authentically due to constraints of budget and health and safety. The intention of this project has therefore been to use modern technology to emulate this memory in a form and electrical interface indistinguishable from the original.
+	
+	The project has been successful in creating a digital emulation of a mercury delay line, implemented in hardware using a low cost \glsentryshort{fpga}. This delay line, coupled with analogue interface circuitry is able to interface with the high voltage used to drive the mercury delay lines. The delay line is also able to phantom power itself from the signal input with the addition of a single passive component to the remainder of the circuitry of \glsentryshort{edsac}.
+	
+	In addition to the delay line itself a comprehensive test harness has been designed that is able to emulate the signals produced by \glsentryshort{edsac} and evaluate the performance of the delay line.
+	
+	The delay line has been integrated in a physical enclosure matching that of the original, and had its performance verified both using the test harness produced by this project as well as integration with the valve circuity of the main reconstruction effort.
+	
+	The project produces a well documented and tested methodology to implement delay line memory, that performs well enough to be a viable solution to perform the task of implementing the memory of the reconstructed computer. Future work will formalise the construction of the delay line, and work to integrate it as part of the museum display.
+	
+	
+	
 \end{abstract}

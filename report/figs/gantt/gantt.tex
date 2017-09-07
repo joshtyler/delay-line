@@ -50,7 +50,7 @@
 	\ganttlinkedmilestone{Parts ordered}{2017-08-04} \\
 	\ganttlinkedmilestone{Parts arrive}{2017-08-09} \\
 	\ganttlinkedbar{Assembling and testing sub-systems}{2017-08-10}{2017-08-15} \\
-	\ganttlinkedbar{Integration testing and modification}{2017-08-16}{2017-08-22} \\
+	\ganttlinkedbar[name=integ-for-demo]{Integration testing and modification}{2017-08-16}{2017-08-22} \\
 	\ganttlinkedbar{Re-implement part of circuit to improve noise crosstalk}{2017-08-25}{2017-08-28} \\
 	\ganttlinkedbar[name=tmnoc-prep]{Preparation of project to visit TNMoC}{2017-09-01}{2017-09-01} \\
 	
@@ -59,7 +59,8 @@
 	\ganttmilestone[name=tmnoc-second-visit]{Visit to TNMoC}{2017-09-04} \\
 	\ganttlink{tmnoc-prep}{tmnoc-second-visit}
 	
-	\ganttmilestone{Project demonstration}{2017-08-30} \\
+	\ganttmilestone[name=demo]{Project demonstration}{2017-08-30} \\
+	\ganttlink{integ-for-demo}{demo}
 	
 	\ganttmilestone[name=handin]{Report handin}{2017-09-07} \\
 	

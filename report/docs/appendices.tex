@@ -3,7 +3,7 @@
 	
 \chapter{Folder Structure} \label{sec:folder-struct}
 
-The project is structured as a single repository using the git version control system. For those unfamiliar with git, the project folder may be treated as an ordinary computer folder, however there exists inside the root of the directory a hidden folder, \texttt{.git}, which contains the entire history of the project. This history is not of use to a user only interested in the latest state of the project, but is useful to find files or parts of files which may have been deleted. An example of such files are the project files for the Lattice and Xilinx toolchains, which were later replaced in the project by the open-source Project IceStorm toolchain.
+The project is structured as a single repository using the git version control system. For the reader unfamiliar with git, the project folder may be treated as an ordinary computer folder, however there exists inside the root of the directory a hidden folder, \texttt{.git}, which contains the entire history of the project. This history is not of use to a user only interested in the latest state of the project, but is useful to find files or parts of files which may have been deleted. An example of such files are the project files for the Lattice and Xilinx toolchains, which were later replaced in the project by the open-source Project IceStorm toolchain.
 
 The philosophy of the project repository is that it should not contain any:
 \begin{itemize}
@@ -15,7 +15,7 @@ but should contain:
 \begin{itemize}
 	\item Design files
 	\item Project files/configuration files used by tools
-	\item Documentation files, even if they may be re-generated (e.g. \LaTeX generated \texttt{.pdf} files), provided they are not excessively bulky.
+	\item Documentation files, even if they may be re-generated (e.g. \LaTeX{} generated \texttt{.pdf} files), provided they are not excessively bulky.
 \end{itemize}
 This philosophy is enforced inside the repository using \texttt{.gitignore} files.
 
@@ -27,19 +27,19 @@ Note that unlabelled folders contain identical types of files to the same name o
 \begin{figure}[ht]
 	\dirtree{%
 		.1 admin \DTcomment{Administration files. E.g. purchase orders}.
-		.1 demo \DTcomment{\LaTeX files used to generate the project demonstration slides}.
+		.1 demo \DTcomment{\LaTeX{} files used to generate the project demonstration slides}.
 			.2 figs \DTcomment{Figures used in the slides}.
 		.1 hdl \DTcomment{\Glsentryshort{hdl} design files/project files, and simulation testbenches}.
 			.2 common \DTcomment{Common Verilog constructs used across multiple designs}.
 				.3 sim \DTcomment{SystemVerilog Simulation testbenches}.
 				.3 sim\_modelsim \DTcomment{ModelSim project file for simulation}.
 				.3 src \DTcomment{Synthesizable Verilog code}.
-			.2 delay\_line \DTcomment{Files related to the delay line design}.
+			.2 delay\_line \DTcomment{Files related to the delay line \glsentryshort{hdl} design}.
 				.3 icestorm \DTcomment{Makefile for the Project IceStorm toolchain}.
 				.3 sim.
 				.3 sim\_modelsim.
 				.3 src.
-			.2 test\_harness \DTcomment{Files related to the delay line design}.
+			.2 test\_harness \DTcomment{Files related to the test harness \glsentryshort{hdl} design}.
 				.3 icestorm.
 				.3 sim.
 				.3 sim\_modelsim.
@@ -47,7 +47,7 @@ Note that unlabelled folders contain identical types of files to the same name o
 		.1 report \DTcomment{\LaTeX files used to generate the project report (this document)}.
 			.2 docs \DTcomment{\LaTeX source files that are not the master project file}.
 			.2 figs.
-			.2 refs \DTcomment{Files for \textsc{Bib}\TeX referencing}. 
+			.2 refs \DTcomment{Files for \textsc{Bib}\TeX{} referencing}. 
 		.1 software \DTcomment{Supporting software intended to run on a \glsentryshort{pc}}.
 			.2 mem\_gui \DTcomment{Source related to the \glsentryshort{gui} software that talks to the test harness}.
 				.3 {.idea} \DTcomment{Project files for CLion}.
@@ -73,7 +73,7 @@ Note that unlabelled folders contain identical types of files to the same name o
 
 This Gantt Chart shown in Figure \ref{fig:gantt-chart} shows how time on the project was actually spent, and this is in comparison to the \gls{pert} chart of Figure \ref{fig:pert-chart} which shows how time was initially planned to be spent at the start of the project.
 
-These charts are discussed more fully in Chapter \ref{sec:project-planning} which discusses the charts.
+These charts are discussed more fully in Chapter \ref{sec:project-planning}.
 
 %Redefine drawing constants to what they were in the lit review.
 %Hacky but it works
@@ -168,5 +168,50 @@ These charts are discussed more fully in Chapter \ref{sec:project-planning} whic
 	
 	
 \chapter{Schematics}
+This appendix includes the schematics for the delay line and test harness.
+
+%\begin{landscape}
+	\includepdf[landscape]{figs/schematics/delay_line}
+	\includepdf[landscape]{figs/schematics/test_harness}
+%\end{landscape}
+
+
+\chapter{\glsentryshort{hdl} verification results} \label{app:sim-wfms}
+This appendix includes the the simulation waveforms resulting from verification.
+
+The waveforms are included here since they are more clearly presented in landscape format, however they are discussed in Section \ref{sec:hdl-verif}.
+
+
+\begin{landscape}
+
+\begin{figure}[ht]
+	\centering
+	
+	\begin{subfigure}[b]{\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{sim_results/delay_line/full_sim}
+		\caption{Full Simulation}
+		\label{fig:delay-sim-full}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{sim_results/delay_line/single_pulse}
+		\caption{Simulated output of a single pulse}
+		\label{fig:delay-sim-single}
+	\end{subfigure}
+	
+	\caption{Delay Line Simulation Results}
+	\label{fig:delay-sim}
+\end{figure}
+
+ \begin{figure}[ht]
+	\centering
+	\includegraphics[width=\linewidth]{sim_results/test_harness/full_sim}
+	\caption{Full Simulation}
+	\label{fig:harness-full}
+\end{figure}
+
+\end{landscape}
 
 \end{appendices}

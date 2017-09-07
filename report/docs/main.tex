@@ -2,27 +2,27 @@
 %\pagestyle{fancy}
 
 \chapter{\chapterStyle{Introduction}} \label{sec:intro}
-\glsentrylong{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}. The exact nature of the machine will be discussed in Chapter \ref{sec:tech-rev}, however it should be noted that the recreation of its memory is non trivial, and designing a system to perform this task is the focus of this project.
+\gls{tnmoc} is currently hosting a project to reconstruct a very early computer: \gls{edsac}. The exact nature of the machine will be discussed in Chapter \ref{sec:tech-rev}, however it should be noted that the recreation of its memory is non trivial, and designing a system to perform this task is the focus of this project.
 
-The reconstruction effort is well underway, and is already developing a separate solution to the problem. The history of \gls{edsac}, along with the technical details of how the memory it used operates is summarised in Chapter \ref{sec:tech-rev}. The final section in this Chapter uses the technical background to describe the exact aims of this project, and compare the goals to the memory currently being developed by the reconstruction effort. Utilising the technical details of the review, Chapter \ref{sec:spec} derives a specification to establish the required performance of the memory solution in explicit detail.
+The reconstruction effort has made good progress towards recreating the machine, and is already developing a separate solution to the problem. The history of \gls{edsac}, along with the technical details of how the memory it used functions is summarised in Chapter \ref{sec:tech-rev}. The final section in this chapter uses the technical background to describe the exact aims of this project, and compare the goals to the memory currently being developed by the reconstruction effort. Utilising the technical details of the review, Chapter \ref{sec:spec} derives a specification to establish the required performance of the memory solution in explicit detail.
 
 Working from the specification derived in Chapter \ref{sec:spec}, Chapter \ref{sec:power} contains the design details of how the solution is powered, whilst Chapter \ref{sec:delay-line-des} details the design decisions taken in the creation of the memory mechanism itself.
 
 Given that \gls{tnmoc} is located in Bletchley, and the project is created in Southampton, it has been necessary to produce a method of testing the memory solution which does not rely upon any of the hardware produced by the reconstruction project. For this reason, Chapter \ref{sec:test-harness-design} details the design of a test harness which is capable of testing the memory by emulating the signals produced by \gls{edsac}.
 
-The memory solution interfaces with valve circuitry that comprises the remainder of \gls{edsac}. This circuitry can be sensitive, and so to ensure that this project wouldn't have any unintended parasitic effects on \gls{edsac} \gls{spice} simulations are used to model the impact this project would have on the circuitry of \gls{edsac}. This is detailed in Chapter \ref{sec:verification}, alongside details of how the digital circuitry of the memory solution created is verified.
+The memory solution interfaces with valve circuitry that comprises the remainder of \gls{edsac}. This circuitry can be sensitive, and so to ensure that this project would not have any unintended parasitic effects on \gls{edsac} \gls{spice} simulations are used to model the impact this project would have on the circuitry of \gls{edsac}. This is detailed in Chapter \ref{sec:verification}, alongside details of how the digital circuitry of the memory solution created is verified.
 
-Following the design and implementation stages, all of the components of the memory module and test harness have been integrated and tested. This, along with details of problems encountered and how they were rectified is detailed in Chaper \ref{sec:sys-integration}.
+Following the design and implementation stages, all of the components of the memory module and test harness have been integrated and tested. This, along with details of problems encountered and how they were rectified are detailed in Chapter \ref{sec:sys-integration}.
 
 The scope encompassed by this project has demanded careful time planning, and analysis of any risks that could derail the goals of the project. This is detailed in Chapter \ref{sec:project-planning}. Final comments comparing the aims of the project to the outcomes, and detailing scope for future work are then presented in Chapter \ref{sec:conclusion}.
 
 \chapter{\chapterStyle{Technology Review}} \label{sec:tech-rev}
-This Chapter presents an overview of \gls{edsac}, and an overview of the relevant literature surrounding its the memory architecture.
+This chapter presents an overview of \gls{edsac}, and an overview of the relevant literature surrounding its the memory architecture.
 
 The data derived will be used to derive a specification for the recreated memory solution, presented in Chapter \ref{sec:spec}. It should be noted that much of the literature presented comes from original documentation produced by Maurice Wilkes, the man who led the original \gls{edsac} project. This reason for this is that despite the notability of \gls{edsac} its architecture was quickly adapted to develop other machines, so aside from the papers written by Wilkes himself, there is little technical documentation from other sources of the machine as it was originally constructed.
 
 \section{\glsentryshort{edsac} overview} \label{sec:edsac-overview}
-\Gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}, was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this earlier computers, such as \gls{eniac}, hard-coded programs using switches, in the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} wa the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
+\Gls{edsac}, pictured with two of its creators in Figure \ref{fig:edsac-photo} \cite{cam2011}, was the first practical digital stored program computer. This means that it was the first practical computer able to accept a program from the user, store it in memory, and execute it on the fly. In contrast to this, earlier computers such as \gls{eniac}, hard-coded programs using switches. In the case of \gls{eniac} using 3,600 ten 10-way switches \cite{cruz2013}. The only digital stored program computer earlier than \gls{edsac} was the Manchester small-scale experimental machine. This machine was not intended for general purpose computation however, but rather for testing of a new type of memory \cite{jones2001}.
 
 The goal of the reconstruction project at \gls{tnmoc} is to reconstruct the computer as faithfully as possible to its state when it ran its first ever program in May 1949 \cite{nmoc2017}.
 
@@ -39,7 +39,7 @@ The completion of \gls{edsac} in 1949 posed a significant design challenge for t
 
 The solution chosen for \gls{edsac}'s storage problem was delay line memory. This was common with other early computers, and works via a fairly simple mechanism. Given a medium able to delay a pulse train by a certain amount, memory can be created by feeding the output of that delay medium back into the input. If the delay time is tuned to be an integer multiple of the system clock frequency, the system is able to store a sequence of bits proportional in length to the delay time. This principle is illustrated in Figure \ref{fig:delay-line-principle}.
 
-Delay lines exist in various forms, from magnetorestrictive delay lines which function by twisting one end of a coil of wire, then waiting for the stress to propagate to the other end of the wire, to electric delay lines which provide much smaller delays by sending electrical impulses down a length of coaxial wire or a \gls{pcb} microstrip trace.
+Delay lines exist in various forms, from magneto-restrictive delay lines which function by twisting one end of a coil of wire, then waiting for the stress to propagate to the other end of the wire, to electric delay lines which provide much smaller delays by sending electrical impulses down a length of coaxial wire or a \gls{pcb} micro-strip trace.
 
 \begin{figure}[ht]
 	\centering
@@ -75,8 +75,16 @@ Delay lines exist in various forms, from magnetorestrictive delay lines which fu
 These delay lines are used in two ways \cite[p.213]{wilkes1948}:
 \begin{enumerate}
 	\item Short tubes used for the results of calculations.
-	\item Batteries of longer tubes used as the main memory store. This is analogous to \gls{ram} in a modern computer.
+	\item Batteries of longer tubes used as the main memory store, illustrated in Figure \ref{fig:coffins}.
 \end{enumerate}
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{delay_lines}
+	\caption{A battery of mercury delay lines in \glsentryshort{edsac} \cite{cam2011c}}
+	\label{fig:coffins}
+\end{figure}
 
 \Gls{edsac} stores words in units of 36 pulses, which is referred to as a minor cycle. 34 pulses are used to store the magnitude of a number, one stores the sign, and one acts as a space between numbers. This system was chosen to allow storage of ten digit numbers \cite[p.209]{wilkes1948}. 
 
@@ -96,15 +104,7 @@ To allow consistent operation of the machine, it is desirable that the recreated
 \end{equation}
 
 
-In the regeneration portion of the circuitry, the pulses are demodulated from the \SI{13.5}{\mega\hertz} carrier and stretched to approximately \SI{1.9}{\micro\second} long, i.e. just long enough that each pulse fails to overlap it's neighbour \cite[p.212]{wilkes1948}.
-
-This is critical because it means that the pulses that have passed through the delay line are effectively resynchronised to the system clock. If the system did not work in this way, then the delay lines in the the original \gls{edsac} would never have worked. The propagation time of acoustic waves through mercury varies slightly with temperature, and the cumulative effect of this through all the delay lines of the store would mean that pulses would be unlikely to align with the system clock at the other end.
-
-Despite this resynchronisation after each delay line, the original \gls{edsac} suffered a great deal from the variation of delay with temperature. Originally the system clock was adjusted whenever the temperature of the delay lines drifted out of synchronization, but later on in development the delay lines were put inside a temperature controlled oven.
-
-\newcommand{\maxJitterPlusSkewNs}{50} %Maximum jitter plus skew in nano seconds
-
-The regeneration system implies that the maximum acceptable skew of the delay line from its nominal delay is $\pm\SI{500}{\nano\second}$. This does not, however, take into account other factors such as the jitter and longer term drift of the system clock, as well the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period. Therefore creating a system which is an order of magnitude better than the above calculation, i.e. a maximum deviation from the nominal value of \SI{\maxJitterPlusSkewNs}{\nano\second}, seems reasonable.
+In the regeneration portion of the circuitry, the pulses are demodulated from the \SI{13.5}{\mega\hertz} carrier and stretched to approximately \SI{1.9}{\micro\second} long, i.e. just long enough that each pulse fails to overlap its neighbour \cite[p.212]{wilkes1948}. The demodulated pulse then is passed into a logical AND function with the system clock to produce the regenerated pulse. This process is illustrated in Figure \ref{fig:edsac-pulse-timing}.
 
 \begin{figure}[ht]
 	\centering
@@ -124,18 +124,18 @@ The regeneration system implies that the maximum acceptable skew of the delay li
 	\newcommand{\lowHalf}{\lowPeriodLessOne 4{\lowPeriod}}
 	
 	\begin{tikztimingtable} [xscale=0.2, timing/slope=.5]
-% There are 27 13.5M periods per system clock
+		% There are 27 13.5M periods per system clock
 		System clock & 2{\sysClkPeriod} 12.5L \gap 2{\sysClkPeriod} \lowPeriodLessOne  \\
-%
+		%
 		Transmitted burst & \lowPeriodLessOne \modulatedPulse 3{\lowPeriod} \gap \lowHalf \\
-%
+		%
 		Received burst &  \lowHalf \gap 6.75L \modulatedPulse 6.75L 2{\lowPeriod} \lowPeriodLessOne \\
-%
-%       Period is 27 units long, Therefore 24.3units of high, plus 2.7 units of low
+		%
+		%       Period is 27 units long, Therefore 24.3units of high, plus 2.7 units of low
 		Demodulated pulse &  \lowHalf \gap 6.75L 24.3H 2.7L 6.75L \lowPeriod \lowPeriodLessOne \\
-%
+		%
 		Re-clocked pulse & \lowHalf \gap \lowPeriodLessOne \highPeriod 3{\lowPeriod}\\
-%
+		%
 		Re-transmitted burst & \lowHalf \gap \lowPeriodLessOne \modulatedPulse 3{\lowPeriod} \\
 		\extracode
 		\begin{pgfonlayer}{background}
@@ -146,6 +146,12 @@ The regeneration system implies that the maximum acceptable skew of the delay li
 	\label{fig:edsac-pulse-timing}
 \end{figure}
 
+This is critical because it means that the pulses that have passed through the delay line are effectively resynchronised to the system clock. If the system did not work in this way, then the delay lines in the the original \gls{edsac} would never have worked. The propagation time of acoustic waves through mercury varies slightly with temperature, and the cumulative effect of this through all the delay lines of the store would mean that pulses would be unlikely to align with the system clock at the other end. Additionally, if the pulse width was not expanded whilst demodulating, any minuscule difference in timing between the system clock and delay line would cause failure very quickly, as each successive regenerated pulse would be narrower than the last.
+
+\newcommand{\maxJitterPlusSkewNs}{50} %Maximum jitter plus skew in nano seconds
+
+The regeneration system implies that the maximum acceptable skew of the delay line from its nominal delay is $\pm\SI{500}{\nano\second}$. This does not, however, take into account other factors such as the jitter and longer term drift of the system clock, as well the slew rates of the analogue circuitry. Whilst the demodulating pulse is lengthened to \SI{1.9}{\micro\second}, it is unlikely to be consistently at it's peak voltage for this time, and so the output pulse is likely to have a better shape if the delay line produces an output in the middle of this period. Therefore creating a system which is an order of magnitude better than the above calculation, i.e. a maximum deviation from the nominal value of \SI{\maxJitterPlusSkewNs}{\nano\second}, seems reasonable.
+
 \subsection{Electrical} \label{sec:review-delay-electrical}
 
 \newcommand{\maxDelayInputV}{35}
@@ -155,40 +161,40 @@ The regeneration system implies that the maximum acceptable skew of the delay li
 \newcommand{\minDelayOutputmV}{10}
 
 
-Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak to peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{69}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt}.
+Electrically speaking, \gls{edsac} originally drove the delay lines with a nominal voltage of \SI{25}{\volt} peak to peak, through a \SI{70}{\ohm} terminated transmission line. The loss in the delay lines was \SI{68}{\decibel}, leading to an output voltage of approximately \SI{10}{\milli\volt} \cite[p.212]{wilkes1948}.
 
-Despite this, the recreation project has discovered that the regeneration circuitry actually feed the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{\maxDelayInputV}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{\minDelayInputV}{\volt} peak for the tubes at the end of the store.
+Despite this, the recreation project has discovered that the regeneration circuitry actually feeds the delay lines with a decreasing voltage as the pulses propagate through the lines. The voltage starts off at approximately \SI{\maxDelayInputV}{\volt} for a signal fed to a delay line at the start of the store, but is reduced to approximately \SI{\minDelayInputV}{\volt} peak for the tubes at the end of the store.
 
-In addition to this, problems were experienced with amplifying the low signal level output by the delay lines. Because the current wire delay line solution has flexibility in its output voltage, currently the delayed signal is output at \SI{100}{\milli\volt} peak.
-
-The \SI{75}{\ohm} transmission lines are \gls{ac} coupled to the main \gls{edsac} chassis, and the shield of the coaxial cable is referenced directly to earth. This poses a small problem for the reconstruction, because modern health and safety regulations dictate that the chassis of \gls{edsac} should be earthed, but the electronics themselves are powered from an isolated \SI{0}{\volt} rail with earth leakage protection in place.
-
-This wouldn't be a problem except for the fact that the coaxial shield is earth referenced, meaning the coaxial return current goes to earth, not the isolated \SI{0}{\volt} rail. In order to combat this, several capacitors have been added between ground and the \SI{0}{\volt} rail, in order to allow the \gls{ac} current to pass, but still provide \gls{dc} isolation. This means that care will be necessary when implementing the circuitry to power the delay line, as it cannot draw any \gls{dc} power from the line.
+In addition to this, problems were experienced by the reconstruction project with amplifying the low signal level output by the delay lines at the \SI{10}{\milli\volt} level. Because the current wire delay line solution has flexibility in its output voltage, currently the delayed signal is output at \SI{100}{\milli\volt} peak.
 
 \subsection{Mechanical} \label{sec:review-delay-mech}
 \newcommand{\tubeLenCm}{165.5} %Tube length in cm
 \newcommand{\tubeOdCm}{4.44} %Tube outer diameter in cm
 
 
-The store delay lines originally consisted of banks of approximately \SI{\tubeLenCm}{\centi\metre} long steel tubes. The tubes are then held in an array using machined end-plates. An illustration of this is shown in Figure \ref{fig:coffins}.
+The store delay lines originally consisted of banks of approximately \SI{\tubeLenCm}{\centi\metre} long steel tubes. The tubes are then held in an array using machined end-plates \cite[p.210]{wilkes1948}. An illustration of this is shown in Figure \ref{fig:coffins}.
 
 The exact dimensions, aside from the length, of each store tube are not explicitly stated in the available literature. However the dimensions of the short tubes are stated, with each short tube having an outer diameter of \SI{\tubeOdCm}{\centi\metre}, and an inner diameter of \SI{2.86}{\centi\metre} \cite[p. 213]{wilkes1948}. For the purposes of this project, the long tubes are therefore assumed to have similar dimensions to this.
 
-The main restriction these dimensions place on the project is that the electronics must fit inside a tube of the corrrect length and outer diameter, so that the reconstructed system can be indistinguishable from the original in terms of form.
+The main restriction these dimensions place on the project is that the electronics must fit inside a tube of the correct length and outer diameter, so that the reconstructed system can be indistinguishable from the original in terms of form.
 
 \section{Comparison with the current reconstruction effort} \label{sec:review-comparison}
 
-Creating a faithful reproduction of this poses challenges, namely: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes. As a result of this the reconstruction project currently intends to use magnetorestrictive delay lines \cite{ward2011}. These are coils of wire which perform a similar function to the Mercury 
+Creating a faithful reproduction of the mercury delay line system described in the previous section poses many challenges. These challenges are discussed at length in \cite{tyler2017}, however a few of the most prevalent are: the expense of mercury, the health and safety implications of using mercury in a museum environment, and the technical challenges of the precise machining necessary for the steel tubes.
 
-As discussed at length in \cite{tyler2017}, this method is non-ideal since it is: anachronistic for the time, dissimilar in appearance to the original delay lines, and dissimilar in terms of electrical interface to the original. For this reason it was decided to investigate the use of modern technology to emulate the original delay lines. This emulation is required to be indistinguishable from the original in terms of appearance and electrical interface. The design of this system is the goal of this project.
 
+As a result of these challenges, the reconstruction project currently intends to use magneto-restrictive delay lines \cite{ward2011}, an example of which is illustrated in Figure \ref{fig:nickel-delay}. This technology works by having a length of nickel wire with transducers on each end which can either twist the wire, or detect a change in how the wire is twisted. The input pulses are therefore delayed by momentarily twisting the wire at one end. This impulse then travels down the wire and is detected at the other end after a delay.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{delay_lines}
-	\caption{A battery of mercury delay lines in \glsentryshort{edsac} \cite{cam2011c}}
-	\label{fig:coffins}
+	\includegraphicssized{nickel-delay}
+	\caption{A magneto-restrictive delay line used in the reconstruction project \cite{linnington2016}}
+	\label{fig:nickel-delay}
 \end{figure}
+
+As discussed at length in \cite{tyler2017}, this method is non-ideal since it is: anachronistic for the time, dissimilar in appearance to the original delay lines, and dissimilar in terms of electrical interface to the original. Due to these shortcomings, it was decided to investigate the use of modern technology to emulate the original delay lines.
+
+Emulation using modern technology means that it should be possible to create a system indistinguishable from the original in terms of appearance and electrical interface, whilst avoiding the need to the use of hazardous substances or tight machining tolerances. The design of such system is the aim of this project.
 
 \chapter{\chapterStyle{Specification}} \label{sec:spec}
 
@@ -211,17 +217,17 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 	\endfoot
 
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the \gls{edsac} pulse train presented to it's input & This is the primary function of the device. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-delay} & \textbf{Must} be capable of producing a delayed copy of the pulse train presented to it's input & This is the primary function of the device. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by \gls{edsac}, with only minimal non-intrusive modifications made to \gls{edsac}. & The goal of the device is to faithfully recreate the appearance and electrical interface of \gls{edsac}, and thus large modifications such as power supply wires must be avoided. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-power} & \textbf{Must} be powered from the input signal driven by \gls{edsac}, with only minimal, and non-intrusive, modifications made to \gls{edsac}. & The goal of the device is to faithfully recreate the appearance and electrical interface of \gls{edsac}, and thus large modifications such as power supply connections must be avoided. \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} be able to have a nominal delay of \SI{\nominalLongTubeDelayMs}{\milli\second}, adjustable by at least $\pm 10\%$. & \SI{\nominalLongTubeDelayMs}{\milli\second} is the nominal delay of a long tube, as discussed in Section \ref{sec:review-delay-timing}. An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-output-delay} & \textbf{Must} have a nominal delay of \SI{\nominalLongTubeDelayMs}{\milli\second}, adjustable by at least $\pm 10\%$. & \SI{\nominalLongTubeDelayMs}{\milli\second} is the nominal delay of a long tube, as discussed in Section \ref{sec:review-delay-timing}. An adjustable delay allows synchronisation with the system clock, with may vary. \tabularnewline
 	
 %	\refstepcounter{specNo}\thespecNo\label{itm:spec-temp-stab} & \textbf{Must} be able a delay that is stable across the temperature range of \review{[xx]} to \review{[xx]}. & As discussed in Section \review{[xx]} \gls{edsac} originally had delay lines which varied with temperature  \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a maximum per burst deviation from the nominal delay of \SI{\maxJitterPlusSkewNs}{\nano\second}. & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \SI{\maxJitterPlusSkewNs}{\nano\second} is the maximum deviation derived in Section \ref{sec:review-delay-timing} \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-jitter} & \textbf{Must} have a maximum per burst deviation from the chosen delay of \SI{\maxJitterPlusSkewNs}{\nano\second}. & This ensures that the delay line output will be able to synchronise with the clock of \gls{edsac}. \SI{\maxJitterPlusSkewNs}{\nano\second} is the maximum deviation derived in Section \ref{sec:review-delay-timing} \tabularnewline
 	
-	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with input waveforms \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt}. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
+	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-input-v} & \textbf{Must} be able to interface with \gls{ac} coupled bursts of \SI{13.5}{\mega\hertz} carrier, with peak voltages in the range of \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} at the input. & This is necessary to mimic the performance of the original delay line, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
 	
 	\refstepcounter{specNo}\thespecNo\label{itm:spec-skew-output-v} & \textbf{Must} be able to have an adjustable nominal output voltage in the range of \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} (peak to peak), driving into \SI{70}{\ohm}. & An adjustable output voltage in this range allows compatibility with both the original electrical interface, and that used by the reconstruction effort, \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} is the range derived in Section \ref{sec:review-delay-electrical}. \tabularnewline
 	
@@ -234,9 +240,21 @@ The research of Chapter \ref{sec:tech-rev} has led to the derivation of a specif
 
 \chapter{\chapterStyle{Power System Design}} \label{sec:power}
 
-This Chapter discusses how the delay line is powered, which is something which has required some consideration. As discussed in Specification point \ref{itm:spec-power}, the delay line must be powered from the input signal, and this method of providing power via this signal must require minimal modifications to the driving circuitry.
+This Chapter discusses how the delay line is powered, which is something which has required significant design effort. As discussed in Specification point \ref{itm:spec-power}, the delay line must be powered from the input signal, and this method of providing power via this signal must require minimal modifications to the driving circuitry. This is discussed prior to the design of the remainder of the delay line circuitry, since it is affected by the method of power.
 
-The \gls{fpga} development board is powered using an LT3030 dual-output lienar regulator \cite{lattice2017b}. This regulator produces a both a \SI{3.3}{\volt}, and a \SI{1.2}{\volt} rail which powers the \gls{fpga} core voltage, and \gls{gpio} banks respectively. Initial testing of the \gls{fpga} showed that the development board, without any support circuitry drew \SI{50}{\milli\ampere} from a \SI{5}{\volt} power supply. The exact voltage of the power supply does not matter however, since the use of a linear power regulator means that approximately the same amount of power will be drawn at all voltages. This current larger than expected, as the Lattice power estimation tool estimated that the \gls{fpga} would draw approximately \SI{15}{\milli\ampere} for my design, and the remainder of the circuitry on the \gls{pcb} only accounted for an extra \SI{10}{\milli\ampere} -- \SI{15}{\milli\ampere}. Careful investigation of the evaluation board schematic revealed that both of the power supply rails were loaded with \SI{100}{\ohm} resistors, accounting for \SI{45}{\milli\ampere} of current draw, as calculated by Equation \ref{eq:current-draw}. Inspection of the LT3030 datasheet shows that the load regulation is specified for a minimum current draw of \SI{1}{\milli\ampere}. The current draw of the resistors is therefore excessive, and the current draw of the remaining components on the \gls{pcb} are sufficient to achieve satisfactory load regulation. The resistors were therefore removed and both the \SI{3.3}{\volt} and \SI{1.2}{\volt} rails were stable and at the correct voltage during normal operation.
+
+A naive solution to power the delay line would be to attempt to harvest the power of the input pulses themselves, and store power from each pulse to power the circuitry when the line is inactive. This seems plausible because a \SI{20}{\volt} peak-to-peak input signal delivers \SI{1.5}{\watt} of power into the delay line for the time it is active, as calculated by Equation \ref{eq:power-delivered-to-load}, and in the best case the line is driven approximately half of the time.
+
+\begin{equation}
+P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
+\end{equation}
+
+The problem with this is approach is that, in the worst case, one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, no pulses will be delivered to the delay line at all. Attempting to use this pulse to power the delay line would require the turn-on time to be very predictably, so that the delay of the first pulse could be compensated for. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
+
+Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discusses a slightly more complex solution that overcomes the shortcomings of the former.
+
+\section{Power Requirement} \label{sec:power requirement}
+The \gls{fpga} development board is powered using an LT3030 dual-output linear regulator \cite{lattice2017b}. This regulator produces a both a \SI{3.3}{\volt}, and a \SI{1.2}{\volt} rail which powers the \gls{gpio} banks, and \gls{fpga} core voltage respectively. Initial testing of the \gls{fpga} showed that the development board, without any support circuitry connected, showed a current draw of \SI{50}{\milli\ampere} from a \SI{5}{\volt} power supply. The exact voltage of the power supply does not matter however, since the use of a linear power regulator means that approximately the same amount of current will be drawn at all voltages. This current is larger than would be expected, as the Lattice power estimation tool estimated that the \gls{fpga} would draw approximately \SI{15}{\milli\ampere} for the design. Investigation of the other \glspl{ic} on the development board revealed that the remainder of the circuitry on the \gls{pcb} only accounted for an extra \SI{10}{\milli\ampere} -- \SI{15}{\milli\ampere}. Careful inspection of the evaluation board schematic revealed that both of the power supply rails were loaded with \SI{100}{\ohm} resistors, accounting for \SI{45}{\milli\ampere} of current draw, as calculated by Equation \ref{eq:current-draw}. Inspection of the LT3030 datasheet shows that the load regulation is specified for a minimum current draw of \SI{1}{\milli\ampere}. The current draw of the resistors is therefore excessive, and the current draw of the remaining components on the \gls{pcb} are sufficient to achieve satisfactory load regulation. The resistors were therefore removed and both the \SI{3.3}{\volt} and \SI{1.2}{\volt} rails were stable and at the correct voltage during normal operation.
 
 
 \newcommand{\delayLineCurrentMa}{28}
@@ -249,24 +267,12 @@ I &= \frac{V_1}{R_1} + \frac{V_2}{R_2} \nonumber \\
 &= \SI{45}{\milli\ampere} \label{eq:current-draw}
 \end{align}
 
-
-A naive solution to power the delay line would be to attempt to harvest the power of the input pulses themselves, and store power from each pulse to power the circuitry when the line is inactive. This is plausible because a \SI{20}{\volt} peak-to-peak input signal, delivers \SI{1.5}{\watt} of power into the delay line for the time it is active, as calculated by Equation \ref{eq:power-delivered-to-load}.
-
-\begin{equation}
-P = \frac{V^2}{R} = \frac{10^2}{68} = \SI{1.5}{\watt} \label{eq:power-delivered-to-load}
-\end{equation}
-
-The problem with this is approach is that one cannot guarantee that pulses will be delivered to the delay line with any frequency. When the store is storing all zeros, non pulses will be delivered to the delay line at all. This means that the delay line would have to power on with a predictable latency such that the first pulse could be delayed by the correct amount. Unfortunately the unpredictable delay of the the supply rails reaching the correct level, coupled with the hard to predict delay of the \gls{fpga} configuring from flash memory would break the timing budget.
-
-Clearly a different solution to this problem is required, and this is what will be discussed in this Chapter. Section \ref{sec:power-dc-offset} will discuss the initially proposed solution which turned out to be flawed after further investigation, and Section \ref{sec:power-valve-supply} discussed a slightly more complex solution that overcomes the shortcomings of the former.
-
-
 \section{DC Offset Solution} \label{sec:power-dc-offset}
-Figure \ref{fig:store-regen-output} shows the output portion of the store regeneration schematic. Inspection of the output port that drives the delay line, S2 in the schematic, it can be seen that it is \gls{ac} coupled, by nature of capacitor C32. A simple solution to interface with \gls{edsac} is to add a \gls{dc} offset to the output. This could be achieved as simply as adding a potential divider to the output of the store regeneration unit, stiff enough to provide a stable voltage for the delay line. This solution is illustrated in Figure \ref{fig:dc-offset}.
+Figure \ref{fig:store-regen-output} shows the output portion of the store regeneration schematic. The store regeneration unit is the unit responsible for transmitting pulses to the delay line, and amplifying the pulses returned by the delay line. Inspection of the output port that drives the delay line, S2 in the schematic, it can be seen that it is \gls{ac} coupled, by nature of capacitor C32. A simple solution to power the delay line would be to add a \gls{dc} offset to the output. This could be achieved as simply as adding a potential divider to the output of the store regeneration unit, stiff enough to provide a stable voltage for the delay line, a solution is illustrated in Figure \ref{fig:dc-offset}.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{store_regen_sch}[trim={15cm 0 0 9cm},clip] %Trim = {left lower right upper}
+	\includegraphicssized{store_regen_sch}[trim={15cm 2.75cm 0.25cm 9cm},clip] %Trim = {left lower right upper}
 	\caption{Store Regeneration Unit Output \cite{burton2014b}}
 	\label{fig:store-regen-output}
 \end{figure}
@@ -346,23 +352,21 @@ Figure \ref{fig:store-regen-output} shows the output portion of the store regene
 	\label{fig:dc-offset}
 \end{figure}
 
-This is an ideal solution in theory, since the \gls{dc} bias is trivial to add to the \gls{ac} coupled output, and can easily be separated from the signal delay line. In addition, since all of the circuitry is powered using \gls{dc}, the biased input could be used directly to power the \gls{ldo} regulator on the \gls{fpga} development board.
+This is an ideal solution in theory, since the \gls{dc} bias is trivial to add to the \gls{ac} coupled output, and can easily be separated from the \gls{hf} signal bursts inside the delay line. In addition, since all of the circuitry is powered using \gls{dc}, the biased input could be used directly, after low pass filtering to remove the \gls{hf} pulses, to power the \gls{ldo} regulator on the \gls{fpga} development board.
 
-Unfortunately there is a problem with this solution. In order to meet modern health and safety requirements the \gls{dc} supply the store regeneration unit, which drives the delay line, has a \SI{0}{\volt} rail which is isolated from ground, and is protected by a \gls{rcbo} \cite{passmore2015}. This means that any current returned to earth, as opposed to the neutral of the supply will cause a fault, and the power supply will be turned off.
+Unfortunately there is a problem with this solution. In order to meet modern health and safety requirements the \gls{hv} \gls{dc} supply the store regeneration unit, which drives the delay line, has a \SI{0}{\volt} rail which is isolated from ground, and is protected by a \gls{rcbo} \cite{passmore2015}. This means that any current returned via earth, as opposed to isolated \SI{0}{\volt} rail, will cause a fault, and the power supply will be turned off.
 
-Despite this, the shields of the coaxial cables used for the delay lines are referenced directly to earth. In order to prevent earth leakage in this situation, since the termination of the pulse driving the return line would return a significant current to ground, substantial decoupling capacitors are added between earth and the isolated \SI{0}{\volt} rail on each regeneration chassis. This allows the \gls{ac} termination current to be returned correctly, but prevents any \gls{dc} current from being drawn. This means that the \gls{dc} offset solution isn't viable in reality.
+Despite this, the shields of the coaxial cables used for the delay lines are referenced directly to earth. In order to prevent earth leakage in this situation, since the termination of the pulse driving the return line would return a significant current to ground, substantial decoupling capacitors are added between earth and the isolated \SI{0}{\volt} rail on each regeneration chassis. This allows the \gls{ac} termination current to be returned correctly, but prevents any \gls{dc} current from being drawn. This limitation therefore precludes drawing a \gls{dc} current from the \gls{hv} \gls{dc} valve power supply.
 
 \section{Valve Power Supply Solution} \label{sec:power-valve-supply}
 
-Given that the \gls{dc} offset solution proposed in the previous section wasn't feasible, an alternative solution was devised.
+Given that the \gls{dc} offset solution proposed in the previous section was not feasible, an alternative solution was devised.
 
 Inspection of the assembly instructions for the store regeneration chassis shows that the heater power supply is referenced directly to ground \cite{burton2014a}.
 
-The heater power supply is a \SI{6.3}{\volt} \gls{rms} \SI{50}{\hertz} \gls{ac} supply. In the regeneration chassis it is used to power the heaters for each valve. A typical valve used in the design draws \SI{1}{\ampere}, so the \SI{\delayLineCurrentMa}{\milli\ampere} load from the delay line will add a negligible load onto this supply.
+The heater power supply is a \SI{6.3}{\volt} \gls{rms}, \SI{50}{\hertz}, \gls{ac} supply, generated by mains transformer mounted on each chassis \cite[p.1]{mullard} \cite[p.1]{passmore2015}. In the regeneration chassis it is used to power the heaters for each valve. A typical valve used in the design draws \SI{1}{\ampere}, so the \SI{\delayLineCurrentMa}{\milli\ampere} load from the delay line will add a negligible load onto this supply \cite[p.1]{mullard}.
 
-The supply is generated by mains transformer mounted on each chassis.
-
-Since the supply is a \SI{50}{\hertz} supply, this is a frequency sufficiently far from the \SI{13.5}{\mega\hertz} pulse carrier frequency, that it is be easy to filter out.
+Since the supply is a \SI{50}{\hertz} supply, this is a frequency sufficiently far from the \SI{13.5}{\mega\hertz} pulse carrier frequency, that it is be easy to filter out with even a first order filter.
 
 In order to couple the heater supply onto the store regeneration output, a single inductor is sufficient. The addition of this inductor is the only modification necessary to the \gls{edsac} chassis circuitry. A diagram showing the equivalent circuit of the modified circuitry is shown in Figure \ref{fig:valve-supply-equiv-cct}.
 
@@ -464,28 +468,28 @@ In a similar manner the \SI{2.2}{\nano\farad} capacitor that is used to couple t
 | Z_{C\SI{13.5}{\mega\hertz}} | = \frac{1}{2 \pi f C} = \frac{1}{2 \times \pi \times \SI{2.2}{\nano\farad} \times \SI{13.5}{\mega\hertz}} = \SI{5.4}{\ohm} \label{eq:pulse-c-impedance} 
 \end{equation}
 
-The same principle works for the termination and power supply circuitry inside the delay line, which will be discussed in more detail in Section \review{xx}.
+The same principle works for the termination and power supply circuitry inside the delay line, which will be discussed in more detail in Section \ref{sec:delay-line-ana-in}.
 
 \subsection{Circuit Design} \label{sec:power-circuit}
 
-Whilst Figure \ref{fig:valve-supply-equiv-cct} models the delay line power supply as a resistor, the reality is slightly more complex since the \gls{ac} supply needs to be rectified in order to power the \gls{dc} circuitry. The circuit to achieve this is shown in Figure \ref{fig:delay-line-psu-sch}.
+Whilst Figure \ref{fig:valve-supply-equiv-cct} models the delay line power supply as a resistor, the reality is slightly more complex, since the \gls{ac} supply needs to be rectified in order to power the \gls{dc} circuitry. The circuit to achieve this is shown in Figure \ref{fig:delay-line-psu-sch}.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{schematic_portions/delay_line_psu}
-	\caption{Delay line power supply schematic \review{replace picture}}
+	\includegraphicssized{schematics/delay_line}[trim={6cm 16cm 14cm 2.5cm},clip] %Trim = {left lower right upper}
+	\caption{Delay line power supply schematic}
 	\label{fig:delay-line-psu-sch}
 \end{figure}
 
 This circuit is a half wave rectifier. This design was chosen in preference to a full-wave rectifier because it removes the need for an isolating transformer inside of the delay line tube.
 
-The combination of the diode, \SI{10}{\ohm} resistor, and \SI{10}{\milli\farad} capacitor act as a traditional half wave rectifier, with the diode only allowing a low impedance path for the positive half of the sine wave, the capacitor storing the voltage to provide continuous power to the load, and the resistor limiting the peak current drawn by the circuit. The addition of the inductor presents a high impedance to the \SI{13.5}{\mega\hertz} memory pulse, preventing unnecessary loading on the input signal, as discussed in Section \ref{sec:power-valve-supply}.
+The combination of the diode, \SI{10}{\ohm} resistor, and \SI{10}{\milli\farad} capacitor act as a traditional half wave rectifier, with the diode only allowing a low impedance path for the positive half of the sine wave, the capacitor storing the voltage to provide continuous power to the load, and the resistor limiting the peak current drawn by the circuit. The addition of the inductor presents a high impedance to the \SI{13.5}{\mega\hertz} tone burst, preventing unnecessary loading on the input signal, as discussed in Section \ref{sec:power-valve-supply}.
 
 The value of the capacitor was designed to keep the ripple of the supply to approximately \SI{0.1}{\ohm}, as illustrated by the linear approximation of Equation \ref{eq:delay-line-ripple}. \SI{10}{\milli\farad}, is the closest readily available value to the calculated \SI{12}{\milli\farad}. In reality the ripple will be much smaller than the calculated value, for two reasons:
 
 \begin{enumerate}
-	\item The current is approximately half of the originally anticipated \SI{60}{\milli\ampere} as discussed at the start of this chapter.
-	\item Energy will also be stored in the magnetic field of the inductor, which is ignored in this approximation.
+	\item The current is approximately half of the originally anticipated \SI{60}{\milli\ampere} as discussed in Section \ref{sec:power requirement}.
+	\item Energy will also be stored in the magnetic field of the inductor, as well as the electric field of the capacitor, which is ignored in this approximation.
 \end{enumerate}
 
 \begin{align}
@@ -496,13 +500,13 @@ I &= C \frac{dV}{dt} \nonumber \\
 &\approx \SI{12}{\milli\farad} \label{eq:delay-line-ripple}
 \end{align}
 
-The only additional component is the resistor. This is included in order to drain the voltage across the capacitor when the circuit is powered off, whilst only providing a small current drain of $I \approx \frac{6.3}{\SI{1}{\kilo\ohm}} \approx \SI{6.3}{\milli\ampere}$ in normal operation.
+The only additional component is the \SI{1}{\kilo\ohm} resistor. This is included in order to drain the voltage across the capacitor when the circuit is powered off, whilst only providing a small current drain of $I \approx \frac{6.3}{\SI{1}{\kilo\ohm}} \approx \SI{6.3}{\milli\ampere}$ in normal operation.
 
 \chapter{\chapterStyle{Delay line Design}} \label{sec:delay-line-des}
 
-This Chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
+This chapter describes the development of the delay line itself, covering the architectural choices made, as well as the detailed design, development and testing. The overall block diagram of the delay line is shown in Figure \ref{fig:delay-line-arch}.
 
-The delay itself is implemented in the digital domain, with the goal of accurately emulating the analogue domain of the original design. This development is detailed in Section \ref{sec:delay-line-dig-des}. The surrounding analogue circuitry translates between the logic level signal signals of the digital circuit, and the input and output.
+The delay itself is implemented in the digital domain, with the goal of accurately emulating the analogue domain of the original design. This development is detailed in Section \ref{sec:delay-line-dig-des} with the surrounding analogue circuitry translates between the logic level signal signals of the digital circuit, and the input and output being discussed in Section \ref{sec:delay-line-ana}
 
 \begin{figure}[ht]
 	\centering
@@ -517,7 +521,7 @@ The delay itself is implemented in the digital domain, with the goal of accurate
 
 	\draw [arrowNml] (input_branch) |- (frontend.west);
 	
-	\node (fpga) [block, right= of frontend.south east, anchor= south west, minimum height = 2*\blockHeight + \nodeDist] {\shortstack{FGPA\\Development\\Board}};
+	\node (fpga) [block, right= of frontend.south east, anchor= south west, minimum height = 2*\blockHeight + \nodeDist] {\shortstack{FPGA\\Development\\Board}};
 	
 	\draw [arrowNml] (psu.east) -- node[above] {\shortstack{\texttildelow \SI{6}{\volt}\\\glsentryshort{dc}}} ([yshift=-0.5*\blockHeight] fpga.north west);
 		
@@ -540,13 +544,13 @@ The delay itself is implemented in the digital domain, with the goal of accurate
 
 \section{Digital Design} \label{sec:delay-line-dig-des}
 
-The goal of the digital design is to delay the signal on it's input by a certain amount. If the input signal were arbitrary, then the optimal solution would be to clock a \SI{1}{\bit} wide \gls{fifo} buffer with a sampling clock. The delay would then be given by Equation \ref{eq:naive-buffer-depth}, where $t_d$ represents the delay time, $f_s$ sampling clock frequency, and $N$ the depth of the buffer.
+The goal of the digital design is to delay the signal on its input by a certain amount. If the input signal were arbitrary, then the optimal solution would be to sample the data and clock it into a single bit wide shift register. The delay would then be given by Equation \ref{eq:naive-buffer-depth}, where $t_d$ represents the delay time, $f_s$ sampling clock frequency, and $N$ the depth of the buffer.
 
 \begin{equation}
 	t_d = \frac{1}{f_s} \times N \label{eq:naive-buffer-depth}
 \end{equation}
 
-This solution can be simplified by consideration of the fact that the input signal is not arbitrary, the characteristics or the signal are known from the research detailed in Section \ref{sec:review-delay-timing}. It is known that:
+This solution, whilst possible, requires a large number shift registers for even a modest delay. The solution can therefore be simplified by consideration of the fact that the input signal is not arbitrary, the characteristics or the signal are known from the research detailed in Section \ref{sec:review-delay-timing}. It is known that:
 \begin{itemize}
 	\item The signal will consist of \SI{0.9}{\micro\second} pulses of \SI{13.5}{\mega\hertz} tone.
 	\item Each tone burst will be separated by \SI{1.1}{\micro\second}.
@@ -557,35 +561,28 @@ Using these characteristics it can be seen that a digital delay line only needs 
 
 \subsection{Architecture selection}
 
-Various architectures could be used to implement the system described in the previous section. The three most obvious methods of implementation being
+Various architectures could be used to implement the system described in the previous section. The three most obvious methods of implementation being:
 \begin{itemize}
 	\item A microcontroller design.
 	\item A discrete logic design
 	\item A \gls{fpga} design
 \end{itemize}
 
-Microcontrollers have the advantage of being comparatively cheap and readily available, in addition they typically have more than enough \gls{ram} available to implement the memory to store the array of times at which pulses arrived.
+Microcontrollers have the advantage of being comparatively cheap and readily available. In addition they typically have more than enough \gls{ram} available than what is required to store the array of times at which pulses arrived.
 
-The principle disadvantage is that microcontrollers inherently to their architecture process a single thread of data at once. This means that even a tight processing loop which samples the input would add a much larger amount of jitter to the input compared to a hardware solution with the same clock rate. Fortunately however modern microcontroller architectures, typically have a large number of peripherals embedded in the silicon, which can remove computation from the core. This combined with interrupts can provide an architecture with very predictable latency.
+The principle disadvantage is that microcontrollers, inherently to their architecture, process data sequentially. This means that even a tight processing loop which samples the input would add a much larger amount of jitter to the input compared to a hardware solution with the same clock rate. Fortunately, however, modern microcontroller architectures, typically have a large number of peripherals embedded in the silicon, which can remove computation from the core. This combined with interrupts can provide an architecture with very predictable latency.
 
-An example implementation is detailed in Figure \ref{fig:mcu-system-arch}. This details a system, based upon a typical microcontroller in the \gls{arm} Cortex-M0 family. A pin change interrupt interrupts the main execution thread, and branches to an interrupt handler. This interrupt handler reads the value of a free-running timer peripheral that counts up using the microcontroller master clock, adds a fixed delay value to it, and appends it to a queue of timer counts held in \gls{ram}. This queue contains the values of the counter which the output should be asserted at.
+As an example the system could be implemented using a typical microcontroller in the \gls{arm} Cortex-M0 family. To achieve the delay, one could utilise the various timers inherent inside the microcontroller architecture. To detect an input pulse a pin change interrupt would interrupt the main execution thread, and branch to an interrupt handler. This interrupt handler would read the value of a free-running timer peripheral that increments unconditionally using microcontroller master clock. The handler would then add a fixed delay value to the counter value and appends it to a queue of timer counts held in \gls{ram}. This queue contains the values of the counter, at which the output should be asserted.
 
-The main execution thread of the microcontroller configures the timer peripheral to trigger a second timer peripheral once its count equals the value on the top of the queue. This second counter is connected directly to an output \gls{gpio} pin, and is clocked such that the output toggles at \SI{13.5}{\mega\hertz}.
+The main execution thread of the microcontroller would be responsible for configuring the free running timer to trigger a second timer peripheral once its count equals the value on the top of the queue. This second counter is connected directly to an output \gls{gpio} pin, and is clocked such that the output toggles at \SI{13.5}{\mega\hertz}.
 
-This system can therefore meet the requirements of the delay line, with a worst case jitter of one system clock period (since the Cortex-M0 family allows for deterministic latency interrupts \review{cite}). Microcontrollers with timers capable of being configured as described above are readily available also \review{cite STM32 reference manual here}.
-
-\begin{figure}[ht]
-	\centering
-	\dummyfigure
-	\caption{Proposed architecture for a microcontroller based system}
-	\label{fig:mcu-system-arch}
-\end{figure}
+This system can therefore meet the requirements of the delay line, with a worst case jitter of one system clock period (since the Cortex-M0 family allows for deterministic latency interrupts \cite{yiu2016}). Microcontrollers with timers capable of being configured as described above are readily available also \cite{freescale2014}.
 
 The other two alternatives, a discrete logic system, and a \gls{fpga} based system would be similar in architecture, but differ in implementation, with the \gls{fpga} based system implementing the function using the programmable fabric of a \gls{fpga}, whereas the discrete implementation would use individual \glspl{ic}. A block diagram of the proposed architecture is shown in Figure \ref{fig:hardware-system-arch}.
 
-The concept of this architecture is similar to that of the microcontroller based system. There is a free running counter inside the \gls{fpga}, when a pulse is detected on the input, the value of the counter, added to a fixed delay is saved into a \gls{fifo}. A second hardware module outputs a pulse train whenever the value of the counter matches the value on the top of the \gls{fifo}.
+The concept of this architecture is similar to that of the microcontroller based system. There is a free running counter inside the \gls{fpga}. When a pulse is detected on the input, the value of the counter is added to the current count and stored in a buffer. A separate hardware module monitors the buffer and triggers a pulse generator at the correct time.
 
-The difference between the hardware implementation and the microcontroller implementation is that there isn't a processor core to set up the hardware blocks, instead each hardware block is designed to perform the correct function, and interacts with the other modules using logic signals. In addition there is no need for an external modulator, as a harware block can be created to output the modulated \SI{13.5}{\mega\hertz} signal.
+The difference between the hardware implementation and the microcontroller implementation is that there isn't a processor core to set up the hardware blocks, instead each hardware block is designed to perform the correct function, and interacts with the other modules using logic signals. In addition there is no need for an external modulator, as a hardware block can be created to output the modulated \SI{13.5}{\mega\hertz} signal.
 
 The \gls{fifo} is the centre of this system. It is set to be the width of the free-running counter. At its input is the current value of the counter, added to a fixed constant that represents the required delay. This value is saved into the \gls{fifo} when the rising edge detector produces a pulse on its output.
 
@@ -593,7 +590,7 @@ The rising edge detector is a fairly simple hardware block that outputs a pulse 
 
 At the output of the \gls{fifo} feeds into a comparator. This comparator compares the value on the top of the \gls{fifo} with the current value of the counter, and triggers the pulse generator when the two values are equal.
 
-The pulse generator outputs a fixed length burst of \SI{13.5}{\mega\hertz} tone whenever it is triggered. This could be implemented simply by choosing a clock frequency that is $2^n$ times greater than \SI{13.5}{\mega\hertz}. Thus the carrier frequency can be generated by a counter clocked from the input clock.
+The pulse generator outputs a fixed length burst of \SI{13.5}{\mega\hertz} tone whenever it is triggered. This could be implemented simply by choosing a clock frequency that is $2^n$ times greater than \SI{13.5}{\mega\hertz}. Thus, the carrier frequency can be generated by a counter clocked from the input clock.
 
 \begin{figure}[ht]
 	\centering
@@ -640,15 +637,13 @@ The pulse generator outputs a fixed length burst of \SI{13.5}{\mega\hertz} tone 
 	\label{fig:hardware-system-arch}
 \end{figure}
 
-\review{Could add power in here}
-
 The advantage of the microcontroller system over a \gls{fpga} or discrete solution is twofold. Firstly the simplicity of the physical circuit necessary. A microcontroller based design would require a \gls{ic} for the microcontroller itself, and an external crystal oscillator (although some microcontrollers do have a reduced precision internal \gls{rc} oscillator, removing the need even for this), and are generally powered from a single \SI{3.3}{\volt} supply. This is in contrast to \glspl{fpga} which typically require more than one supply rail, with extensive decoupling, and a discrete solution which would require many \glspl{ic}.
 
 Secondly a microcontroller design would likely be slightly cheaper than a discrete logic design, as low end microcontrollers are typically only slightly more expensive than individual logic \glspl{ic}, and are much less costly than typical \glspl{fpga}.
 
-Despite these advantages, a hardware solution does have the advantage of elegance. While it has been demonstrated above that a microcontroller solution could achieve single cycle jitter -- the same as a hardware solution. It is a lot more difficult to implement and verify, given the fact that configuration of many hardware peripherals are required.
+Despite these advantages, a hardware solution does have the advantage of elegance. While it has been demonstrated above that a microcontroller solution could achieve single cycle jitter, the same as a hardware solution, it is a lot more difficult to implement and verify. This is due to the fact that configuration of many hardware peripherals are required.
 
-In addition, the cost advantage of the microcontroller solution may be smaller than anticipated. This is because the simplicity of the hardware solution would only require a very small \gls{fpga}, which may be competitive in price to a microcontroller. Alternatively a \gls{cpld} with an external \gls{ram} \gls{ic} could be used. A \gls{fpga} solution would be preferred to a discrete implementation, due to the ease of testing, and reconfiguring the hardware if the requirements change.
+In addition, the cost advantage of the microcontroller solution may be smaller than is typical when comparing microcontroller and \gls{fpga} based systems. This is because the simplicity of the hardware solution would only require a very small \gls{fpga}, which may be competitive in price to a microcontroller. Alternatively a \gls{cpld} with an external \gls{ram} \gls{ic} could be used. A \gls{fpga} solution would be preferred to a discrete implementation, due to the ease of testing, and reconfiguring the hardware if the requirements change.
 
 Therefore on balance it has been decided to proceed with a \gls{fpga} based solution.
 
@@ -656,9 +651,9 @@ Therefore on balance it has been decided to proceed with a \gls{fpga} based solu
 
 The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:fpga-reqs}.
 
-\begin{table}[ht]
 
-	
+\newcommand{\minFpgaClkMhz}{20}
+\begin{table}[ht]
 	\centering
 	\newcounter{FpgaSpecNo}
 	
@@ -675,33 +670,33 @@ The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:f
 		\midrule
 
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-cost} &
-		\textbf{Must} have a moderately low cost &
+		\textbf{Must} have a moderately low cost. &
 		Using the \gls{ic} for every delay line in the store must not be cost prohibitive.\\
 		
 		
 		\midrule
 		
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-les} &
-		\textbf{Must} have enough logic elements and block \gls{ram} to implement a single long delay line &
-		This is the proposed function of the delay line\\
+		\textbf{Must} have enough logic elements and block \gls{ram} to implement a single long delay line. &
+		This is the proposed function of the delay line.\\
 		
 		\midrule
 
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-speed} &
-		\textbf{Must} have fabric capable of being clocked fast enough to implement the design with a clock rate of \review{xx} &
-		It was decided at \review{xx} that this is the required sampling speed.\\
+		\textbf{Must} have fabric capable of being clocked fast enough to implement the design with a clock rate of greater than \SI{\minFpgaClkMhz}{\mega\hertz}. &
+		System specification point \ref{itm:spec-skew-jitter} states that the maximum deviation from the chosen delay value is \SI{\maxJitterPlusSkewNs}{\nano\second}. Achieving this requires that the signal is sampled at a rate faster than $\frac{1}{\SI{\maxJitterPlusSkewNs}{\nano\second}}=\SI{\minFpgaClkMhz}{\mega\hertz}$.\\
 		
 		\midrule
 
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-dev-board} &
-		\textbf{Should} have a development board available with a width less than \review{xx} &
-		As described in Section \review{xx}, \review{xx} is the internal diameter of the delay line tube, it would be ideal if the development board could fit inside the tube, to save a custom \gls{pcb} being designed.\\
+		\textbf{Should} have a development board available with a width less than \SI{3.3}{\centi\metre}. &
+		System specification point \ref{itm:spec-phys-size} states that the external diameter of the tube is \SI{\tubeOdCm}{\centi\metre}. Therefore assuming that the inner diameter is equal to three quarters of the outer diameter, this is the maximum diameter of board which would fit inside the tube. It would be therefore be ideal if the development board could fit inside the tube, to save a custom \gls{pcb} being designed.\\
 
 		
 		\midrule
 
 		\refstepcounter{FpgaSpecNo}\theFpgaSpecNo\label{itm:fpga-spec-pll} &
-		\textbf{Should} have a \gls{pll} to enable to fabric clock to be generated from a crystal oscillator &
+		\textbf{Should} have a \gls{pll} to enable to fabric clock to be generated from a crystal oscillator. &
 		An internal \gls{pll} is ideal, but an external \gls{pll} could also be used.\\
 		
 		\bottomrule
@@ -710,31 +705,29 @@ The primary requirements for the \gls{fpga} are as described in Table \ref{tbl:f
 
 \end{table}
 
-At the time of writing the least expensive \gls{fpga} available from component suppliers Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
+At the time of writing the least expensive \gls{fpga} available from component suppliers Farnell, is the a 1280 logic cell variant of the iCE40 \gls{fpga} family, produced by Lattice \cite{farnell2017}. This is \pounds5.10 in single quantity, and significantly lower in higher quantities, which is low cost enough that it could reasonably be used to replace all of the delay lines, thus meeting specification point \ref{itm:fpga-spec-cost}.
 
-This \gls{fpga} has 1280 \glspl{lc}, which should be plenty to implement the simple design, given that each \gls{lc} in this architecture consists of a four input \gls{lut}, and a flip-flop \cite[p.2-2]{lattice2017a}. The \gls{fpga} also has \SI{64}{\kilo\bit} of block \gls{ram}. This meets specification point \ref{itm:fpga-spec-les}, when one considers that is enough to store a clock sample for each of the 576 possible pulses, even if a \SI{64}{\bit} clock width was used, as demonstrated by Equation \ref{eq:bram-size-estimate}, where $S$ representes the size of memory required. In addition to this, there is one \gls{pll} available on the \gls{fpga} die, meeting specification point \ref{itm:fpga-spec-pll}.
+This \gls{fpga} has 1280 \glspl{lc}, which should be plenty to implement the simple design, given that each \gls{lc} in this architecture consists of a four input \gls{lut}, and a flip-flop \cite[p.2-2]{lattice2017a}. The \gls{fpga} also has \SI{64}{\kilo\bit} of block \gls{ram}. This meets specification point \ref{itm:fpga-spec-les}, when one considers that is enough to store a clock sample for each of the 576 possible pulses, even if a \SI{64}{\bit} clock width was used, as demonstrated by Equation \ref{eq:bram-size-estimate}, where $S$ represents the size of memory required. In addition to this, there is one \gls{pll} available on the \gls{fpga} die, meeting specification point \ref{itm:fpga-spec-pll}.
 
 \begin{equation}
 	S = \SI{64}{\bit} \times 576 = \SI{36}{\kilo\bit} \label{eq:bram-size-estimate}
 \end{equation}
 
-It is hard to estimate how fast a design will be able to operate in a \gls{fpga} without synthesising it, and running timing analysis. However, despite this we can estimate that the \gls{fpga} will easily meet timing at \review{xx}, thus meeting specification point \ref{itm:fpga-spec-speed}, given that the register-to-register performance of the fabric is as good as \SI{403}{\mega\hertz} for a dual-port \gls{ram}, \SI{305}{\mega\hertz} for a 16:1 multiplexer, and \SI{105}{\mega\hertz} for a \SI{64}{\bit} counter.
+It is hard to estimate how fast a design will be able to operate in a \gls{fpga} without synthesising it, and running timing analysis. Despite this, we can estimate that the \gls{fpga} will easily meet timing at \SI{\minFpgaClkMhz}{\mega\hertz}, thus meeting specification point \ref{itm:fpga-spec-speed}, given that the register-to-register performance of the fabric is as good as \SI{403}{\mega\hertz} for a dual-port \gls{ram}, \SI{305}{\mega\hertz} for a 16:1 multiplexer, and \SI{105}{\mega\hertz} for a \SI{64}{\bit} counter.
 
 In addition to this, a development board is available which is very narrow \cite{lattice2017b}. The exact dimensions are not provided, but it is barely wider than the \SI{22}{\milli\metre} \gls{tqfp} of the \gls{fpga} itself \cite[p.2]{lattice2017b}, meaning it is highly likely to fit in the \review{xx} diameter tube, thus meeting specification point \ref{itm:fpga-spec-dev-board}.
 
-Based upon the fact that it meets all of the specification points, it has been decided to implement the design using the Lattice iCEstick evaluation board, with the possibility of moving to a custom \gls{pcb} if many instances of the design were required.
+Based upon the fact that it meets all of the specification points, it was decided to implement the design using the Lattice iCEstick evaluation board, with the possibility of moving to a custom \gls{pcb} if many instances of the design were required.
 
 \subsection{\glsentryshort{hdl} Design}
 
-Uniquely, the Lattice iCE40 family of \glspl{fpga} has an open-source toolchain available, named Project IceStorm which can be used as an alternative to the toolchain provided by Lattice \cite{icestorm}. Project IceStorm synthesises Verilog natively, and Lattice's iCEcube2 toolchain synthesises both Verilog and \gls{vhdl} \cite[p.10]{lattice2017c}. Therefore in order to maintain compatibility with both toolchains, the design will be written using Verilog. Both toolchains were trialled, and the codebase is compatible with both, however Project IceStorm was used in the end as it is the more user-friendly toolchain.
+Uniquely, the Lattice iCE40 family of \glspl{fpga} has an open-source toolchain available, named Project IceStorm \cite{icestorm} which can be used as an alternative to the toolchain provided by Lattice \cite{icestorm}. Project IceStorm synthesises Verilog natively, and Lattice's iCEcube2 toolchain synthesises both Verilog and \gls{vhdl} \cite[p.10]{lattice2017c} \cite{icestorm}. Therefore in order to maintain compatibility with both toolchains, the design will be written using Verilog. Both toolchains were trialled, and the codebase is compatible with both, however Project IceStorm was used in the end as it is the more user-friendly toolchain.
 
 The design was implemented using the structure of Figure \ref{fig:hardware-system-arch}, with the rising edge detector, \gls{fifo}, comparator, and pulse generator implemented as individual Verilog modules.
 
-\review{Could talk about how the parameters are determined here}
-
 \subsubsection{Rising Edge Detector}
 
-The rising edge detector is implemented as the state machine of Figure \ref{fig:edge-detect-sm}. In the wait state, the input is sampled on every clock edge, when it is true, the state machine transitions to the assert state, where the output is asserted, until the state machine unconditionally branches to the timeout state. In the timeout state a counter is incremented until it reaches the required limit. At this point the state machine branches back to the wait state.
+The rising edge detector is implemented as the state machine of Figure \ref{fig:edge-detect-sm}. In the wait state, the input is sampled on every clock edge, when it is true, meaning that a rising edge has been detected, the state machine transitions to the assert state, where the output is asserted for exactly one clock cycle, until the state machine unconditionally branches to the time-out state. In the time-out state a counter is incremented until it reaches the required limit, designed to be long enough to guarantee that the pulse has finished. At this point the state machine branches back to the wait state.
 
 \begin{figure}[ht]
 
@@ -767,18 +760,20 @@ The rising edge detector is implemented as the state machine of Figure \ref{fig:
 \end{figure}
 
 \subsubsection{\Glsentryshort{fifo}}
-The \gls{fifo} is implemented by building logic constructs around a dual port \gls{ram} to handle addressing of the read and write ports.
+The \gls{fifo} is implemented using a dual port \gls{ram} block, around which logic constructs are built to handle addressing of the read and write ports.
 
-The main part of the \gls{fifo} is the read and write addresses. These addresses act as pointers to the current location of the read/write word in \gls{ram}. Each address is incremented on when the \gls{fifo} it read from/written to, and the address loops around to the start when it reaches the end of the \gls{ram} buffer. This `round robin' approach means that the \gls{fifo} can be read from and written to an unlimited amount of times, so long as the total number of words stored is not greater than the depth of the buffer.
+The main part of the \gls{fifo} is the read and write address generation logic. These addresses act as pointers to the current location of the read/write word in \gls{ram}. Each address is incremented on when the \gls{fifo} it read from/written to respectively, and the address loops around to the start when it reaches the end of the \gls{ram} buffer. This `round robin' approach means that the \gls{fifo} can be read from and written to an unlimited amount of times, so long as the total number of words stored is not greater than the depth of the buffer.
 
 In addition to the read/write address pointers, there is a counter which keeps track of the total number of words stored in the buffer. This counter is decremented if a read is requested, and incremented if a write is requested (its value does not change if both a read and a write is requested at the same time, or neither a read or write is requested). This counter is used to generate empty and full signals so that the surrounding logic knows the state of the counter.
 
 \subsubsection{Comparator}
 The comparator is implemented as a state machine that requests data from the \gls{fifo} and asserts the output when the counter matches the data word, as illustrated by the state transition diagram of Figure \ref{fig:comparator-sm}.
 
-\texttt{empty} is the \texttt{empty} signal from the \gls{fifo}, and the \gls{fifo} read request signal is true when the state machine is in the request state.
+\texttt{empty} is the \texttt{empty} signal from the \gls{fifo}, and the \gls{fifo} read request signal is combinationally set to be true when the state machine is in the request state.
 
-\texttt{count} is the value of the system counter, and \texttt{data\_in} is the data read from the \gls{fifo}. The output trigger is true when the state machine is in the \texttt{SM\_ASSERT} state.
+\texttt{count} is the value of the system counter, and \texttt{data\_in} is the data read from the \gls{fifo}. The output trigger is combinationally set to be true when the state machine is in the \texttt{SM\_ASSERT} state.
+
+The state machine therefore works be waiting in the \texttt{SM\_WAIT\_FOR\_DATA} until the \gls{fifo} is not empty, at this point is requests the data from the \gls{fifo} and waits in \texttt{SM\_WAIT} until the correct time to trigger the output, at which point the system transitions to \texttt{SM\_ASSERT} to trigger the output modulator before resetting.
 
 \begin{figure}[ht]
 
@@ -795,7 +790,7 @@ The comparator is implemented as a state machine that requests data from the \gl
 	\node[state]         (assert) [below of=req] {\texttt{SM\_ASSERT}};
 
 	
-	\path (waitData) edge[bend left] node[auto] {\texttt{!empty}} (req)
+	\path (waitData) edge[bend left] node[above] {\texttt{!empty}} (req)
 
 	(req) edge[bend left] node[auto] {} (wait)
 	(wait) edge[loop above] node[auto] {\texttt{count != data\_in}} (wait)
@@ -811,24 +806,63 @@ The comparator is implemented as a state machine that requests data from the \gl
 	\label{fig:comparator-sm}
 \end{figure}
 
-\section{Analogue Design}
+\subsubsection{Pulse Generator}
+The pulse generator is implemented as another simple state machine, illustrated by Figure \ref{fig:pulse-gen-sm}. The system remains in the \texttt{WAIT} state until the generator is enabled once this is true it alternates between the \texttt{HIGH} and \texttt{LOW} states transitioning when an internal counter reaches a set limit (i.e. \texttt{period\_done} is true). Once a second counter, which counts the correct number of pulses to output, reaches its limit, the system transitions back to the \texttt{WAIT} state.
 
-The \gls{fpga} communicates using \SI{3.3}{\volt} \gls{lvcmos} inputs and outputs. This is a great difference from the \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} input, and \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} output range. In addition to this, the input and outputs are \gls{ac} coupled and so require a voltage symmetrical about \SI{0}{\volt}.
+\begin{figure}[ht]
+	
+	\centering
+	
+	\begin{tikzpicture}[stateMachine]
+
+
+	\node[initial,state] (wait) {\texttt{WAIT}};
+	
+	\node[state]         (high) [right of=wait] {\texttt{HIGH}};
+	
+	\node[state]         (low) [right of=high] {\texttt{LOW}};
+	
+	
+	\path (wait) edge[bend left] node[auto] {\texttt{en}} (high)
+	
+	(high) edge[loop above] node[auto] {\texttt{!period\_done}} (high)
+	
+	(high) edge[bend left] node[auto] {\texttt{period\_done}} (low)
+	
+	(low) edge[loop above] node[auto] {\texttt{!period\_done}} (low)
+	
+	(low) edge[bend left=60] node[auto] {\texttt{\shortstack{period\_done AND pulse\_done}}} (wait)
+	
+	(low) edge[bend left] node[auto, xshift=-1cm] {\texttt{\shortstack{period\_done AND\\!pulse\_done}}} (high)
+	
+	(wait) edge[loop above] node[auto] {\texttt{!en}} (wait);
+	
+	
+	\end{tikzpicture}
+	
+	\caption{Pulse Generator State Machine}
+	
+	\label{fig:pulse-gen-sm}
+\end{figure}
+
+\section{Analogue Design} \label{sec:delay-line-ana}
+
+The \gls{fpga} communicates using \SI{3.3}{\volt} \gls{lvcmos} inputs and outputs. This is a great difference from the \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} input, and \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} output range. In addition to this, the input and outputs are \gls{ac} coupled and so require a voltage symmetrical about \SI{0}{\volt}. This section discusses the implementation of this circuitry
 
 \subsection{Input} \label{sec:delay-line-ana-in}
 
-The input voltage needs to be terminated with \SI{68}{\ohm}, the closest E12 preferred resistor value to \SI{70}{\ohm} and the value which is used by the remainder of the reconstruction project to terminate the transmission lines, in addition to this the power system imposes a requirement to remove the \SI{50}{\hertz} power signal discussed in Chapter \ref{sec:power}.
+The input voltage needs to be terminated with \SI{68}{\ohm}, the closest E12 preferred resistor value to \SI{70}{\ohm} and the value which is used by the remainder of the reconstruction project to terminate the transmission lines \cite{burton2014b}. In addition to this, the power system imposes a requirement to remove the \SI{50}{\hertz} power signal discussed in Chapter \ref{sec:power}.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{schematic_portions/delay_line_input}
-	\caption{Delay line input schematic \review{replace with better schematic}}
+	\includegraphicssized{schematics/delay_line}[trim={6cm 11.75cm 11.5cm 6cm},clip] %Trim = {left lower right upper}
+	\caption{Delay line input schematic}
 	\label{fig:delay-line-input-sch}
 \end{figure}
 
 The schematic designed to interface the input signal to the \gls{fpga} is shown in Figure \ref{fig:delay-line-input-sch}.
 
-The \SI{2.2}{\nano\farad} capacitor and \SI{68}{\ohm} resistor act as a low pass filter with a break frequency of \SI{1.1}{\mega\hertz}, as derived in Equation \ref{eq:delay-input-cutoff}. This correctly terminate the incoming \SI{13.5}{\mega\hertz} bursts, as well as presenting a high impedance to the \SI{50}{\hertz} power supply signal.
+The \SI{2.2}{\nano\farad} capacitor and \SI{68}{\ohm} resistor act as a low pass filter with a break frequency of \SI{1.1}{\mega\hertz}, as derived in Equation \ref{eq:delay-input-cutoff}. This correctly terminates the incoming \SI{13.5}{\mega\hertz} bursts, as well as presenting a high impedance to the \SI{50}{\hertz} power supply signal.
 
 \begin{equation}
 f_0 = \frac{1}{2\pi RC} = \frac{1}{2\pi \times \SI{68}{\ohm} \times \SI{2.2}{\nano\farad}} = \SI{1.1}{\mega\hertz} \label{eq:delay-input-cutoff}
@@ -840,27 +874,14 @@ The value of the potentiometer is designed such that it provides negligible load
 
 The Schmitt trigger removes small glitches which may occur on the input so that they do not reach the \gls{fpga} input. it also helps to provide a defined \gls{lvcmos} output signal from the unclean input signal.
 
-The BAT54 protection diodes clamp the input signal to the Schmitt buffer close to its supply rails. The are suitable for the task due to their fast recovery time, \SI{5}{\nano\second} and low forward voltage, \SI{0.4}{\volt} at \SI{10}{\milli\ampere} \cite[p.2]{vishay2013}. In addition their continuous forward current rating, \SI{200}{\milli\ampere} max is far greater than what can be sourced through the \SI{4.7}{\kilo\ohm} potentiometer.
+The BAT54 protection diodes clamp the input signal to the Schmitt buffer close to its supply rails. The are suitable for the task due to their fast recovery time, \SI{5}{\nano\second}, and low forward voltage, \SI{0.4}{\volt} at \SI{10}{\milli\ampere} \cite[p.2]{vishay2013}. Additionally their continuous forward current rating, \SI{200}{\milli\ampere} max is far greater than what can be sourced through the \SI{4.7}{\kilo\ohm} potentiometer.
 
 \subsection{Output} \label{sec:delay-line-ana-output}
 
-The output section of the delay line is required to drive the line with \SI{0}{\volt} when no pulse is present, and a \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} peak-to-peak signal, centered about \SI{0}{\volt} when no signal is present.
+The output section of the delay line is required to drive the line with \SI{0}{\volt} when no pulse is present, and a \SI{\minDelayOutputmV}{\milli\volt} to \SI{\maxDelayOutputmV}{\milli\volt} peak-to-peak signal, centered about \SI{0}{\volt,} when no signal is present.
 
 
-The biasing about \SI{0}{\volt} is achieved by \gls{ac} coupling the output of the amplification circuit. One problem which can occur from this is that the output of the \gls{fpga} will be \SI{0}{\volt} when no signal is being output, but will oscillate between \SI{0}{\volt} and \SI{3.3}{\volt} when a pulse is being transmitted. This is a problem for the circuit because to correctly \gls{ac} couple the signal, the voltage at the capacitor should be half way between the two extreme values, i.e. \SI{1.65}{\volt}. This is illustrated in Figure \ref{fig:delay-line-output-coupling}.
-
-In order to achieve this effect, the internal tri-state buffer capability of the \gls{fpga} is used. This is the purpose of the resistor network shown on the output of the \gls{fpga}. When the \gls{fpga} output is disabled, the two resistors between power rails pull the op-amp non-inverting input to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{2}{\kilo\ohm}} = \SI{1.65}{\volt}$. When the \gls{fpga} drives its output to \SI{3.3}{\volt}, the voltage at the op-amp is equal to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{2.2}{\volt}$, and when the \gls{fpga} drives \SI{0}{\volt}, the voltage at the op-amp will be $\SI{3.3}{\volt} \times\frac{\SI{0.5}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{1.1}{\volt}$. This arrangement is used, rather than having the \gls{fpga} directly drive the non-inverting input of the op-amp in order to avoid driving the op-amp into saturation, as it is powered from the same \SI{0}{\volt} to \SI{3.3}{\volt} rails as the \gls{fpga} \gls{gpio} pins.
-
-The first stage op amp is a unity gain buffer amplifier used to drive the output into a \SI{220}{\ohm} potentiometer. This potentiometer is used to attenuate the signal to the required level from the \SI{1}{\volt} peak to peak amplitude driven by the op-amp to the required level. This also attenuates the bias point away from half way between the voltage rails. For this reason, the \gls{ac} component of the signal is re-biased onto \SI{1.65}{\volt} before buffering by the second amplifier.
-
-The second amplifier is a second unity gain buffer, that critically has an output impedance of \SI{68}{\ohm} and \gls{ac} couples the output signal in order to remove the \gls{dc} bias.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphicssized{schematic_portions/delay_line_output}
-	\caption{Delay line output schematic \review{replace with better schematic}}
-	\label{fig:delay-line-output-sch}
-\end{figure}
+The biasing about \SI{0}{\volt} is achieved by \gls{ac} coupling the output of the amplification circuit. One problem which can occur from this is that, using a standard \gls{lvcmos} output, the output pin of the \gls{fpga} will be \SI{0}{\volt} when no pulse is being transmitted, and will oscillate between \SI{0}{\volt} and \SI{3.3}{\volt} when a pulse is being transmitted. This is a problem for the circuit because to correctly \gls{ac} couple the signal, the voltage at the capacitor should be half way between the two extreme values, i.e. \SI{1.65}{\volt}. This is illustrated in Figure \ref{fig:delay-line-output-coupling}.
 
 \begin{figure}[ht]
 	\centering
@@ -869,7 +890,20 @@ The second amplifier is a second unity gain buffer, that critically has an outpu
 	\label{fig:delay-line-output-coupling}
 \end{figure}
 
-For both amplifiers in the circuit LMH6639 amplifiers are used \cite{ti2013}. This amplifier is chosen because of several desirable properties. Firstly it has a \gls{gbp} of \SI{190}{\mega\hertz}, more than what is necessary to buffer the \SI{13.5}{\mega\hertz} signal with unity gain. In addition to this, unlike many high \gls{gbp} op-amps, the LMH6639 is a voltage feedback architecture simplifying design. Crucially for this application the amplifier is stable at a gain of +1, and has almost rail-to-rail performance at a single supply voltage of \SI{3}{\volt} (typical output range is \SI{75}{\milli\volt} to \SI{2.93}{\volt} driving \SI{150}{\ohm}.
+In order to solve this problem, the internal tri-state buffer capability of the \gls{fpga} is used. This is the purpose of the resistor network shown on the output of the \gls{fpga}. When the \gls{fpga} output is disabled, the two resistors between power rails pull the op-amp non-inverting input to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{2}{\kilo\ohm}} = \SI{1.65}{\volt}$. When the \gls{fpga} drives its output to \SI{3.3}{\volt}, the voltage at the op-amp is equal to $\SI{3.3}{\volt} \times\frac{\SI{1}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{2.2}{\volt}$, and when the \gls{fpga} drives \SI{0}{\volt}, the voltage at the op-amp will be $\SI{3.3}{\volt} \times\frac{\SI{0.5}{\kilo\ohm}}{\SI{1.5}{\kilo\ohm}} = \SI{1.1}{\volt}$. This arrangement is used, rather than having the \gls{fpga} directly drive the non-inverting input of the op-amp in order to avoid driving the op-amp into saturation, as it is powered from the same \SI{0}{\volt} to \SI{3.3}{\volt} rails as the \gls{fpga} \gls{gpio} pins.
+
+The first stage op amp is a unity gain buffer amplifier used to drive the output into a \SI{220}{\ohm} potentiometer. This potentiometer is used to attenuate the signal to the required level from the \SI{1}{\volt} peak to peak amplitude driven by the op-amp to the required level. This also attenuates the bias point away from half way between the voltage rails. For this reason, the \gls{ac} component of the signal is re-biased onto \SI{1.65}{\volt} before buffering by the second amplifier.
+
+The second amplifier is a second unity gain buffer, that critically has an output impedance of \SI{68}{\ohm} and \gls{ac} couples the output signal in order to remove the \gls{dc} bias.
+
+\begin{figure}[ht]
+	\centering
+		\includegraphicssized{schematics/delay_line}[trim={2cm 5.5cm 10.5cm 9.75cm},clip] %Trim = {left lower right upper}
+	\caption{Delay line output schematic}
+	\label{fig:delay-line-output-sch}
+\end{figure}
+
+For both amplifiers in the circuit LMH6639 amplifiers are used \cite{ti2013}. This amplifier is selected because of several desirable properties. Firstly it has a \gls{gbp} of \SI{190}{\mega\hertz}, more than what is necessary to buffer the \SI{13.5}{\mega\hertz} signal with unity gain. In addition to this, unlike many high \gls{gbp} op-amps, the LMH6639 is a voltage feedback architecture simplifying design. Crucially for this application the amplifier is stable at a gain of +1, and has almost rail-to-rail performance at a single supply voltage of \SI{3}{\volt} (typical output range is \SI{75}{\milli\volt} to \SI{2.93}{\volt} driving \SI{150}{\ohm}.
 
 
 \chapter{\chapterStyle{Test Harness Design}} \label{sec:test-harness-design}
@@ -884,18 +918,18 @@ The test harness is able to control the following parameters about the modulated
 	\item Modulator frequency
 \end{enumerate}
 
-In addition to setting the parameters, the test harness is able to store any number in any one of the test \gls{edsac} memory locations.
+In addition to setting the parameters, the test harness is able to store any number in any one of the memory locations.
 
 In order to facilitate control of the test harness, a piece of \gls{pc} software able to interact with the test harness has been created.
 
-Section \ref{sec:test-harness-comms} disucessed the communication format used between the \gls{gui} application and the \gls{fpga}, Section \ref{sec:test-harness-dig} discusses the \gls{hdl} design of the test harness, Section \ref{sec:test-harness-sw} the design of the software interface, and Section \ref{sec:test-harness-ana} the design of the input and output amplifiers.
+Section \ref{sec:test-harness-comms} discusses the communication format used between the \gls{gui} application and the \gls{fpga}, Section \ref{sec:test-harness-dig} discusses the \gls{hdl} design of the test harness, Section \ref{sec:test-harness-sw} the design of the software interface, and Section \ref{sec:test-harness-ana} the design of the input and output amplifiers.
 
 \section{Communication Format} \label{sec:test-harness-comms}
-The \gls{pc} and test harness communicate over a \gls{uart} link. The reason for this is the ubiquity of serial interfaces leading to readily available \gls{usb} to \gls{uart} converters with good driver support. The Lattice \gls{fpga} development boards contain such a converter already on their iCE40 development board, removing the need for external hardware. In addition to this, a \gls{uart} protocol does not have a master since both parties can transmit messages asynchronously across separate data channels. This allows the \gls{fpga} developement board to inform the \gls{pc} of any changes in state without the \gls{pc} having to poll it.
+The \gls{pc} and test harness communicate over a \gls{uart} link. The reason for this is the ubiquity of serial interfaces inside embedded electronics, leading to readily available \gls{usb} to \gls{uart} converters with good driver support. The Lattice \gls{fpga} development boards contain such a converter already on their iCE40 development board, removing the need for external hardware. In addition to this, a \gls{uart} protocol does not have a bus master, instead allowing both parties to transmit messages asynchronously across separate data channels. This allows the \gls{fpga} development board to inform the \gls{pc} of any changes in state without the \gls{pc} having to poll it.
 
-The \gls{uart} packet format is eight data bits, one stop bit, and no parity bits at 9600 baud. This was chosen becuase it is very simple to implement in the \gls{fpga}, and is also the most commmonly used \gls{uart} format.
+The \gls{uart} packet format used is eight data bits, one stop bit, and no parity bits transmitted at 9600 baud. This was chosen because it is very simple to implement in the \gls{fpga}, and is also very commonly used, and widely supported.
 
-Since the messages communicated between the \gls{pc} and \gls{fpga} are greater than eight bits in length, messages will be transmitted as eight packets of eight bit data each. The first packet transmitted is a header packet indicating the type of the message being sent, and the following seven packets are the payload, both each data packet, and the overall message are sent in little-endian format. The contents of the payload can vary across messages, and can contain multiple binary numbers. These numbers can be extracted using bit masking. Table \ref{tbl:msg-types} shows the valid test harness message types. It should be noted that the message types which echo back a received message, such as the acknowledge message, and some of the error messages necessarily omit the last byte from the incoming message, so as to obey the 8 byte message size. This is not a problem however since the last byte of all the messages that do not echo an incoming message is guaranteed to be all zeros.
+Since the messages communicated between the \gls{pc} and \gls{fpga} are greater than eight bits in length, messages will be transmitted as eight packets, each containing eight bits of data. The first packet transmitted is a header packet indicating the type of the message being sent, and the following seven packets are the payload. The message is transmitted using little-endian format. The contents of the payload can vary across messages, and can contain multiple binary numbers. These numbers can be extracted using bit masking. Table \ref{tbl:msg-types} shows the valid test harness message types. It should be noted that the message types which echo back a received message, such as the acknowledge message, and some of the error messages necessarily omit the last byte from the incoming message, so as to obey the eight byte message size. This is not a problem, however, since the last byte of all the messages that do not echo an incoming message is guaranteed to be all zeros.
 
 
 \begin{longtable}{>{\raggedright}p{0.2\textwidth}  >{\raggedright}p{0.3\textwidth} >{\raggedright}p{0.3\textwidth} }
@@ -914,62 +948,72 @@ Since the messages communicated between the \gls{pc} and \gls{fpga} are greater 
 	
 	\endfoot
 		
-		\texttt{received wrong num} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that an incorrect number was received & \texttt{addr} -- The address where the incorrect number was received. \texttt{data} -- the erroneous data received. \tabularnewline
+		\texttt{received wrong num} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that an incorrect number was received. & \texttt{addr} -- The address where the incorrect number was received.
+		
+		\texttt{data} -- the erroneous data received. \tabularnewline
 		
 
 
-	\texttt{replace num} & A message sent by the \gls{pc} to the \gls{fpga} to request replacement of a number in the \gls{edsac} store & \texttt{addr} -- The address of the number to replace. \texttt{data} -- the new data. \tabularnewline
+	\texttt{replace num} & A message sent by the \gls{pc} to the \gls{fpga} to request replacement of a number in the \gls{edsac} store. & \texttt{addr} -- The address of the number to replace.
+	
+	\texttt{data} -- the new data. \tabularnewline
 	
 
 
-		\texttt{replace num done} & A message sent by the \gls{fpga} to the \gls{pc} to inform the \gls{pc} that a number has been received correctly & \texttt{addr} -- The address of the number replaced. \texttt{data} -- the old data. \tabularnewline
+		\texttt{replace num done} & A message sent by the \gls{fpga} to the \gls{pc} to inform the \gls{pc} that a number has been received correctly. & \texttt{addr} -- The address of the number replaced. \texttt{data} -- the old data. \tabularnewline
 		
 		
 
 
-\texttt{mod params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the modulator & \texttt{cycles per half period} -- The number of clock cycles per half period of the modulated signal. \tabularnewline
+\texttt{mod params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the modulator. & \texttt{cycles per half period} -- The number of clock cycles per half period of the modulated signal. \tabularnewline
 
 
 
-\texttt{demod params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the demodulator & \texttt{pulse width} -- The width that each incoming pulse should be demodulated to. \tabularnewline
+\texttt{demod params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the demodulator. & \texttt{pulse width} -- The width that each incoming pulse should be demodulated to. \tabularnewline
 
 
-\texttt{sys status} & A message sent by the \gls{pc} to the \gls{fpga} to change the status of the system& \texttt{run} -- A boolean value that determines whether the system should run or not. \tabularnewline
+\texttt{sys status} & A message sent by the \gls{pc} to the \gls{fpga} to change the status of the system. & \texttt{run} -- A boolean value that determines whether the system should run or not. \tabularnewline
 
 
-\texttt{mem params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the memory manager& \texttt{no nums} -- The number of \gls{edsac} numbers in the store. \texttt{test mode} -- Tells the system if it should output numbers as usual, or output a continuous stream of pulses for testing. \texttt{pulse width} -- The width of the output pulse burst. \texttt{pulse gap} -- The width of the gap between output pulse bursts \tabularnewline
+\texttt{mem params} & A message sent by the \gls{pc} to the \gls{fpga} to change the parameters of the memory manager. & \texttt{no nums} -- The number of \gls{edsac} numbers in the store.
+
+\texttt{test mode} -- Tells the system if it should output numbers as usual, or output a continuous stream of pulses for testing.
+
+\texttt{pulse width} -- The width of the output pulse burst.
+
+\texttt{pulse gap} -- The width of the gap between output pulse bursts. \tabularnewline
 
 
-\texttt{err fifo full} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that its \gls{uart} input \gls{fifo} is full& \tabularnewline
+\texttt{err fifo full} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that its \gls{uart} input \gls{fifo} is full. & None. \tabularnewline
 
 		
-		\texttt{err mem overrun} & A message sent by the \gls{fpga} to the \gls{pc} to indicate it missed a message from the memory manager because dealing with a \gls{uart} request took too long.& \tabularnewline
+		\texttt{err mem overrun} & A message sent by the \gls{fpga} to the \gls{pc} to indicate it missed a message from the memory manager because dealing with a \gls{uart} request took too long. & None. \tabularnewline
 
 
-\texttt{err update whilst run} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that the \gls{pc} attempted to send an update parameters request whilst the system was running.& \texttt{payload} -- the message which caused the error (less the final byte) \tabularnewline
+\texttt{err update whilst run} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that the \gls{pc} attempted to send an update parameters request whilst the system was running. & \texttt{payload} -- the message which caused the error (less the final byte). \tabularnewline
 
 
-\texttt{err invalid msg} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that the \gls{pc} sent the \gls{fpga} a message of invalid type.& \texttt{payload} -- the message which caused the error (less the final byte) \tabularnewline
+\texttt{err invalid msg} & A message sent by the \gls{fpga} to the \gls{pc} to indicate that the \gls{pc} sent the \gls{fpga} a message of invalid type.& \texttt{payload} -- the message which caused the error (less the final byte). \tabularnewline
 
 
-\texttt{ack} & A message sent by the \gls{fpga} to the \gls{pc} to acknowledge that a message has been received and acted upon.& \texttt{payload} -- the message which is being acknowledged (less the final byte) \tabularnewline
+\texttt{ack} & A message sent by the \gls{fpga} to the \gls{pc} to acknowledge that a message has been received and acted upon. & \texttt{payload} -- the message which is being acknowledged (less the final byte). \tabularnewline
 	
 \end{longtable}
 
-Since a large number of messages exist, manually writing header files for the software and \gls{hdl} that encode and decode the messages would be tedious and error prone. In addition it would be likely that as the formats of the messages need to be changed in future, discrepancies between the software and hardware designs would be introduced. In order to eliminate this a Python script was written to automatically generate the Verilog and C++ header files necessary for the software and hardware implementation. This means that changes to the message format only need to happen in one place, and both systems can be updated automatically by regnerating the files.
+Since a large number of messages exist, manually writing header files for the software and \gls{hdl} that encode and decode the messages would be tedious and error prone. In addition it would be likely that as the formats of the messages need to be changed in future, allowing discrepancies between the software and hardware designs would be introduced. In order to eliminate this a Python script was written to automatically generate the Verilog and C++ header files necessary for the software and hardware implementation. This means that changes to the message format only need to happen in one place, and both systems can be updated automatically by regenerating the files.
 
 
 \section{Digital Design} \label{sec:test-harness-dig}
 
-The digital part of the test harness is implemented as a \gls{fpga} design. There are several reasons for this. Firstly, the design is largely based around on parametrised generation of output signals, and sampling of input signals. This is the type of application that lends itself to a hardware design rather than a software design. Secondly, the part of the design which would lend itself to a software application, namely interfacing with the external controller and sending / receiving messages can be designed to be simple enough that a hardware implementation is not too cumbersome. Finally choosing a \gls{fpga} design, targeted towards a Lattice iCE40 \gls{fpga} means that the same IceStorm toolchain as was used for the delay line can be reused for the test harness.
+The digital part of the test harness is implemented as a \gls{fpga} design. There are several reasons for this choice. Firstly, the design is largely based around on parametrised generation of output signals, and sampling of input signals. This is the type of application that lends itself to a hardware design rather than a software design. Secondly, the part of the design which would lend itself to a software application, namely interfacing with the external controller and sending / receiving messages is designed to be simple enough that a hardware implementation is not too cumbersome. Finally choosing a \gls{fpga} design, targeted towards a Lattice iCE40 \gls{fpga} means that the same IceStorm toolchain as was used for the delay line can be reused for the test harness.
 
 A block diagram of the digital test harness architecture is shown in Figure \ref{fig:test-harnesss-system-arch}. At the centre of the diagram is the controller. This maintains system state, and acts on received messages and events as they occur, by polling both the memory manager and received message \gls{fifo}.
 
-The two signal paths above the controller are the transmit and receive datapaths. Both have a \gls{fifo} so that messages can be enqueued for transmission without having to wait for the \gls{uart} to finish transmitting the current message, and messages can be received faster than the controller is able to deal with them. The message assembler block waits to receive eight \gls{uart} packets, and then enqueues the assembled \SI{64}{\bit} word in the \gls{fifo}, and the message disassembler does the opposite taking a \SI{64}{\bit} word from the \gls{fifo} and transmitting it as eight separate packets using the \gls{uart} transmitter.
+The two signal paths above the controller are the transmit and receive data paths. Both have a \gls{fifo} so that messages can be enqueued for transmission without having to wait for the \gls{uart} to finish transmitting the current message, and messages can be received faster than the controller is able to instantaneously handle them. The message assembler block waits to receive eight \gls{uart} packets, and then enqueues the assembled \SI{64}{\bit} word in the \gls{fifo}, and the message disassembler does the opposite taking a \SI{64}{\bit} word from the \gls{fifo} and transmitting it as eight separate packets using the \gls{uart} transmitter.
 
 The demodulator block samples its input and when it receives a rising edge it outputs a pulse of the length determined by its parameters. This mimics the analogue demodulation which occurs in \gls{edsac}.
 
-The modulator does the opposite, it contains a free running oscillator whose freqeuncy is set by its parameters. The output of the system is then the logical AND of the memory manager output and the oscillator output.
+The modulator does the opposite, it contains a free running oscillator whose frequency is set by its parameters. The output of the system is then the logical AND of the memory manager output and the oscillator output.
 
 \begin{figure}[ht]
 	\centering
@@ -1084,7 +1128,7 @@ The input is clocked into the received number shift register. When an entire wor
 
 \section{Software Design}  \label{sec:test-harness-sw}
 
-The \gls{pc} software to interact with the test harness must be capable of keeping track of the system state, sending messages to the delay line, and interpreting the results, and presenting that information to the user. A command line tool was considered for this, but in order for additional clarity it was decided to create a \gls{gui} application, shown in Figure \ref{fig:mem-gui-screenshot}. Despite this, it would be fairly simple to replace the \gls{gui} with a command line frontend, due to the object orientated nature of the design.
+The \gls{pc} software to interact with the test harness must be capable of keeping track of the system state, sending messages to the delay line, and interpreting the results, and presenting that information to the user. Initially, a command line tool was considered for this but, in order to provide a simpler user interface, it was decided to create a \gls{gui} application, shown in Figure \ref{fig:mem-gui-screenshot}. Despite this, it would be fairly simple to replace the \gls{gui} with a command line frontend, due to the object orientated nature of the design.
 
 \begin{figure}[ht]
 	\centering
@@ -1093,11 +1137,11 @@ The \gls{pc} software to interact with the test harness must be capable of keepi
 	\label{fig:mem-gui-screenshot}
 \end{figure}
 
-The software is designed to be cross-platform and due to this it uses open-source, cross platform libraries to implement the interface to the outside world, namely the \gls{gui} framework and \gls{usb} to \gls{uart} converter. Additionally the CMake build system is used to allow compilation on different platforms \cite{cmake2017}. The \gls{gui} is implemented using gtkmm, which is a C++ wrapper for the popular GTK+ \gls{gui} framework \cite{cumming2017}. The library used for serial communication is libftdi, which is an open-source alternative to the proprietary drivers provided by \gls{ftdi} \cite{intra2net2017}.
+The software is designed to be cross-platform and due to this it uses open-source, cross platform libraries to implement the interface to the outside world, namely the \gls{gui} framework and \gls{usb} to \gls{uart} converter. Additionally, the CMake build system is used to allow compilation on different platforms \cite{cmake2017}. The \gls{gui} is implemented using gtkmm, which is a C++ wrapper for the popular GTK+ \gls{gui} framework \cite{cumming2017}. The library used for serial communication is libftdi, which is an open-source alternative to the proprietary drivers provided by \gls{ftdi} for their \gls{usb} to \gls{uart} bridge \glspl{ic} \cite{intra2net2017}.
 
-In order to allow for a modular design, the system is comprised of a series of classes. The central class is called \texttt{MainGui}. This class is responsible for creating the \gls{gui} and responding to human input. \texttt{main()} passes control to this class once some initialisation has been performed. This class then relies on a series of small classes which are responsible for the \gls{gui} elements of each sub-section of the display. These small classes all inherit from a virtual parent class, that provides a common interface for \texttt{MainGui} to communicate with the subclasses. Allowing operations message passing to occur simply via iterating over a list of references to each \gls{gui} element.
+In order to allow for a modular design, the system is comprised of a series of classes. The central class is called \texttt{MainGui}. This class is responsible for creating the \gls{gui} and responding to human input. \texttt{main()} passes control to this class once some initialisation has been performed. This class then relies on a series of small classes which are responsible for the \gls{gui} elements of each sub-section of the display. These small classes all inherit from a virtual parent class, that provides a common interface for \texttt{MainGui} to communicate with the subclasses. Allowing operations such as message passing between the classes in the \texttt{MainGui} processing loop to occur simply via iterating over a list of references to each \gls{gui} element.
 
-Aside from the classes relating to the operation of the \gls{gui}, there are a number of other classes which implement lower level operations of the software. \texttt{FtdiWrapper} is a class written to create a C++ wrapper for the, C, libftdi library. This is the class which handles setting up the serial port and transmitting and receiving messages via it. One layer of abstraction above this is the \texttt{UartManager} class. This class maintains queues of messages to be sent to, or which have been received from, the \gls{fpga}. It is also responsible for ensuring that the \gls{fpga} acknowledges each message. The messages stored in these message queues are of the type \texttt{UartMsg}. This is a base class which encapsulates a \gls{uart} message and provides access to the underlying data, as well as the header and payload bits. In addition to this for each message type there is a derived class which provides a print function to print the various data words inside the message, as well as getter and setter functions for each field. The \texttt{UartMsg} header is automatically generated by the Python software described in Section \ref{sec:test-harness-comms}.
+Aside from the classes relating to the operation of the \gls{gui}, there are a number of other classes which implement lower level operations of the software. \texttt{FtdiWrapper} is a class written to create a C++ wrapper for the, C, libftdi library. This is the class which handles setting up the serial port and the transmitting and receiving of messages. One layer of abstraction above this is the \texttt{UartManager} class. This class maintains queues of messages to be sent to, or which have been received from, the \gls{fpga}. It is also responsible for ensuring that the \gls{fpga} acknowledges each message. The messages stored in these message queues are of the type \texttt{UartMsg}. This is a base class which encapsulates a \gls{uart} message and provides access to the underlying data, as well as the header and payload bits. In addition to this for each message type there is a derived class which provides a print function to print the various data words inside the message, as well as getter and setter functions for each field. The \texttt{UartMsg} header is automatically generated by the Python software described in Section \ref{sec:test-harness-comms}.
 
 The other classes which manage lower level operations are the \texttt{StatusManager} and \texttt{MemoryManger} classes. The \texttt{StatusManager} class keeps track of whether the system is running or not, as well as the parameters for the various \gls{fpga} modules. It also generates objects of type \texttt{UartMsg} to change the system status or parameters. The \texttt{MemoryManger} class manages the status of a single word of \gls{edsac} memory. It keeps the current value, sends messages to the test harness to update the value and ensures that the corresponding update messages are received. The system uses an array of these objects to keep track of the entire store.
 
@@ -1107,26 +1151,26 @@ Unfortunately, as discussed in Section \ref{sec:review-delay-electrical}, interf
 
 \subsection{Input}
 
-The input to the delay line needs to be able to amplify the signal from the attenuated level output by the delay line, and present the \gls{fpga} with a \SI{0}{\volt} to \SI{3.3}{\volt} logic level siganl.
+The input to the delay line needs to be able to amplify the signal from the attenuated level output by the delay line, and present the \gls{fpga} with a \SI{0}{\volt} to \SI{3.3}{\volt} logic level signal
 
 The circuitry to do this is relatively simple, and is illustrated in Figure \ref{fig:test-harness-input-sch}. A two stage non inverting amplifier is sufficient to amplify the incoming pulse to a voltage level suitable for the Schmitt trigger. The gain of each op-amp is adjustable in order to accommodate variation in the output voltage of the delay line.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{schematic_portions/test_harness_input}
-	\caption{Test harness input schematic \review{replace with better schematic, and add schmitt + diodes}}
+	\includegraphicssized{schematics/test_harness}[trim={12.25cm 13.5cm 2.5cm 2.5cm},clip] %Trim = {left lower right upper}
+	\caption{Test harness input schematic}
 	\label{fig:test-harness-input-sch}
 \end{figure}
 
-The LMH6639 op-amps selected for the delay line output, discussed in Section \ref{sec:delay-line-ana-output} are also suitable for this purpose. The \SI{190}{\mega\hertz} \gls{gbp} allows for a amplification of fourteen times per stage before appreciably attenuating the \SI{13.5}{\mega\hertz} carrier frequency. The limited slew rate of \SI{172}{\volt\per\micro\second} is also not a problem due to the relatively low amplitude of both the input and output signals.
+The LMH6639 op-amps selected for the delay line output, discussed in Section \ref{sec:delay-line-ana-output} are also suitable for this purpose. The \SI{190}{\mega\hertz} \gls{gbp} allows for a amplification of fourteen times per stage before appreciably attenuating the \SI{13.5}{\mega\hertz} carrier frequency. The limited slew rate of \SI{172}{\volt\per\micro\second} is also not a concern due to the relatively low amplitude of both the input and output signals.
 
-It should be noted that a gain of fourteen times per stage, meaning a total gain of 196, would amplify a \SI{10}{\milli\volt} peak to peak signal to \SI{1.96}{\volt} peak to peak. The positive portion of this would only be \SI{0.98}{\volt} peak, which is not high enough for the schmitt trigger to detect. This is not a problem however since the delay line can be tested using the higher \SI{100}{\milli\volt} peak to peak signal used by the reconstruction effort. If it is desirable in the future to test the lower amplitude signal then a further amplification stage can be added.
+It should be noted that a gain of fourteen times per stage, meaning a total gain of 196, would amplify a \SI{10}{\milli\volt} peak to peak signal to \SI{1.96}{\volt} peak to peak. The positive portion of this would only be \SI{0.98}{\volt} peak, which is not high enough for the Schmitt trigger to detect. This is not a problem, however, since the delay line can be tested using the higher \SI{100}{\milli\volt} peak to peak signal amplitude used by the reconstruction project. If it is desirable in the future to test the lower amplitude signal then a further amplification stage can be added.
 
-The schmitt trigger provides a clean square wave to the \gls{fpga} for detection of the input pulses, and provides protection against incorrect detection of noise on the line. The diodes on the input of the schmitt trigger are to protect the schmitt trigger input from the negative pulses output by the op-amp by clamping the input to just below \SI{0}{\volt}, in a similar manner to the circuitry discussed in Section \ref{sec:delay-line-ana-in}.
+The Schmitt buffer provides a clean square wave to the \gls{fpga} for detection of the input pulses, and provides protection against incorrect detection of noise on the line. The diodes on the input of the Schmitt buffer are to protect the Schmitt buffer input from the negative pulses output by the op-amp by clamping the input to just below \SI{0}{\volt}, in a similar manner to the circuitry discussed in Section \ref{sec:delay-line-ana-in}.
 
 \subsection{Output}
 
-The output circuitry of the test harness is similarly similar in principle to the input circuitry, but is more complex in the execution. In contrast to the amplification of the input signal, the output signal is very large in amplitude, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} peak to peak, and needs to be able to drive this into a \SI{68}{\ohm} load. This means that when a tone burst is being transmitted \SI{4.5}{\watt} is delivered to the load, as shown by Equation \ref{eq:test-harness-load-i}, in this equation the voltage is \SI{17.5}{\volt}. This is because the maximum output from \gls{edsac} is a \SI{35}{\volt} square wave symmetric about \SI{0}{\volt}, this is equivalent to delviering a constant voltage of \SI{17.5}{\volt} to the load.
+The output circuitry of the test harness is similar in principle to the input circuitry, but is more complex in the execution. In contrast to the amplification of the input signal, the output signal is very large in amplitude, \SI{\minDelayInputV}{\volt} to \SI{\maxDelayInputV}{\volt} peak to peak, and needs to be able to drive this into a \SI{68}{\ohm} load. This means that, when a tone burst is being transmitted, \SI{4.5}{\watt} is delivered to the load, as shown by Equation \ref{eq:test-harness-load-i}. In this equation the voltage is \SI{17.5}{\volt}, this is because the maximum output from \gls{edsac} is a \SI{35}{\volt} square wave symmetric about \SI{0}{\volt}, this is equivalent to delivering a constant voltage of \SI{17.5}{\volt} to the load.
 
 \begin{equation}
 P = \frac{V^2}{R} = \frac{17.5^2}{68} = \SI{4.5}{\watt} \label{eq:test-harness-load-i}
@@ -1134,9 +1178,9 @@ P = \frac{V^2}{R} = \frac{17.5^2}{68} = \SI{4.5}{\watt} \label{eq:test-harness-l
 
 In order to simplify implementation of the output stage, one restriction was added. It was decided that the amplifier selected would be limited to voltage rails of $\pm \SI{15}{\volt}$. This widely improves the range of op-amps available to purchase as the vast majority are not specified for voltages above \SI{30}{\volt}. This design choice does, however, mean that maximum peak to peak output voltage will be a little under \SI{30}{\volt}. This is lower than the maximum voltage driven by \gls{edsac}, but is large enough to demonstrate the principle of the delay line correctly receiving a large amplitude pulse. It is simple to reason, given the topology of the delay line input stage discussed in Section \ref{sec:delay-line-ana-in}, that if the delay line works well with lower amplitude pulses, \SI{35}{\volt} peak to peak pulses will not present a problem.
 
-To implement the amplification circuit, there were several requirements for the amplifer. First the amplifier must have the ability to be powered from  $\pm \SI{15}{\volt}$ rails, as previously discussed. In addition, the amplifier must have a high \gls{gbp}, at least several times greater than the \SI{13.5}{\mega\hertz} carrier frequency to allow modest amplification.
+To implement the amplification circuit, there were several requirements for the amplifier. First the amplifier must have the ability to be powered from  $\pm \SI{15}{\volt}$ rails, as previously discussed. In addition, the amplifier must have a high \gls{gbp}, at least several times greater than the \SI{13.5}{\mega\hertz} carrier frequency to allow modest amplification.
 
-In addition to this, the amplifier must have a slew rate greater than \SI{810}{\volt\per\micro\second}, as calculated by Equation \ref{eq:test-harness-slew}. This equation calculates the minimum slew rate in order for the amplifier to transition from the lower output rail to the upper output rail in half a period of the modulation frequency, meaning at this slew rate a triangle wave would be output.
+Another specification required that the amplifier have a slew rate greater than \SI{810}{\volt\per\micro\second}, as calculated by Equation \ref{eq:test-harness-slew}. This equation calculates the minimum slew rate in order for the amplifier to transition from the lower output rail to the upper output rail in half a period of the modulation frequency, meaning at this slew rate a triangle wave would be output.
 
 \begin{align}
 	SR &\geq \frac{V_\text{pk-pk}}{\frac{1}{2} \times \frac{1}{f_m}}  \nonumber \\
@@ -1145,32 +1189,41 @@ In addition to this, the amplifier must have a slew rate greater than \SI{810}{\
 	&\geq \SI{810}{\volt\per\micro\second} \label{eq:test-harness-slew}
 \end{align}
 
-Finally the op-amp must be able to deliver a current of at least \SI{220}{\milli\ampere}, as calculated by Equation \ref{eq:test-harness-output-i}. This equation calculates the minimum output current that the op-amp must be able to deliver assuming that two op-amps are being used in parallel to deliver a continuous tone burst to the delay line.
+Finally the op-amp must be able to deliver a current of at least \SI{220}{\milli\ampere}, as calculated by Equation \ref{eq:test-harness-output-i}. This equation calculates the minimum output current that the op-amp must be able to deliver assuming that two op-amps are being used in parallel to deliver a tone burst of 50\% duty cycle to the load.
 
 \begin{align}
-I &\geq \frac{1}{2} \times \frac{V}{R}  \nonumber \\
-&\geq \frac{1}{2} \times \frac{15}{68}  \nonumber \\
-&\geq \SI{220}{\milli\ampere} \label{eq:test-harness-output-i}
+I &\geq \frac{1}{2} \times \frac{1}{2} \times \frac{V}{R}  \nonumber \\
+&\geq \frac{1}{2} \times \frac{1}{2} \times \frac{15}{68}  \nonumber \\
+&\geq \SI{110}{\milli\ampere} \label{eq:test-harness-output-i}
 \end{align}
 
 Surveying the op-amps available for purchase, the LM7372 was selected \cite{ti2014}. This op-amp is specified for $\pm \SI{15}{\volt}$ operation, has a very high slew rate of \SI{3000}{\volt\per\second}, and a \gls{gbp} of \SI{120}{\mega\hertz}. In addition to this the amplifiers have a maximum output current of \SI{150}{\milli\ampere} per amplifier, with two amplifiers present per package.
 
 Having selected the amplifier, the circuit of Figure \ref{fig:test-harness-output-sch} was designed to drive the delay line. This amplifier is in three stages. The first stage is a passive biasing stage that presents the input to the first amplifier with \SI{0}{\volt} when nothing is being transmitted, and $\pm \SI{1.65}{\volt}$ when the tone burst is being transmitted. This first stage amplifier buffers the input signal and amplifies it with gain tunable by potentiometer.
 
-The second stage is an output buffer which uses two parallel op-amps to buffer the signal and drive the load. The op-amps outputs are connected in parallel with a modest current sharing resistance. Ideally the series resistance on the output of each op-amp should be twice the characteristic impedance of the transmission line, as discussed in \cite{intersil2005}. This was not done however because a series resistance of $2 \times \SI{68}{\ohm} = \SI{136}{\ohm}$ would limit the peak output voltage to slightly less than $\SI{15}{\volt} \times \frac{\SI{68}{\ohm}}{\SI{68}{\ohm} + \SI{136}{\ohm}} = \SI{5}{\volt}$, as the output op-amps saturate close to the voltage rails. Fortunately reflected pulses are not an issue in this case since the delay line only needs to detect the carrier, integrity of the pulses is not critical.
-
+The second stage is an output buffer which uses two parallel op-amps to buffer the signal and drive the load. The op-amps outputs are connected in parallel with a modest current sharing resistance. Ideally the series resistance on the output of each op-amp should be twice the characteristic impedance of the transmission line, as discussed in \cite{intersil2005}. This was not possible however because a series resistance of $2 \times \SI{68}{\ohm} = \SI{136}{\ohm}$ would limit the peak output voltage to slightly less than $\SI{15}{\volt} \times \frac{\SI{68}{\ohm}}{\SI{68}{\ohm} + \SI{136}{\ohm}} = \SI{5}{\volt}$, as the output op-amps saturate close to the voltage rails. Fortunately reflected pulses are not an issue in this case since the delay line only needs to detect the carrier, integrity of the pulses is not critical.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{schematic_portions/test_harness_output}
-	\caption{Test harness input schematic \review{replace with better schematic}}
+	\includegraphicssized{schematics/test_harness}[trim={1.25cm 3.5cm 12.1cm 9.5cm},clip] %Trim = {left lower right upper}
+	\caption{Test harness output schematic}
 	\label{fig:test-harness-output-sch}
 \end{figure}
+
+It should be noted that despite the design and implementation containing the twin amplifier output stage, the second amplifier is disconnected in the final matrix board implementation. This is due to issues encountered with the stability of the op-amps when driving the load in parallel. This does not matter since consultation with the datasheet shows that the \SI{150}{\milli\ampere} previously stated was the short circuit current at $\pm \SI{5}{\volt}$, when using a $\pm \SI{15}{\volt}$ supply a single amplifier can source \SI{260}{\milli\ampere}, and sink \SI{250}{\milli\ampere}, which is greater than double the \SI{110}{\milli\ampere} of Equation \ref{eq:test-harness-output-i}. Therefore, with adequate heat sinking, a single amplifier can drive the load. This was achieved in practice by `dead-bug' soldering the amplifier \gls{ic} upside down to expose the heatsink pad, then attaching a high thermal mass heatsink and further cooling with a fan, illustrated in Figure \ref{fig:test-harness-heatsink}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphicssized{driver-heatsink}
+	\caption{Test harness cooling solution}
+	\label{fig:test-harness-heatsink}
+\end{figure}
+
 
 \chapter{\chapterStyle{Simulation and Verification}} \label{sec:verification}
 
 \section{\glsentryshort{spice} Simulation}
-As well as building practically building and testing the circuits, it was desirable to simulate the performance of the circuits using LTspice \cite{linear2017}. There were two main reasons for this. Firstly, building the circuits and testing the circuits practically takes a large amount of time, and involves expense of purchasing components. Therefore it was desirable to limit the number of iterations of this process by first testing performance in simulation.
+As well as practically building and testing the circuits, it was desirable to simulate the performance of the circuits using LTspice \cite{linear2017}. There were two main reasons for this. Firstly, building the circuits and testing the circuits practically takes a large amount of time, and involves expense of purchasing components. It was therefore desirable to limit the number of iterations of this process by first testing performance in simulation.
 
 In addition to this, interfacing with the \gls{edsac} circuitry is difficult since it requires travel to Bletchley, and consideration of the practicalities of interfacing with high voltage valve circuitry.
 
@@ -1178,27 +1231,27 @@ This chapter presents the results of the various simulations which were run. Sec
 
 \subsection{Valve Models} \label{sec:spice-valve-models}
 
-In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This previous work has created models for the valves based both on the datasheet characteristics, as well as practical testing with the valves used in \gls{edsac}. The models produced had been tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
+In order to model the store regeneration circuitry, it was necessary to have models for the valves used in the design. Fortunately, work has been done previously to create models for the purposes of simulating \gls{edsac} circuitry \cite{linnington2015}. This work has created models for the valves based both on the datasheet characteristics, as well as practical testing with the valves used in \gls{edsac}. The models produced had been tested with simulations of some parts of the store regeneration circuitry and was found to match practical measurements well.
 
-An existing workflow was provided to produce \gls{spice} netlists which use the models from the DesignSpark \cite{rs2017} schematics which the reconstruction project uses. Instead of using this workflow however it was decided to create an LTspice symbol for each valve model and reconstruct the relevant parts of each schematic using LTspice. This decision was made in order to allow better integration with the other simulation models, and to allow for faster iteration of the design.
+An existing workflow was provided to produce \gls{spice} netlists which use the models from the DesignSpark \cite{rs2017} schematics which the reconstruction project uses \cite{linnington2015}. Instead of using this workflow, it was decided to create an LTspice symbol for each valve model and reconstruct the relevant parts of each schematic using LTspice. This decision was made in order to allow better integration with the other simulation models, and to allow for faster iteration of the design.
 
 \subsection{Delay Line Input Simulation}
-The main \gls{spice} simulation run is the simulation of \gls{edsac} output, and delay line input. The reason that this simulation is important is that it models several of the concerns for integration with the rest of \gls{edsac}, namely:
+The main \gls{spice} simulation is the simulation of \gls{edsac} output, and delay line input. This simulation is important because it models several of the concerns for integration with the rest of \gls{edsac}, namely:
 \begin{itemize}
 	\item Checking that the method of phantom powering does not effect the store regeneration output
 	\item Checking that the phantom power circuitry works correctly
 	\item Checking that the pulses are able to be detected and output to the \gls{fpga}
 \end{itemize}
 
-In order to run the simulation, first a model had to be created of the output of the store regeneration unit. In order to do this an LTspice schematic was created containing the store regeneration circuitry from test point 22 to the output This section was chosen because the expected signal at TP22 is known from the commissioning documentation of \gls{edsac} \cite[p.7]{linnington2016b}, and so simulation from this point onwards is sufficient to model the output of the store regeneration unit.
+In order to run the simulation, first a model had to be created of the output of the store regeneration unit. To achieve this an LTspice schematic was created containing the store regeneration circuitry from test point 22 to the output. This section was chosen because the expected signal at TP22 is known from the commissioning documentation of \gls{edsac} \cite[p.7]{linnington2016b}, and so simulation from this point onwards is sufficient to model the output of the store regeneration unit.
 
-This model was then tested and works correctly with the correct \SI{68}{\ohm} termination.
+This model was then tested and works correctly when terminated with \SI{68}{\ohm}.
 
 The valve heater voltage was then modelled as a \SI{50}{\hertz} \gls{ac} source, and connected to the store regeneration output with the correct inductance.
 
-Following this both the power generation frontend and the pulse detection frontend of the delay line were added to the schematic. The pulse regeneration frontend is modelled as far as the schmitt trigger which connects to the \gls{fpga}, and the power frontend is modelled as far as the outputs of the \gls{ldo} regulator on the \gls{fpga} development board, which is loaded with resistors that approximate the anticipated load.
+Following this, both the power generation frontend and the pulse detection frontend of the delay line were added to the schematic. The pulse regeneration frontend is modelled as far as the Schmitt buffer which connects to the \gls{fpga}, and the power frontend is modelled as far as the outputs of the \gls{ldo} regulator on the \gls{fpga} development board, which is loaded with resistors that approximate the anticipated load.
 
-Figure \ref{fig:psu-init} shows the simulation of the voltage rails startup from \SI{0}{\volt} across the capacitor, gradually charging to just under \SI{6}{\volt}. The \gls{ldo} regulator is able to use this to generate stable \SI{3.3}{\volt} and \SI{1.2}{\volt} rails. The green signal shows the input to the delay line, the blue signal shows the voltage input to the \gls{fpga} \gls{ldo} regulator, the red signal is the \SI{3.3}{\volt} rail, and the blue signal the \SI{1.2}{\volt} rail. It should be noted that in this simulation the store regeneration output is disconnected. This is done for simulation speed as simulating the store regeneration output also would cause the simulation to take an unmanageably long time. A simulation was run of one \SI{50}{\hertz} cycle to ensure that the store regeneration output did not pass to the power supply rail, and this did not occur.
+Figure \ref{fig:psu-init} shows the simulation of the voltage rails start-up from \SI{0}{\volt} across the capacitor, gradually charging to just under \SI{6}{\volt}. The \gls{ldo} regulator is able to use this to generate stable \SI{3.3}{\volt} and \SI{1.2}{\volt} rails within \SI{2}{\second} from starting the \SI{50}{\hertz} generator. The green signal shows the input to the delay line, the blue signal shows the voltage input to the \gls{fpga} \gls{ldo} regulator, the red signal is the \SI{3.3}{\volt} rail, and the blue signal the \SI{1.2}{\volt} rail. It should be noted that in this simulation the store regeneration output is disconnected. This is done for simulation speed as simulating the store regeneration output also would cause the simulation to take an unmanageably long time. A simulation was run of one \SI{50}{\hertz} cycle to ensure that the store regeneration output did not pass to the power supply rail, and this did not occur.
 
 \begin{figure}[ht]
 	\centering
@@ -1207,7 +1260,7 @@ Figure \ref{fig:psu-init} shows the simulation of the voltage rails startup from
 	\label{fig:psu-init}
 \end{figure}
 
-Figure \ref{fig:fpga-input-sim} shows a simulation of a pulse burst from the store regeneration unit output, coupled onto \SI{50}{\hertz} valve heater signal. In this simulation the green signal is the output of the store regeneration unit. The red signal is the output of the store regeneration unit with the \SI{50}{\hertz} signal filtered out, and the blue signal is the output of the schmitt trigger which is an input to the \gls{fpga}. It can be seen that the signal input to the \gls{fpga} exactly follows the positive going pulses of the modulated packet.
+Figure \ref{fig:fpga-input-sim} shows a simulation of a pulse burst from the store regeneration unit output, coupled onto \SI{50}{\hertz} valve heater signal. In this simulation the green signal is the output of the store regeneration unit. The red signal is the output of the store regeneration unit with the \SI{50}{\hertz} signal filtered out, and the blue signal is the output of the Schmitt trigger which is an input to the \gls{fpga}. It can be seen that the signal input to the \gls{fpga} exactly follows the positive going pulses of the modulated packet.
 
 
 \begin{figure}[ht]
@@ -1218,7 +1271,7 @@ Figure \ref{fig:fpga-input-sim} shows a simulation of a pulse burst from the sto
 \end{figure}
 
 \subsection{Store Regeneration Input Simulation}
-The purpose of simulating the input of the store regeneration unit is to ensure that biasing the store regeneration output onto the heater power supply doesn't allow any of the modulated carrier signal to couple into the sensitive analogue input section. The theory of why this would happen is illustrated in Figure \ref{fig:store-regen-input-sch}. Pentodes often have a non-insignificant parasitic capacitance between their heater pins, and cathode. This normally would not be a problem for the \SI{50}{\hertz} \gls{ac} heater supply, as even a moderately large parasitic capacitance would present a very high impedance to \SI{50}{\hertz}. If, however, there is a significant \SI{13.5}{\mega\hertz} signal present on the heater power supply, then this could cause a problem as the frontend of the store regeneration unit is very sensitive. On the orignal pulses of as little as \SI{10}{\milli\volt} peak to peak could be detected, as discussed in Section \ref{sec:review-delay-electrical}.
+The purpose of simulating the input of the store regeneration unit is to ensure that biasing the store regeneration output onto the heater power supply does not allow any of the modulated carrier signal to couple into the sensitive analogue input section. The theory of why this would happen is illustrated in Figure \ref{fig:store-regen-input-sch}. Pentodes typically have a non-insignificant parasitic capacitance between their heater pins, and cathode. This would not ordinarily cause issues \SI{50}{\hertz} \gls{ac} heater supply, as even a moderately large parasitic capacitance would present a very high impedance to \SI{50}{\hertz}. If, however, there is a significant \SI{13.5}{\mega\hertz} signal present on the heater power supply, then this could cause a problem as the frontend of the store regeneration unit is very sensitive. On the original pulses of as little as \SI{10}{\milli\volt} peak to peak could be detected, as discussed in Section \ref{sec:review-delay-electrical}.
 
 \begin{figure}[ht]
 	\centering
@@ -1266,11 +1319,11 @@ The purpose of simulating the input of the store regeneration unit is to ensure 
 \end{figure}
 
 %\subsubsection{Modification of valve model}
-Figure \ref{fig:store-regen-input} shows the input portion of the store regeneration circuitry. The pentodes used here are EF54 pentodes, and the capacitance of concern is the parasitic capacitance between pins five and nine of each pentode.
+Figure \ref{fig:store-regen-input} shows the input portion of the store regeneration circuitry. The pentodes used here are EF54 pentodes, and the capacitance of concern is the parasitic capacitance between pins one and five of each pentode.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{store_regen_sch}[trim={0 12cm 16cm 0},clip] %Trim = {left lower right upper}
+	\includegraphicssized{store_regen_sch}[trim={0.5cm 12cm 16cm 0.5cm},clip] %Trim = {left lower right upper}
 	\caption{Store Regeneration Unit Input \cite{burton2014b}}
 	\label{fig:store-regen-input}
 \end{figure}
@@ -1279,14 +1332,14 @@ The first stage of simulation was to create a simulation model of the store rege
 
 The next stage was to look at the EF54 model netlist and check if any capacitance was present between pins five and one of the model. No capacitance was present, and so the parasitic capacitance was not modelled.
 
-The datasheet was then consulted, and it was found that the heater-cathode capacitance was not specified, however several other capacitances were, namely the input capacitance, output capacitance, annode to gate 1 capacitance, and gate 1 to gate 2 capacitance \cite{mullardb}. The largest of these capacitances is the input capacitance, \SI{6.2}{\pico\farad}, and the smallest is the anode to gate 1 capacitance at \SI{0.02}{\pico\farad}. Since the capacitance was not stated in the datasheet, it seems reasonable to assume that it is not largely more significant than those which are stated, and thus \SI{10}{\pico\farad} was chosen as the value to model.
+The datasheet was then consulted, and it was found that the heater-cathode capacitance was not specified, however several other capacitances were, namely the input capacitance, output capacitance, anode to gate one capacitance, and gate one to gate two capacitance \cite{mullardb}. The largest of these capacitances is the input capacitance, \SI{6.2}{\pico\farad}, and the smallest is the anode to gate 1 capacitance at \SI{0.02}{\pico\farad}. Since the capacitance was not stated in the datasheet, it seems reasonable to assume that it is not largely more significant than those which are stated, and thus \SI{10}{\pico\farad} was chosen as the value to model.
 
 In order to simulate the effect of the output coupling onto the heater voltage, a \SI{13.5}{\mega\hertz}, \SI{30}{\volt} peak-to-peak generator was connected to the heater voltage via a \SI{1}{\milli\henry} inductor, mimicking the proposed output circuit.
 
 
 Figure \ref{fig:rf-disconnected} shows the result of the simulation with the \SI{13.5}{\mega\hertz} tone generator disconnected. This is the waveform which would normally be observed at test point five, and is what the modified topology should aim to match. Figure \ref{fig:rf-1mh} shows the result with the added \SI{1}{\milli\henry} inductor. Figure \ref{fig:rf-1mh} matches Figure \ref{fig:rf-disconnected} almost exactly, and so the proposed circuit works correctly.
 
-As a test, the \SI{1}{\milli\henry} inductor used to connect the \SI{13.5}{\mega\hertz} tone generator to the output was replaced with a \SI{10}{\nano\henry} inductor. This presents a much higher impedance to the \SI{13.5}{\mega\hertz} tone, and thus one would expect the waveform at test point five to be disrupted. Figure \ref{fig:rf-10nh} shows this result, and the effect of the tone generator can clearly be seen, this demonstrates that the modified valve model works as anticipated.
+As a test, the \SI{1}{\milli\henry} inductor used to connect the \SI{13.5}{\mega\hertz} tone generator to the output was replaced with a \SI{10}{\nano\henry} inductor. This presents a much lower impedance to the \SI{13.5}{\mega\hertz} tone, and thus one would expect the waveform at test point five to be disrupted. Figure \ref{fig:rf-10nh} shows this result, and the effect of the tone generator can clearly be seen, this demonstrates that the modified valve model works as anticipated.
 
 \begin{figure}[ht]
 	\centering
@@ -1319,69 +1372,39 @@ As a test, the \SI{1}{\milli\henry} inductor used to connect the \SI{13.5}{\mega
 
 % \subsection{Delay Line Output Simulation} %Don't include this for brevity
 
-\section{\glsentryshort{hdl} Verification}
+\section{\glsentryshort{hdl} Verification} \label{sec:hdl-verif}
 Due to the lengthy iteration cycle required to synthesise a \gls{hdl} design and test it in hardware, as well as the necessity of treating a synthesised \gls{hdl} design as a black-box model, rather than being able to inspect internal signals, verification via simulation is critical.
 
-In order to verify the designs, in the first instance a SystemVerilog testbench was written for each module, and each module was simulated using Mentor Graphics ModelSim. These unit-level testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
+In order to verify the designs, in the first instance a SystemVerilog testbench was written for each module, and each module was simulated using Mentor ModelSim \cite{mentor2017}. These unit-level testbenches provide stimulus to verify that each block works as anticipated before integration with the system as a whole.
 
 The focus of the verification is, however, on system level testing, rather than extensive unit based testing. The reason for this choice is that many of the modules which make up a design are fairly simple and their functionality is trivial to verify. The majority of the problems occur during integration of the blocks at a higher level, as well as unexpected problems interfacing two modules.
 
-SystemVerilog has been chosen as the language for verification, rather than plain Verilog which the synthesizable \gls{hdl} has been implemented using. There are several reasons for this. Firstly ModelSim will be used for all of the verification in this project, so maintaining compatibility with multiple toolchains isn't a concern. Secondly, SystemVerilog is a superset of Verilog, so therefore integrates well with the Verilog code. The final, and most important reason, however is that SystemVerilog includes a number of advanced simulation constructs, such as complex assertions, properties, and a number of abstract data types, that allow for simpler and more comprehensive verification.
+SystemVerilog has been chosen as the language for verification, rather than plain Verilog which the synthesizable \gls{hdl} is implemented using. There are several reasons for this. Firstly ModelSim will be used for all of the verification in this project, so maintaining compatibility with multiple toolchains is not a concern. Secondly, SystemVerilog is a superset of Verilog, so therefore integrates well with the Verilog code. The final, and most important reason, however is that SystemVerilog includes a number of advanced simulation constructs, such as complex assertions, properties, and a number of abstract data types, that allow for simpler and more comprehensive verification.
+
+The remainder of this section presents the verification strategies used for the delay line, and test harness. It should be noted however that the simulation waveforms are best presented in landscape format, so are presented in Appendix \ref{app:sim-wfms}.
 
 \subsection{Delay Line Verification}
- This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses, and each transmitted pulse burst is added to a queue with the simulation time when the pulse is expected to arrive on the delay line output. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time.
- 
- Figure \ref{fig:delay-line-tb-output} shows the output of this testbench. Figure \ref{fig:delay-sim-full} shows the full simulated output. The top signal is the generated by the testbench and input to the delay line, and the second signal is the output of the delay line. The output is in a high impedance state (blue) when no pulse is output, and is black when the signal is being driven. The pulses in the output signal relate exactly to a delayed version of the input pulses. This may not immediately be obvious from the simulation output image due to the image aliasing effects of having so many pulses displayed. The correct performance of the testbench is verified by the textual simulation output which displays \texttt{\# Simulation completed successfully} after the simulation run, indicating that none of the assertions failed, and each output pulse was asserted at the correct time. The lower two signals are the internal \gls{fifo} full and empty signals. It can be seen that the \gls{fifo} never entirely fills up which is the expected behaviour, and the empty signal is asserted once there are no more delayed pulses being stored in the \gls{fifo}.
- 
- Figure \ref{fig:delay-sim-single} shows two individual output pulses from the \gls{fifo}. The signal is high impedance when no pulse is being driven, then is a \SI{13.5}{\mega\hertz} tone burst which is the desired behaviour as discussed in Section \ref{sec:delay-line-ana-output}.
- 
- \begin{figure}[ht]
- 	\centering
- 	
- 	\begin{subfigure}[b]{\textwidth}
- 		\centering
- 		\includegraphicssized{sim_results/delay_line/full_sim}
- 		\caption{Full Simulation}
- 		\label{fig:delay-sim-full}
- 	\end{subfigure}
- 	
- 	\begin{subfigure}[b]{\textwidth}
- 		\centering
- 		\includegraphicssized{sim_results/delay_line/single_pulse}
- 		\caption{Simulated output of a single pulse}
- 		\label{fig:delay-sim-single}
- 	\end{subfigure}
- 	
- 	\caption{Delay Line Simulation Results}
- 	\label{fig:delay-sim}
- \end{figure}
 
-In addition to this top level test bench, the edge detector, pulse generator and \gls{fifo} also had individual test harnesses created. For brevity, however, these will not be discussed in this report.
+In addition to the delay line \gls{hdl} design testbenches were written for several of the subsystems including: the edge detector, pulse generator and \gls{fifo}. For brevity, however, these will not be discussed in this report, and the focus will be on the behaviour of the top level module.
+
+This testbench generates pulse trains representing random numbers in the same format as \gls{edsac}. The number is then transmitted as a series of modulated pulses, and each transmitted pulse burst is added to a queue with the simulation time when the pulse is expected to arrive on the delay line output. The testbench then checks the queue on each time step to verify that the system produces output bursts of the correct frequency at the correct time.
+ 
+Figure \ref{fig:delay-sim} shows the output of this testbench. Figure \ref{fig:delay-sim-full} shows the full simulated output. The top signal is the generated by the testbench and input to the delay line, and the second signal is the output of the delay line. The output is in a high impedance state (blue) when no pulse is output, and is black when the signal is being driven. The pulses in the output signal relate exactly to a delayed version of the input pulses. This may not immediately be obvious from the simulation output image due to the image aliasing effects of having so many pulses displayed. The correct performance of the testbench is verified by the textual simulation output which displays \texttt{\# Simulation completed successfully} after the simulation run, indicating that none of the assertions failed, and each output pulse was asserted at the correct time. The lower two signals are the internal \gls{fifo} full and empty signals. It can be seen that the \gls{fifo} never entirely fills up which is the expected behaviour, and the empty signal is asserted once there are no more delayed pulses being stored in the \gls{fifo}.
+ 
+Figure \ref{fig:delay-sim-single} shows two individual output pulses from the \gls{fifo}. The signal is high impedance when no pulse is being driven, then is a \SI{13.5}{\mega\hertz} tone burst which is the desired behaviour as discussed in Section \ref{sec:delay-line-ana-output}.
 
 \subsection{Test Harness Verification}
 To verify the test bench at a system level, a testbench was created that emulates a \gls{uart} and transmits messages to set up the test harness and transmit numbers into the delay line, which is represented by a Verilog delay in the simulated model. It can be observed whether the test harness returns the expected results.
 
-It should be noted however that, due to the fact that the whole system is being simulated, the simulation can take a fairly long time. Due to this, if basic testing shows the the test harness is functioning, it is simpler to test all facets of the functionality in hardware.
+Figure \ref{fig:harness-sim} show the results of the test harness simulation. This simulation tests configuration of the modulator, demodulator, and memory manager, starting the system, requesting that the number at address one is replaced with data three, and then requesting that the number at address one is reset to zero again.
 
-Figure \ref{fig:harness-sim} show the results of the test harness simulation. This simulation tests setting up of the modulator, demodulator, and memory manager, starting the system, requesting that the number at address 1 is replaced with data 3, and then requesting that the number at address 1 is reset to 0 again.
-
-The top signal shows the \gls{uart} messages sent from the test harness to the test harness, and the signal below it shows the messages returned by the \gls{fpga}, it should be noted that the \gls{uart} signal from the test harness to the \gls{fpga} is superimposed with random noise in order to test the immunity of the \gls{uart} receiver to noise, this is the reason why there are many more transitions than would be expected shown in the simulation waveform. The two signals below this are the output to the delay line from the test harness, and delayed signal returned to the test harness. It can be seen from these two signals that a pulse is transmitted into the delay line, received, and regenerated several times before being removed, as intended.
+The top signal shows the \gls{uart} messages sent from the test harness to the \gls{hdl} design, and the signal below it shows the messages returned by the \gls{fpga}, it should be noted that the \gls{uart} signal from the test harness to the design is superimposed with random noise in order to test the immunity of the \gls{uart} receiver to noise, this is the reason why there are many more transitions than would be expected shown in the simulation waveform. The two signals below this are the output to the delay line from the test harness, and delayed signal returned to the test harness. It can be seen from these two signals that a pulse is transmitted into the delay line, received, and regenerated several times before being removed, as intended.
 
 The messages to and from the test harness are logged in the test bench output and reproduced in Figure \ref{fig:harness-sim-log}.
 
- \begin{figure}[ht]
+\begin{figure}[ht]
 	\centering
-	
-	\begin{subfigure}[b]{\textwidth}
-		\centering
-		\includegraphicssized{sim_results/test_harness/full_sim}
-		\caption{Full Simulation}
-		\label{fig:harness-full}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{\textwidth}
-		\centering
-		\begin{lstlisting}
+	\begin{lstlisting}
 # Sending 0000000000000005 at time           1000000000
 # Sending 000000006c621006 at time          10333333360
 # Sending 0000000000000203 at time          19666666720
@@ -1400,22 +1423,16 @@ The messages to and from the test harness are logged in the test bench output an
 # Received 0000000000000102 at time         128486078149
 # Received 000000000001010b at time         143485658149
 # Received 0000000000010102 at time         158485238149
-		\end{lstlisting}
-		\caption{Logged output of the simulation}
-		\label{fig:harness-sim-log}
-	\end{subfigure}
-	
-	\caption{Test Harness Simulation Results}
-	\label{fig:harness-sim}
+	\end{lstlisting}
+	\caption{Logged output of the simulation}
+	\label{fig:harness-sim-log}
 \end{figure}
 
-
-
 \chapter{\chapterStyle{System Integration}} \label{sec:sys-integration}
-Having developed and tested the delay line and test harness subsystems described in Chapters \ref{sec:delay-line-des} and \ref{sec:test-harness-design}, it was necessary to integrate the subsystems together and test the system as a whole. This chapter details how the subsystems were integrated mechanically, and tested at a system level. Finally the results of the system level testing is presented.
+Having developed and tested the delay line and test harness subsystems described in Chapters \ref{sec:delay-line-des} and \ref{sec:test-harness-design}, it was necessary to integrate the subsystems together and test the system as a whole. This chapter details how the subsystems were integrated mechanically, and tested at a system level. The results of this testing is presented, alongside the issues encountered in this process.
 
 \section{Mechanical}
-In order to integrate the delay line subsystems together, a metal tube of correct outer dimensions was sourced, meeting Specification Point \ref{itm:spec-phys-size}. In order for the tube to function as a standalone unit, it was necessary to deviate slightly from the original design. This is because the original tube did not have end caps, instead the delay lines were terminated with a metal plate that held all of the tubes in the coffin, and the coaxial cables were on top. This can be seen in Figure \ref{fig:coffins}. As a compromise end caps were machined for the delay line that cover the ends of the tube and mount the coaxial connectors perpendicular to each end cap. A photograph of the assembled delay line, whilst being tested is reproduced in Figure \ref{fig:delay-line-testing}.
+In order to integrate the delay line subsystems together, a metal tube of correct outer dimensions was sourced, meeting Specification Point \ref{itm:spec-phys-size}. In order for the tube to function as a standalone unit, it was necessary to deviate slightly from the original design. This is because the original tube did not have end caps, instead the delay lines were terminated with a metal plate that held all of the tubes in the `coffin', and the coaxial connectors were on the top of the `coffin'. This can be seen in Figure \ref{fig:coffins}. As a compromise end caps were machined for the delay line that cover the ends of the tube and mount the coaxial connectors perpendicular to each end cap. A photograph of the assembled delay line, whilst being tested is reproduced in Figure \ref{fig:delay-line-testing}.
 
 \begin{figure}[ht]
 	\centering
@@ -1424,9 +1441,9 @@ In order to integrate the delay line subsystems together, a metal tube of correc
 	\label{fig:delay-line-testing}
 \end{figure}
 
-In order to mount the delay line design inside of the metal tube, the circuits described in Figure \ref{fig:delay-line-arch} were assembed on matrix board and connected to the end caps using coaxial cable. The final result of this assembly is shown in Figure \ref{fig:delay-line-assy}. In this figure, the input port is the coaxial socket at the bottom of the photo. This feeds through a short section of coaxial cable to the first matrix board. This board implements the input circuitry described in Section \ref{sec:delay-line-ana-in}, apart from the protection diodes and Schmitt buffer, as well as the power circuitry described in Section \ref{sec:power-circuit}.
+In order to mount the delay line design inside of the metal tube, the circuits described in Figure \ref{fig:delay-line-arch} were assembled on matrix board and connected to the end caps using coaxial cable. The final result of this assembly is shown in Figure \ref{fig:delay-line-assy}. In this figure, the input port is the coaxial socket at the bottom of the photo. This feeds through a short section of coaxial cable to the first matrix board. This board implements the input circuitry described in Section \ref{sec:delay-line-ana-in}, apart from the protection diodes and Schmitt buffer, as well as the power circuitry described in Section \ref{sec:power-circuit}.
 
-From this input board two coaxial cables, one carrying the \gls{dc} power supply for the remaining circuitry, and one carrying the attenuated input signal connect to the collection of boards visible in the middle of the image. This is a stack of three boards. The lower board in the stack contains the schmitt trigger and diode protection for the input. The middle board is the Lattice iCEstick \gls{fpga} development board, with the \gls{usb} connector, and \gls{gpio} header removed, and the top board is the analogue outptut circuitry. the attenuated signal is then carried from the analogue output circuitry to the output coaxial connector via coaxial cable.
+From this input board two coaxial cables, one carrying the \gls{dc} power supply for the remaining circuitry, and one carrying the attenuated input signal connect to the collection of boards visible in the middle of the image. This is a stack of three boards. The lower board in the stack contains the Schmitt buffer and diode protection for the input. The middle board is the Lattice iCEstick \gls{fpga} development board, with the \gls{usb} connector, and \gls{gpio} header removed, and the top board is the analogue output circuitry. The attenuated signal is then carried from the analogue output circuitry to the output coaxial connector via coaxial cable.
 
 \begin{figure}[ht]
 	\centering
@@ -1439,10 +1456,10 @@ From this input board two coaxial cables, one carrying the \gls{dc} power supply
 
 \section{Issues}
 
-During the integration stages, several issues were encountered that had not been anticipated during developement. This section describes these issues, as well as how they were resolved.
+During the integration stages, several issues were encountered that had not been anticipated during development. This section describes these issues, as well as how they were resolved.
 
 \subsection{\glsentryshort{fpga} Reset Issue}
-The first issue which was encountered was that when the input cable was connected the \gls{fpga} would not always configure correctly, and the output would remain low.
+The first issue which was encountered was that when the input cable was connected the \gls{fpga} would not always configure correctly, and the output would remain in a high impedance state, irrespective of the input waveform.
 
 The reason for this was determined to be the fact that the input power rail is brought up slowly, as the smoothing capacitor on the input was charged. Reading the programming and configuration guide for the \gls{fpga} used, it can be seen that the \gls{fpga} checks all of it's supply voltages are within the correct range before it configures from the \gls{spi} flash \cite[p.4]{lattice2016}.
 
@@ -1450,25 +1467,65 @@ Despite this check, the \gls{fpga} considers its \gls{gpio} power rail to be sta
 
 Further consultation with the programming and configuration guide reveals that the \gls{fpga} has a pin, named \texttt{CRESET\_B} which can be held low to inhibit the configuration of the \gls{fpga}, and the \gls{fpga} will not configure itself until the signal is asserted \cite[p.4]{lattice2016}. As supplied this pin is held high on the development board with a \SI{10}{\kilo\ohm} resistor.
 
-Inspection of the datasheet of the \gls{ldo} regulator which provides the \SI{3.3}{\volt} and \SI{1.2}{\volt} rails reveals that it provides two pins, named \texttt{PWRGD1} and \texttt{PWRGD2} to indicate when the output is within 10\% of the nominal output voltage \cite[p.11]{linear2013}. This is an open collector output which is high impedance when the power is below 90\% of the nominal value and sinks current when the power output is above this. The output can sink a maximum current of \SI{100}{\micro\ampere}, and is pulled up with a \SI{50}{\kilo\ohm} resistor on the development board.
+Inspection of the datasheet of the \gls{ldo} regulator which provides the \SI{3.3}{\volt} and \SI{1.2}{\volt} rails reveals that it provides two pins, named \texttt{PWRGD1} and \texttt{PWRGD2} to indicate when the output is within 10\% of the nominal output voltage \cite[p.11]{linear2013}. This is an open collector output which is high impedance when the power is below 90\% of the nominal value and sinks current when the power output is above this. The output can sink a maximum current of \SI{100}{\micro\ampere}, and is pulled up with a \SI{1}{\mega\ohm} resistor on the development board.
 
-The obvious solution is therefore to remove the pulldown from \texttt{CRESET\_B}, and connect the pin to \texttt{PWRGD1}, the \texttt{PWRGD} output corresponding with the \SI{3.3}{\volt} output, but there is a subtle problem with this approach. Lattice specify that \texttt{CRESET\_B} must be either pulled with a maximum resistance of \SI{10}{\kilo\ohm}, or actively driven \cite[p4-1]{lattice2017}. Using a \SI{10}{\kilo\ohm} pullup resistor would however require \texttt{PWRGD1} to sink $I=\frac{\SI{3.3}{\volt}}{\SI{10}{\kilo\ohm}}= \SI{330}{\micro\ampere}$, far more than it is capable of sinking.
+The obvious solution is therefore to remove the pull-down from \texttt{CRESET\_B}, and connect the pin to \texttt{PWRGD1}, the \texttt{PWRGD} output corresponding with the \SI{3.3}{\volt} output, but there is a subtle problem with this approach. Lattice specify that \texttt{CRESET\_B} must be either pulled with a maximum resistance of \SI{10}{\kilo\ohm}, or actively driven \cite[p4-1]{lattice2017a}. Using a \SI{10}{\kilo\ohm} pull-up resistor would however require \texttt{PWRGD1} to sink $I=\frac{\SI{3.3}{\volt}}{\SI{10}{\kilo\ohm}}= \SI{330}{\micro\ampere}$, far more than it is capable of sinking.
 
-The devised solution is that of Figure \ref{fig:fpga-reset-sol}. In this schematic the \SI{1}{\mega\ohm} pullup resistor on \texttt{PWRGD1} is replaced with a \SI{50}{\kilo\ohm} resistor to provide a strong enough current for the Schmitt buffer, whilst not exceeding the \SI{100}{\micro\ampere} sinking limit of the \gls{ldo} regulator. The output of this Schmitt buffer then drives \texttt{CRESET\_B}, which is pulled down with a \SI{10}{\kilo\ohm} resistor in case the \gls{fpga} detects that its power input are at the correct levels before the buffer \gls{ic} has powered up.
+The devised solution is that of Figure \ref{fig:fpga-reset-sol}. In this schematic the \SI{1}{\mega\ohm} pull-up resistor on \texttt{PWRGD1} is replaced with a \SI{50}{\kilo\ohm} resistor to provide a strong enough current for the Schmitt buffer, whilst not exceeding the \SI{100}{\micro\ampere} sinking limit of the \gls{ldo} regulator. The output of this Schmitt buffer then drives \texttt{CRESET\_B}, which is pulled down with a \SI{10}{\kilo\ohm} resistor in case the \gls{fpga} detects that its power input are at the correct levels before the buffer \gls{ic} has powered up.
 
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{integration/fpga_reset}
-	\caption{\glsentryshort{fpga} reset issue solution \review{Replace with better schematic}}
+	\begin{tikzpicture}
+	
+	\draw (0,0.35) 
+
+	to[short] ++(0,1.65)
+
+	node[vcc] {3V3};
+	
+	\draw (0,-0.35) 
+
+	to[short] ++(0,-1.65)
+
+	node[ground] {};	
+	
+	\draw (0,0) node[buffer] (buf) {}
+	(buf.in)  to[short] ++(-1,0) coordinate (pwrgd_pull) to[short] ++(-1,0) coordinate (start);
+	\node (pwrgd) [rectangle, draw, minimum size=1cm, anchor=east] at (start) {\texttt{PWRGD1}};
+	
+	\draw (pwrgd_pull)
+	
+	to[R, l^=50k] ++(0,2)
+	
+	node[vcc] {3V3};
+	
+	\draw (buf.out)
+	
+	to[short] ++(1,0)
+	
+	coordinate(pulldown)
+	
+	to[R, l^=10k] ++(0,-2)
+
+ 	node[ground] {};
+ 	
+ 	\draw (pulldown)
+ 
+ 	to[short] ++(1,0)
+ 	
+ 	node (reset) [rectangle, draw, minimum size=1cm, anchor=west] {\texttt{CRESET\_B}};
+	
+	\end{tikzpicture}
+	\caption{\glsentryshort{fpga} reset issue solution}
 	\label{fig:fpga-reset-sol}
 \end{figure}
 
 
 \subsection{Signal Breakthrough} \label{sec:signal-breakthrough}
-Breakthrough of the input signal to the output has been the most difficult problem encountered during integration of the subsystems. Figure \ref{fig:fpga-initial-input-couping} demonstrates the problem and is a capture of the output of the system as initially integrated. The yellow trace in the oscilloscope capture is the input to the delay line, and the green trace is the output. The larger right hand pulse on the output trace represents the correct output of the delay line, however the left hand pulse should not be present, and is a result of the input coupling to the output. This capture was taken with the oscilloscope connected directly to the output of the amplifier, but the same behaviour occurred with the circuit inside the tube, and the coaxial output was probed.
+Breakthrough of the input signal to the output has been the most difficult problem encountered during integration of the subsystems. Figure \ref{fig:fpga-initial-input-couping} demonstrates the problem and is a capture of the output of the system as initially integrated. The yellow trace in the oscilloscope capture is the input to the delay line, and the green trace is the output. The larger right hand pulse on the output trace represents the correct output of the delay line, however the left hand pulse should not be present, and is a result of the input coupling to the output. It is approximately \SI{200}{\milli\volt} in amplitude peak to peak. This capture was taken with the oscilloscope connected directly to the output of the amplifier, but the same behaviour occurred with the circuit inside the tube, and the coaxial output was probed.
 
-One important point of note is that for all of the traces captured in this section, the standard oscilloscope probe hood and ground clip were removed and a small spring clip was added to provide the probe with a local ground reference. The reason for this probing setup is that a standard length ground lead was able to pick up as much as \SI{500}{\milli\volt} of the input signal, by acting as an antenna when not connected to the circuit.
+One point of note is that for all of the traces captured in this section, the standard oscilloscope probe hood and ground clip were removed and a small spring clip was added to provide the probe with a local ground reference. The reason for this probing setup is that a standard length ground lead was able to pick up as much as \SI{500}{\milli\volt} of the input signal, by acting as an antenna when not connected to the circuit.
 
 \begin{figure}[ht]
 	\centering
@@ -1477,20 +1534,37 @@ One important point of note is that for all of the traces captured in this secti
 	\label{fig:fpga-initial-input-couping}
 \end{figure}
 
-The initial step to attempt to solve this issue was to implement the input circuitry, which was originally part of the central board assembly, separately and add the metal ring visible on the right hand side of Figure \ref{fig:delay-line-assy} which when assembled will connected to the, earthed, metal tube and shield the output circuitry from the input.
+The initial step to attempt to solve this issue was to implement the input circuitry, which was originally part of the central board assembly, separately and add the metal ring visible on the right hand side of Figure \ref{fig:delay-line-assy}. When assembled, the ring will be connected to the, earthed, metal tube and shield the output circuitry from the input.
 
 These modifications improved the performance, approximately halving the amplitude of noise which was coupled onto the output, but the problem still persisted.
 
-The eventual solution was to remove the output amplifier from the \gls{fpga} and instead use a passive attenuation circuit on the \gls{fpga} output. Figure \ref{fig:output-passive-attenuator} shows the schematic for this circuit. The \SI{4.7}{\kilo\ohm} potentiometer and \SI{68}{\ohm} resistor attenuate the signal, whilst the \SI{10}{\nano\farad} capacitor removes \gls{dc} bias from the signal to center it about \SI{0}{\volt}, this circuit was built on a small piece of matrixboard mounted at the output coaxial connector, as far as possible from the rest of the circuitry.
+The eventual solution was to remove the output amplifier and instead use a passive attenuation circuit on the \gls{fpga} output. Figure \ref{fig:output-passive-attenuator} shows the schematic for this circuit. The \SI{4.7}{\kilo\ohm} potentiometer and \SI{68}{\ohm} resistor act as a potential divider to attenuate the signal, whilst the \SI{10}{\nano\farad} capacitor removes \gls{dc} bias from the signal to centre it about \SI{0}{\volt}, this circuit was built on a small piece of matrix board mounted at the output coaxial connector, as far as possible from the rest of the circuitry.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphicssized{integration/passive_attenuator}
+		\begin{tikzpicture}
+	
+	\draw (0,0) 
+	
+	node (in) [rectangle, draw, minimum size=1cm, anchor=east] {Input}
+	
+	to[pR, l_=4k7, n=POT] ++(2,0);
+	
+	\draw ([xshift=1cm] POT.east) |- (POT.wiper);
+	
+	\draw ([xshift=1cm] POT.east) to [C, l^=10n] ++(2,0)
+	to [short] ++(1,0)
+	coordinate (resistor)
+	to [short] ++(1,0)
+	node (out) [rectangle, draw, minimum size=1cm, anchor=west] {Output};
+	
+	\draw (resistor) to[R, l^=68] ++(0,-2) node[ground] {};
+	\end{tikzpicture}
 	\caption{The passive attenuation circuit used}
 	\label{fig:output-passive-attenuator}
 \end{figure}
 
-This passive attenuation circuit performs well, and produces little attenuation as demonstrated in Figure \ref{fig:final-breakthrough}. In this screenshot the test harness has been modified to not regenerate pulses, and to output a pulse with a fixed different to that of the delay line. This makes it easy to see where the input couples onto the output. As is evident from the screenshot, any coupling of the input to the output is below the noise floor of the oscilloscope. It should be noted that the second channel of the oscilloscope is \SI{50}{\ohm} terminated because in this instance the delay line was assembled, and the output coaxial connector was directly probing the output instead of the output connecting to the amplifier circuit. \SI{50}{\ohm} termination was therefore added to the oscilloscope to approximately match the \SI{70}{\ohm} characteristic impedance of the transmission line.
+This passive attenuation circuit performs well, and a screenshot of its performance is presented in Figure \ref{fig:final-breakthrough}. In this figure the test harness has been modified to not regenerate pulses, and to output a pulse with a fixed different to that of the delay line. This makes it easy to see where the input couples onto the output. As is evident from the screenshot, any coupling of the input to the output is below the noise floor of the oscilloscope. It should be noted that the second channel of the oscilloscope is \SI{50}{\ohm} terminated because in this instance the delay line was assembled, and the output coaxial connector was directly probing the output instead of the output connecting to the amplifier circuit. \SI{50}{\ohm} termination was therefore added to the oscilloscope to approximately match the \SI{70}{\ohm} characteristic impedance of the transmission line.
 
 \begin{figure}[ht]
 	\centering
@@ -1500,30 +1574,28 @@ This passive attenuation circuit performs well, and produces little attenuation 
 \end{figure}
 
 \chapter{\chapterStyle{Project Planning}} \label{sec:project-planning}
-Given the large scope of this project, as well as the tight time constraint in which to complete it, good planning has been imperative to success. This chapter briefly details how the project was planned in terms of both the time allocated to each task, as well as the analysis of risks inside of the project.
+Good planning was essential for the conduction of this project, due to the tight time frame, as well as the scale of the project. This chapter briefly details how the project was planned in terms of both the time allocated to each task, as well as the analysis of risks relating to the project.
 
 
 \section{Time Management}
 
-\review{check exact timings with gantt chart}
-
 Time management was critical in this project due to the fact that the project is quite broad, involving the implementation of two separate systems, the delay line itself and the test harness, which involve work across several different disciplines including: software design, analogue electronics design, and \gls{pld} design.
 
-Appendix \ref{app:proj-plan-charts} contains the charts used to plan how time would be spent on various activities during the project. The first chart included is Figure \ref{fig:pert-chart} which is a \gls{pert} chart produced for the project plan, in order to plan how time would be spent over the course of the project \cite[p.3]{tyler2017b}. In contrast to this the Gantt chart of Figure \ref{fig:gantt-chart} is a record of how time was actually spent on the project.
+Appendix \ref{app:proj-plan-charts} contains the charts used to plan how time would be spent on various activities during the project. The first chart included is Figure \ref{fig:pert-chart} which is a \gls{pert} chart produced for the project plan \cite[p.3]{tyler2017b}. In contrast to this the Gantt chart of Figure \ref{fig:gantt-chart} is a record of how time was actually spent on the project.
 
-It is hard to directly compare the two charts for a couple of reasons. Firstly the \gls{pert} chart assumed that the design and testing of each sub-system would be followed by a \gls{pcb} implementation of the system, whereas in reality the final system was implemented using matrix board as discussed in Chapter \ref{sec:sys-integration}. In addition the \gls{pert} chart schedules time at the start of the project for a literature review. In reality much of the background research was conducted during the writing of the research review, negating some of the need for the literature review \cite{tyler2017}. It was therefore easier to begin planning the implementation of each module, and research any of the finer points of the original design as necessary. It should also be noted that the plan breaks the project into three modules: the delay line itself; the test harness, which is used to mean the digital part of the test harness; and an amplifier module, which is used to refer to the analogue parts of the test harness. For simplicity the final design combines the test harness and amplifier modules.
+There are two reasons why the charts are difficult to compare. Firstly the \gls{pert} chart assumed that the design and testing of each sub-system would be followed by a \gls{pcb} implementation of the system, whereas in reality the final system was implemented using matrix board as discussed in Chapter \ref{sec:sys-integration}. In addition, the \gls{pert} chart schedules time at the start of the project for a literature review. In reality, much of the background research was conducted during the writing of the research review, negating some of the need for the literature review \cite{tyler2017}. It was therefore easier to begin planning the implementation of each module, and research any of the finer points of the original design as necessary. It should also be noted that the plan breaks the project into three modules: the delay line itself; the test harness, which is used to mean the digital part of the test harness; and an amplifier module, which is used to refer to the analogue parts of the test harness. For simplicity the final design combines the test harness and amplifier modules.
 
-In order to compare the two designs it is therefore simplest to break the project into two phases. The first phase is the initial design phase, which includes design of each module, research of any of the finer points of the original design as may be necessary, and testing of the design. The second phase is the final implementation of the design, as well as creation of the formal documentation.
+In order to compare the two plans it is therefore simplest to break the project into two phases. The first phase is the initial design phase, which includes design of each module, research of any of the finer points of the original design as may be necessary, and testing of the design. The second phase is the final implementation of the design, as well as creation of the formal documentation.
 
-Inspection of the \gls{pert} chart shows that it schedules a total of six weeks for this phase. Comparison with the Gantt chart shows that the corresponding stages, all of the work up until the end of the group labelled `Initial Analogue Design', took six weeks and one day. This shows that the project was largely on track up until this point. Unfortunately work could not begin on the second stage at this point, because it was here understood that the phantom power would require further work and investigation than was originally anticipated, as discussed in Chapter \ref{sec:power}, and so a further fifteen days were used to solve this problem.
+Inspection of the \gls{pert} chart shows that it schedules a total of six weeks for this phase. Comparison with the Gantt chart shows that the corresponding stages, all of the work up until the end of the group labelled `Initial Analogue Design', took six weeks and one day. This shows that the project was largely on track up until this point. Unfortunately work could not begin on the second stage at this point, because it was here understood that the phantom power would require further work and investigation than was originally anticipated, as discussed in Chapter \ref{sec:power}, and so a further sixteen days were used to solve this problem.
 
-For phase two, the \gls{pert} chart schedules a total of three weeks for the \gls{pcb} construction and formal documentation to be written. In reality, the corresponding Gantt chart groups, `Building final delay line circuity', and `Documentation' take five weeks. This has taken longer than expected for several reasons. Firstly the project plan only allocates time for a standalone \gls{pcb} implementation. It was not anticipated at the planning stage that the scope of the project would include integration into an actual metal tube. This has required additional construction time, as well as time to debug the issues relating to the signal breakthrough discussed in Section \ref{sec:signal-breakthrough}.
+For phase two, the \gls{pert} chart schedules a total of three weeks for the \gls{pcb} construction and formal documentation to be written. In reality, the corresponding Gantt chart groups, `Building final delay line circuity', and `Documentation' took five weeks. This has taken longer than expected for several reasons. Firstly the project plan only allocates time for a standalone \gls{pcb} implementation. It was not anticipated at the planning stage that the scope of the project would include integration into an actual metal tube. This has required additional construction time, as well as time to debug the issues relating to the signal breakthrough discussed in Section \ref{sec:signal-breakthrough}.
 
-Considering that the slack in the original \gls{pert} chart was intended for changes in scope and unexpected problems, and given that the project was completed successfully achieving all of it's goals, it is considered that the time planning in this project has been successful.
+Considering that the unallocated time in the original \gls{pert} chart was intended for changes in scope and unexpected problems, and given that the project was completed successfully achieving all of its goals, it is considered that the time planning in this project has been successful.
 
 \section{Risk Management}
 
-In order to ensure that the project was able to deliver on its intentions risk analysis was used. The aim of this exercise is to identify the main risks that would impact on the ability of the project to deliver against all of its goals. For each risk, the chance of occurrence, and impact are assessed as well as any mitigation efforts as necessary. Table \ref{tbl:risk-matrix} shows the risk matrix used by this project. A severe impact is an impact that would cause the project to not deliver some or all of its goals. A moderate impact is an impact that would cause the project to not deliver one goal, or cause undesirable performance despite achieving goals. A minor impact is an impact which would cause undesirable performance of the project whilst meeting all goals, and a negligible impact has no measurable impact upon the project.
+In order to ensure that the project was able to deliver on its intentions, risk analysis was used. The aim of this exercise is to identify the main risks that would impact on the ability of the project to deliver against all of its goals. For each risk, the chance of occurrence, and impact are assessed as well as any mitigation efforts as necessary. Table \ref{tbl:risk-matrix} shows the risk matrix used by this project. A severe impact is an impact that would cause the project to not deliver some or all of its goals. A moderate impact is an impact that would cause the project to not deliver one goal, or cause undesirable performance despite achieving goals. A minor impact is an impact which would cause undesirable performance of the project whilst meeting all goals, and a negligible impact has no measurable impact upon the project.
 
 
 \newcommand{\riskCellWidth}{2cm}
@@ -1533,7 +1605,7 @@ In order to ensure that the project was able to deliver on its intentions risk a
 \newcommand{\goodCol}{\cellcolor{green!50}}
 \begin{table}[ht]
 	\centering
-	\caption{Risk Matrix} \label{[tbl:risk-matrix}
+	\caption{Risk Matrix} \label{tbl:risk-matrix}
 	\begin{tabular}{|c|c|p{\riskCellWidth}|p{\riskCellWidth}|p{\riskCellWidth}|p{\riskCellWidth}|}
 		\cline{3-6}
 		\multicolumn{2}{c|}{} &  \multicolumn{4}{c|}{Impact}\\
@@ -1597,13 +1669,13 @@ In order to ensure that the project was able to deliver on its intentions risk a
 
 \chapter{\chapterStyle{Final Comments}} \label{sec:conclusion}
 
-The aim of this project was to create a delay line capable of forming the store of \gls{edsac}, without requiring excessive modification to the rest of \gls{edsac}, and without deviating from the physical appearance of the original. This has been achieved in full, with this report presenting methodology to both achieve the delay, and interface with \gls{edsac}. The circuitry required fits inside of the footprint of the original storage tubes and only requires the addition of a single \SI{1}{\milli\henry} inductor, per delay line installed, in order to power the store.
+The aim of this project was to create a delay line capable of forming the store of \gls{edsac}, without requiring excessive modification to the rest of \gls{edsac}, and without deviating from the physical appearance of the original. This has been achieved in full, with this report presenting methodology to both achieve the delay, and emulate the driving signals of \gls{edsac}. The circuitry required for the delay unit fits inside of the footprint of the original storage tubes and only requires the addition of a single \SI{1}{\milli\henry} inductor, per delay line installed, in order to power the store.
 
-In addition to the delay line itself, a comprehensive test harness has been created capable of driving each delay line, receiving and regenerating the returned pulses, and detecting any errors in the output of the delay line. This is suitable for testing the performance of each delay line without integration with \gls{edsac}.
+In addition to the delay line itself, a comprehensive test harness has been created which is capable of driving each delay line, receiving and regenerating the returned pulses, and detecting any errors in the output of the delay line. This is suitable for testing the performance of each delay line without integration with \gls{edsac}.
 
-Due to difficulties with testing the design with the physical \gls{edsac} reconstruction machine, notably the physical machine being located far from Southampton and the incomplete nature of the machine, extensive \gls{spice} simulations were performed to ensure that the delay line would integrate well with the relevant components of \gls{edsac}.
+Due to difficulties with testing the design with the physical \gls{edsac} reconstruction machine, notably the physical machine being located far from Southampton and the incomplete nature of the machine, extensive \gls{spice} simulations were performed to ensure that the delay line would integrate well with the relevant components of \gls{edsac}. These simulations were successful and showed that the delay line was able to integrate well with the store regeneration chassis in all respects.
 
-Following the successful construction and testing of the delay line, it was taken to \gls{tnmoc} to integrate with the rest of the machine. The integration effort was successful and the delay line was powered from the valve chassis, accepted the pulses sent to it, and transmitted pulses back to the chassis after a small delay. These pulses were correctly amplified and demodulated. The only problem encountered was an issue with the valve chassis not correctly regenerating the pulses. It was ambigous as to whether this is a problem with the delay line or the chassis itself however, as there had not previously been any method to test this particular chassis with a delay medium.
+Following the successful construction and testing of the delay line, it was taken to \gls{tnmoc} to integrate with the rest of the machine. The integration effort was successful and the delay line was powered from the valve chassis, accepted the pulses sent to it, and transmitted pulses back to the chassis after a small delay. These pulses were correctly amplified and demodulated. The only problem encountered was an issue with the valve chassis not correctly regenerating the pulses. It was ambiguous as to whether this is a problem with the delay line or the chassis itself however, as there had not previously been any method to test this particular chassis with a delay medium.
 
-There is some scope for further work on this project, notably to continue integration with the rest of the system, and there is also scope to produce the design more formally using a \gls{pcb} now that the concept is proven. This is work which is intended to take place, with the intention that the delay line will be able to form some part of the final \gls{edsac} exhibit and help to educate the general public about the history of computing.
+There is some scope for further development on this project, notably to continue integration with the rest of the system, and there is also scope to produce the design more formally using a \gls{pcb} now that the concept is proven. This is work which is intended to take place, with the intention that the delay line will be able to form some part of the final \gls{edsac} exhibit and help to educate the general public about the history of computing.
 

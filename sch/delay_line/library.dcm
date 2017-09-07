@@ -1,0 +1,16 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 74LVC1G17
+D Schmitt Buffer
+K Schmitt Buffer
+$ENDCMP
+#
+$CMP LMH6639
+D LMH6639 op amp
+$ENDCMP
+#
+$CMP LT1229
+D LT1229 op amp
+$ENDCMP
+#
+#End Doc Library
