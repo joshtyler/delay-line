@@ -45,7 +45,7 @@ delay_line delay_line_0
 	.out_en(out_en)
 );
 
-assign out_sig = out_en? delay_line_out : 1'bz;
+assign out_sig = 1? delay_line_out : 1'bz;
 assign enable = 1; //Always enable op-amps
 
 endmodule

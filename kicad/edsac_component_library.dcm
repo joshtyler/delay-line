@@ -1,0 +1,14 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 74LVC1G17W5
+D inverting buffer with Schmitt trigger.
+F 74xx/74ahc_ahct1g14.pdf
+$ENDCMP
+#
+$CMP NCV8114ASN120T1G
+D 150mA low dropout linear regulator, wide input voltage range, 1.5V fixed positive output, SOT-23-5 package
+K linear regulator ldo fixed positive
+F https://www.diodes.com/assets/Datasheets/AP2204.pdf
+$ENDCMP
+#
+#End Doc Library
