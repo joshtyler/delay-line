@@ -1,0 +1,13 @@
+# output_pcb constraints
+
+# Red LEDs
+set_io LED0 94
+set_io LED1 95
+
+# Other header
+#set_io out_sig 112
+#set_io in_sig 113
+
+# 12 MHz clock
+#set_io clk_in 21
+
