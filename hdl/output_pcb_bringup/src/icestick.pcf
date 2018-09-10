@@ -9,5 +9,5 @@ set_io LED1 95
 #set_io in_sig 113
 
 # 12 MHz clock
-#set_io clk_in 21
+set_io clk_in 21
 
